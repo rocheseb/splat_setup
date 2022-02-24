@@ -88,6 +88,7 @@ TWO STREAM--------------------->: ModelName NMomnt ThermMax[nm]
 %%% WINDOW OPTIONS %%%          :
 ISRF Parameterizations -------->:
   (1.1) Fixed Supergaussian     :      Name     HW1E     Asymm    ShapeFac WavenumberUnits
+                                :   MSatCH4    0.189       0.0         2.0               F   
                                 :   MSatFix    0.050       0.0         2.0               F   
                                 :    MSatdw    0.05001     0.0         2.0               F   
                                 :  OMVISFix    0.340       0.0         2.0               F   
@@ -283,16 +284,7 @@ Trace Gas                       : <.............................................
                                 : ###END_OF_LIST###
 Aerosol                         : <....................................................>
  - Profile Species AOD          :
- - Column Species  AOD          :
- - Profile Param. Species AOD   :
- - Overwrite Clim. Uncertainty? : F
-   (T) Uncertainty Option ----->: Name CovarMatrixType  Par1  Par2  Par3
-                                :   SU     GDFDIAGONAL
-                                :   BC     GDFDIAGONAL
-                                :   OC     GDFDIAGONAL
-                                :   SF     GDFDIAGONAL
-                                :   SC     GDFDIAGONAL
-                                :   DU     GDFDIAGONAL
+ - Profile Param. Species AOD ->: Name  ProfPar OverwriteUncert? (T)->NewCovar
                                 : ###END_OF_LIST###
  - Aerosol Opt Prop Pars.       :
 Temperature                     : <....................................................>
@@ -364,8 +356,8 @@ Wavelength Grid                 : <.............................................
            - Win. 1 Uncert (%)  : 1.0
 --------------------------------+------------------------------------------------------
 %%% OPTIMIZER OPTIONS %%%       :
-Maximum # Iterations            : 180
-Maximum # Divergent Iterations  : 15
+Maximum # Iterations            : 15
+Maximum # Divergent Iterations  : 4
 Convergence Threshold           : 0.1 10.0
 R_Divergent                     : 0.25
 R_Convergent                    : 0.75
@@ -452,9 +444,9 @@ RTM Output Options              :
      Profile SSA Par           @: F     F
        --> Species              : all
        --> Stokes Q,U?          : F
-     Opt Prop Params           @: F     F
-       --> Params               : all 
-       --> Stokes Q,U?          : F 
+     Opt Prop Params            : F     F
+       --> Params               : all
+       --> Stokes Q,U?          : F     F
    Surface Jacobians            : 
      BRDF Kernel Factors       @: F     F
        --> Stokes Q,U?          : F
@@ -483,12 +475,16 @@ Spectrum                        :
    Spectrum Residuals           : T
    Level 1 Spectrum             : T
    Level 1 Uncertainty          : T
+   Iteration Radiance           : T
+       (T) Max Iterations       : 5 
 Total State Vector              : 
    Averaging Kernel             : T
    Posteriori Covariance        : T
    Priori Covariance            : T
    Posteriori State             : T
    Priori State                 : T
+   Iteration State              : F
+       (T) Max Iterations       : 5 
 Sub State Vector Diagnostics    :
    Gas Absorption Post. Covar.  :
      Profile Mixing ratio       : T 
