@@ -1,0 +1,10 @@
+{
+	"xsec":"ori",
+	"abs_species":["O2","O4","H2O"],
+	"prf_species":[],
+	"col_species":["H2O"],
+	"win_poly_order":5,
+	"nfl":2,
+	"l1_rad":"/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700.nc",
+	"l2_met":"/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700_prior.nc"
+}
