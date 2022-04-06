@@ -1,10 +1,1115 @@
 {
-	"xsec":"ggge46",
-	"abs_species":["O2","O4","H2O"],
-	"prf_species":[],
-	"col_species":["H2O"],
-	"win_poly_order":5,
-	"nfl":2,
-	"l1_rad":"/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700.nc",
-	"l2_met":"/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700_prior.nc"
+	"INPUT FILES":{
+		"l1_file": "/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700.nc",
+		"l2_met_file": "/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700_prior.nc",
+		"l2_wind_file":"=l2_met_file",
+		"l2_chlorophyll_file":"=l2_met_file",
+		"l2_ocean_file":"=l2_met_file",
+		"l2_snow_file":"=l2_met_file",
+		"apriori_file": "AFGLUS_apriori_PA.nc",
+		"isrf_file": "o2_isrf_lut_20210722_xflipped.nc",
+		"solar_file":"chance_jpl_mrg_hitran_200-16665nm.nc",
+		"custom_grid_file":"custom_rtm_grid.nc",
+		"lambertian_surface_file":"grass_ASTAR.dat",
+		"ler_climatology_file":"OMI-Aura_L3-OMLER_2005m01-2009m12_v003-2010m0503t063707.nc",
+		"modis_fa_file":"spatial_db_scia_mrg_usgs_FA_n16_12Ksamp_splib07a_extended.nc",
+		"brdf_climatology_file":"MARCI_Hapke_clim.nc",
+		"albedo_file":"albedo_bands.nc"
+	},
+
+	"RETRIEVAL":{
+		"calculation_mode": "INVERSE",
+		"compute_all_pixels":"F",
+		"x_retrieval_range": [100,100],
+		"y_retrieval_range": [30,30],
+		"output_to_xy": "F",
+		"use_file_lock": "F",
+		"overwrite_existing": "F",
+		"only_create_file": "F",
+		"root_data_directory":"COMMENT: SETUP FROM PYTHON CALL",
+		"switch_on_debug": "T",
+		"debug_level": 3,
+		"debug_filename":"COMMENT: SETUP FROM PYTHON CALL"
+	},
+
+	"LEVEL1 OPTIONS":{
+		"do_single_pixel_calc_from_inp": "F",
+		"band_definition":{
+			"band1":{
+				"name":"TEMPOVis",
+				"start_nm": 540.0,
+				"end_nm": 740.0,
+				"sampling_nm": 0.01,
+				"view_dir_idx": 1
+			}
+		},
+		"date_yyyymmdd":"20070715",
+		"hour_decimal_utc":17,
+		"sza_deg":30.0,
+		"vza_deg":30.0,
+		"aza_deg":45.0,
+		"saa_deg":0.0,
+		"vaa_deg":45.0,
+		"longitude_deg":-87.95,
+		"latitude_deg":32.05,
+		"pixel_corners":{
+			"longitudes_deg":{
+				"bot_left":-88.0,
+				"top_left":-88.0,
+				"top_right":-87.9,
+				"bot_right":-87.9
+			},
+			"latitudes_deg":{
+				"bot_left":32.0,
+				"top_left":32.1,
+				"top_right":32.1,
+				"bot_right":32.0
+			}
+		},
+		"surface_altitude_km": 0.0,
+		"obs_altitude_km": 0.0,
+		"cloud_fraction": 0.2,
+		"cloud_pressure_hpa": 500.0,
+		"wind_speed_mps": 5.0,
+		"wind_dir_deg": 0.0,
+		"chlorophyll_mgpm3": 30.0,
+		"ocean_salinity_pptv": 300.0,
+		"snow_fraction": 0.0,
+		"sea_ice_fraction": 0.0,
+		"snow_depth_m": 0.0,
+		"snow_age_days": 0.0,
+
+		"l1_radiance_band_input": {
+			"band1": {
+				"index": 1,
+				"name": "O2Delta",
+				"file_type": "SPLAT"
+			}
+		},
+
+		"l2_2d_support_data":{
+			"surface_altitude":{
+				"use":"T",
+				"aux_file_type":"SPLAT"
+			},
+			"surface_winds":{
+				"use":"F",
+				"aux_file_type":"SPLAT"
+			},
+			"chlorophyll":{
+				"use":"F",
+				"aux_file_type":"SPLAT"
+			},
+			"ocean_salinity":{
+				"use":"F",
+				"aux_file_type":"SPLAT"
+			},
+			"snow_parameters":{
+				"use":"F",
+				"aux_file_type":"SPLAT"
+			}
+		},
+
+		"l2_profile_support_data":{
+			"use_l2_profile_met": "T",
+			"input_filename":"=l2_met_file",
+			"file_type": "SPLAT",
+			"gases": ["CH4","CO2","H2O"],
+			"aerosols":[]
+		},
+
+		"clouds":{
+			"use_l2_clouds": "F",
+			"use_clouds_from_l2_prof_met": "F",
+			"species": [],
+			"use_aux_lam_clouds": "=l2_met_file",
+			"file_type": "SPLAT"
+		},
+
+		"l2_surface_reflectance":{
+			"use_l2_surface": "T",
+			"band_inputs":{
+				"o2_window": {
+					"index": 2,
+					"name": "O2Delta",
+					"file_type": "SPLAT"
+				}
+			}
+		}
+	},
+
+	"RTM OPTIONS":{
+		"vlidort_line_by_line":{
+			"model1":{
+				"name":"LBL_IQU",
+				"n_stoke":3,
+				"n_stream":4,
+				"n_moment":1000,
+				"thermax_nm":3000.0,
+				"debug": "F"
+			},
+			"model2":{
+				"name":"LBL_I",
+				"n_stoke":1,
+				"n_stream":4,
+				"n_moment":1000,
+				"thermax_nm":3000.0,
+				"debug": "F"
+			},
+			"model3":{
+				"name":"LBL_16S",
+				"n_stoke":3,
+				"n_stream":16,
+				"n_moment":1000,
+				"thermax_nm":3000.0,
+				"debug": "F"
+			}
+		},
+		"vlidort_pca":{
+			"model1":{
+				"name":"PCA_IQU",
+				"n_stoke":3,
+				"n_stream":4,
+				"n_moment":1000,
+				"thermax_nm":3000.0,
+				"debug":"F",
+				"control_file":"pca_bin.control"
+			}
+		},
+		"first_order":{
+			"model1":{
+				"name":"FrstOrd",
+				"n_stoke":1,
+				"n_moment":200,
+				"thermax_nm":3000.0
+			}
+		},
+		"two_stream":{
+			"model1":{
+				"name":"TwoStr",
+				"nmoment":1000,
+				"thermax_nm":3000.0
+			}
+		}
+	},
+
+	"WINDOW OPTIONS":{
+		"isrf_parametrization":{
+			"fixed_supergaussian":{
+				"a":{
+					"name":"MSatCH4",
+					"hw1e":0.189,
+					"asym":0.0,
+					"shape_fac":2.0,
+					"wavenumber_units":"F"
+				},
+				"b":{
+					"name":"MSatFix",
+					"hw1e":0.050,
+					"asym":0.0,
+					"shape_fac":2.0,
+					"wavenumber_units":"F"
+				},
+				"c":{
+					"name":"MSatdw",
+					"hw1e":0.05001,
+					"asym":0.0,
+					"shape_fac":2.0,
+					"wavenumber_units":"F"
+				},
+				"d":{
+					"name":"OMVISFix",
+					"hw1e":0.340,
+					"asym":0.0,
+					"shape_fac":2.0,
+					"wavenumber_units":"F"
+				},
+				"e":{
+					"name":"MSatWnum",
+					"hw1e":0.300,
+					"asym":0.0,
+					"shape_fac":2.0,
+					"wavenumber_units":"T"
+				}
+			},
+
+			"fixed_tropomi":{
+				"a":{
+					"name":"SWIR",
+					"c0":0.00000,
+					"d":0.5703,
+					"s":2.7202,
+					"w":2.6464,
+					"eta":0.0989,
+					"gamma":1.4770,
+					"m":1.6701,
+					"wavenumber_units":"F"
+				}
+			},
+
+			"isrf_input_file":{
+				"a":{
+					"name":"MSatB1",
+					"band_index":1,
+					"wavenumber_units":"F",
+					"input_file":"methanesat_isrf_parameters.nc",
+					"isrf_agg":""
+				},
+				"b":{
+					"name":"MSatB2",
+					"band_index":2,
+					"wavenumber_units":"F",
+					"input_file":"methanesat_isrf_parameters.nc",
+					"isrf_agg":""
+				},
+				"c":{
+					"name":"MAirCal",
+					"band_index":1,
+					"wavenumber_units":"F",
+					"input_file":"=isrf_file",
+					"isrf_agg":1
+				},
+				"d":{
+					"name":"TROPSWIR",
+					"band_index":1,
+					"wavenumber_units":"F",
+					"input_file":"tropomi_isrf_test_parameters.nc",
+					"isrf_agg":""
+				},
+				"e":{
+					"name":"LUTSIR",
+					"band_index":1,
+					"wavenumber_units":"F",
+					"input_file":"tropomi_isrf_test_lut.nc",
+					"isrf_agg":""
+				},
+				"f":{
+					"name":"GOSATB2",
+					"band_index":1,
+					"wavenumber_units":"T",
+					"input_file":"gosat_isrf_lut.nc",
+					"isrf_agg":""
+				}
+			}
+		},
+		"amf_mode_options":{
+			"convolution_buffer":2.0,
+			"radiative_transfer_model":"LBL_IQU",
+			"isrf_option":"OMVISFix"
+		},
+
+		"fwd_inv_mode_options":{
+			"o2_window":{
+				"index":1,
+				"start_nm":1249.2,
+				"end_nm":1287.8,
+				"buffer_nm":2.0,
+				"convultion_grid_sampling":0.002,
+				"radiative_transfer_model":"TRNMSM",
+				"isrf":"MAirCal",
+				"convolution_width_hw1e":10.0,
+				"use_fft_for_convolution":"F"
+			}
+		},
+
+		"common_options":{
+			"rtm_at_l1_resolution":"F",
+			"solar_io_correction":"F",
+			"use_common_rtm_grid":"F"
+		}
+	},
+
+	"PROFILE OPTIONS":{
+		"sampling_method":1,
+		"surface_gravity_mps2":9.80991,
+		"planetary_radius":6378.1,
+		"linearize_wrt_hybrid_grid":"T",
+		"profile_trace_gases":["N2","O2","Ar","H2O","CH4","CO2"],
+		"wet_trace_gases":["H2O"],
+		"proxy_normalization_species":["CH4"],
+		"tarce_gas_properties":{
+			"a":{
+				"name":"N2",
+				"molecular_weight_gpmol":28.014
+			},
+			"b":{
+				"name":"O2",
+				"molecular_weight_gpmol":31.998
+			},
+			"c":{
+				"name":"Ar",
+				"molecular_weight_gpmol":39.948
+			},
+			"d":{
+				"name":"H2O",
+				"molecular_weight_gpmol":18.015
+			},
+			"e":{
+				"name":"CH4",
+				"molecular_weight_gpmol":16.043
+			},
+			"f":{
+				"name":"CO2",
+				"molecular_weight_gpmol":44.009
+			},
+			"g":{
+				"name":"PA1",
+				"molecular_weight_gpmol":28.965
+			}
+		},
+
+		"profile_aerosols":{
+			"aod_reference_wavelenth_nm":550.0,
+			"aod_from_profile_file":"T",
+			"profile_aer_opt_prop_params":{
+				"a":{
+					"name":"SU",
+					"aod":1.00,
+					"prof_type":"GDF",
+					"lower_z":0.0,
+					"upper_z":12.0,
+					"peak_z":6.0,
+					"h_width":0.5,
+					"relaxation":0.0
+				},
+				"b":{
+					"name":"BC",
+					"aod":0.01,
+					"prof_type":"EXP",
+					"lower_z":0.0,
+					"upper_z":12.0,
+					"peak_z":6.0,
+					"h_width":0.5,
+					"relaxation":1.0
+				},
+				"c":{
+					"name":"OC",
+					"aod":0.01,
+					"prof_type":"BOX",
+					"lower_z":0.0,
+					"upper_z":12.0,
+					"peak_z":6.0,
+					"h_width":0.5,
+					"relaxation":0.0
+				},
+				"d":{
+					"name":"SF",
+					"aod":0.01,
+					"prof_type":"GDF",
+					"lower_z":0.0,
+					"upper_z":12.0,
+					"peak_z":6.0,
+					"h_width":0.5,
+					"relaxation":0.0
+				},
+				"e":{
+					"name":"SC",
+					"aod":0.01,
+					"prof_type":"GDF",
+					"lower_z":0.0,
+					"upper_z":12.0,
+					"peak_z":6.0,
+					"h_width":0.5,
+					"relaxation":0.0
+				},
+				"f":{
+					"name":"DU",
+					"aod":0.01,
+					"prof_type":"GDF",
+					"lower_z":0.0,
+					"upper_z":12.0,
+					"peak_z":6.0,
+					"h_width":0.5,
+					"relaxation":0.0
+				}
+			},
+			"aer_opt_par_from_profile_file":"F",
+			"const_values":{
+				"a":{
+					"name":"SU_alpha",
+					"value":3.000,
+					"column_uncertainty":1.0
+				}
+			}
+		},
+
+		"profile_cloud_species":{
+			"cod_reference_wavelength_nm":550.0,
+			"cod_from_profile_file":"F",
+			"n_subpixels":2,
+			"cloud_frations":[0.8,0.01],
+			"cloud_pressure_hpa":[500.0,200.0],
+			"species_proftype":{
+				"a":{
+					"name":"CW",
+					"prof_type":"BOX"
+				},
+				"b":{
+					"name":"CI",
+					"prof_type":"BOX"
+				}
+			},
+			"profile_params":{
+				"a":{
+					"name":"CW",
+					"pixel":1,
+					"cod":10.0,
+					"lower_z":2.0,
+					"upper_z":5.0,
+					"peak_z":4.0,
+					"h_width":1.0,
+					"relaxation":0.0
+				},
+				"b":{
+					"name":"CW",
+					"pixel":2,
+					"cod":0.1,
+					"lower_z":10.0,
+					"upper_z":12.0,
+					"peak_z":11.0,
+					"h_width":1.0,
+					"relaxation":0.0
+				},
+				"c":{
+					"name":"CI",
+					"pixel":2,
+					"cod":0.9,
+					"lower_z":10.0,
+					"upper_z":12.0,
+					"peak_z":11.0,
+					"h_width":1.0,
+					"relaxation":0.0
+				}
+			}
+		}
+	},
+
+	"SURFACE OPTIONS":{
+		"surface_reflectance_option":1,
+		"fixed_lambertian_1":{
+			"albedo_value":0.3
+		},
+		"lambertian_spectrum_2":{},
+		"ler_climatology_3":{
+			"use_constant_wavelength":"T",
+			"ler_wavelength_nm":335.0			
+		},
+		"modis_fa_4":{
+			"refl_clim_directory":"./mcd43cmg_0p05",
+			"do_isotropic":"T",
+			"black_white_blue":1,
+			"ocean_glint_brdf":"T"
+		},
+		"fixed_kernel_brdf_5":{
+			"vlidort_options":{
+				"a":{
+					"name":"Lambertian",
+					"index":1,
+					"amplitude":0.50000,
+					"n_par":0,
+					"par1":0.000000,
+					"par2":0.000000,
+					"par3":0.000000
+				},
+				"b":{
+					"name":"LiSparse",
+					"index":4,
+					"amplitude":0.01000,
+					"n_par":2,
+					"par1":2.000000,
+					"par2":1.000000,
+					"par3":0.000000
+				},
+				"c":{
+					"name":"Ross-thick",
+					"index":3,
+					"amplitude":0.01000,
+					"n_par":0,
+					"par1":0.000000,
+					"par2":0.000000,
+					"par3":0.000000
+				}
+			}
+		},
+		"brdf_climatology_6":{},
+		"surface_emissity_option":1,
+		"fixed_emissivity_1":{
+			"emissivity_value":0.9
+		},
+		"emissivity_spectrum_2":{},
+		"emissivity_climatology_3":{},
+		"do_plant_fluorescence":"F"
+	},
+
+	"GAS OPTIONS":{
+		"assum_earth_for_scattering":"T",
+		"co2_profile_gas_name":"CO2",
+		"scattering_gases":["N2"],
+		"scattering_gas_entries":{
+			"a":{
+				"name":"CO2",
+				"file":"CO2_rayleigh_optprop.nc"
+			},
+			"b":{
+				"name":"Ar",
+				"file":"Ar_rayleigh_optprop.nc"
+			},
+			"c":{
+				"name":"N2",
+				"file":"N2_rayleigh_optprop.nc"
+			},
+			"d":{
+				"name":"O2",
+				"file":"O2_rayleigh_optprop.nc"
+			}
+		},
+		"do_raman_scattering":"F",
+		"rss_ref_temperature_k":"250.0",
+		"raman_gases":["N2","O2"],
+		"raman_gas_entries":{
+			"a":{
+				"name":"N2",
+				"file":"N2_rrs_optprop.nc"
+			},
+			"b":{
+				"name":"O2",
+				"file":"O2_rrs_optprop.nc"
+			}			
+		},
+		"abs_species":["O2","O4","H2O","CO2","PACIA"],
+		"nfl":2,
+		"full_lut_to_memory":"T",
+		"cross_section_entries":{
+			"O3":{
+				"name":"O3",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"TEMPO_o3abs_brion_270_800_vacfinal.nc"
+			},
+			"NO2":{
+				"name":"NO2",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"no2_tpar_vandaele_2003.nc"
+			},
+			"HCHO":{
+				"name":"HCHO",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"TEMPO_h2co_300K.nc"
+			},
+			"SO2":{
+				"name":"SO2",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"TEMPO_so2_295K.nc"
+			},
+			"H2O":{
+				"name":"H2O",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"GGG2020_H2O_1550_1710_VP_0p01.nc"
+			},
+			"GLYX":{
+				"name":"GLYX",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"TEMPO_glyx_296K.nc"
+			},
+			"BRO":{
+				"name":"BRO",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"TEMPO_bro_228K.nc"
+			},
+			"IO":{
+				"name":"IO",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"io_298k_bremen.nc"
+			},
+			"CO":{
+				"name":"CO",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"GGG2020_CO_1550_1710_VP_0p01.nc"
+			},
+			"CO2":{
+				"name":"CO2",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"GGG2020_CO2_1550_1710_SDVP_LM_0p01.nc"
+			},
+			"N2O":{
+				"name":"N2O",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"GGG2020_N2O_1550_1710_VP_0p01.nc"
+			},
+			"CH4":{
+				"name":"CH4",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"GGG2020_CH4_1600_1700_SDVP_LM_0p01.nc"
+			},
+			"O2":{
+				"name":"O2",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"GGG2020_O2_1200_1310_SDVP.nc"
+			},
+			"CO2":{
+				"name":"CO2",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"GGG2020_CO2_1550_1710_SDVP_LM_0p01.nc"
+			},
+			"NO":{
+				"name":"NO",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"HITRAN"
+			},
+			"HNO3":{
+				"name":"HNO3",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"HITRAN"
+			},
+			"OCS":{
+				"name":"OCS",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"HITRAN"
+			},
+			"O4":{
+				"name":"O4",
+				"cia1":"O2",
+				"cia2":"O2",
+				"brd1":"-",
+				"file":"GGG2020_O2_1200_1310_ACIA_scaled_e46.nc"
+			},
+			"OCLO":{
+				"name":"OCLO",
+				"cia1":"-",
+				"cia2":"-",
+				"brd1":"-",
+				"file":"oclo_213k_sciafm.nc"
+			},
+			"PACIA":{
+				"name":"PACIA",
+				"cia1":"PA1",
+				"cia2":"PA1",
+				"brd1":"-",
+				"file":"GGG2020_O2_1200_1310_PACIA_scaled_e46.nc"
+			}
+		},
+		"airglow_species":{
+				"a":{
+					"name":"O2DG",
+					"brd1":"-",
+					"file":"GGG2020_O2_1200_1310_SDVP_Airglow.nc"
+				}
+		}
+	},
+
+	"AEROSOL OPTIONS":{
+		"do_aerosols":"F",
+		"aerosol_optical_properties":{
+			"SU":{
+				"name":"SU",
+				"file":"SU_200nm-20um_wgphase_flexinput.nc"
+			},
+			"BC":{
+				"name":"BC",
+				"file":"BC_200nm-20um_wgphase_flexinput.nc"
+			},
+			"OC":{
+				"name":"OC",
+				"file":"OC_200nm-20um_wgphase_flexinput.nc"
+			},
+			"SF":{
+				"name":"SF",
+				"file":"SF_200nm-20um_wgphase_flexinput.nc"
+			},
+			"SC":{
+				"name":"SC",
+				"file":"SC_200nm-20um_wgphase_flexinput.nc"
+			},
+			"DU":{
+				"name":"DU",
+				"file":"DU_200nm-20um_wgphase_flexinput.nc"
+			}
+		}
+	},
+
+	"CLOUD OPTIONS":{
+		"do_clouds":"F",
+		"do_lambertian_clouds":"T",
+		"cloud_albedo":0.8,
+		"cloud_opt_prop":{
+				"a":{
+					"name":"CW",
+					"file":"WC_200nm-20um_wgphase_flexinput.nc"
+				},
+				"b":{
+					"name":"CI",
+					"file":"WC_200nm-20um_wgphase_flexinput.nc"
+				}
+		}
+	},
+
+	"STATE VECTOR OPTIONS":{
+		"prf_species":[],
+		"col_species":["H2O","CO2","PA1"],
+		"overwrite_clim_uncertainty":"F",
+		"uncertainty_option":{
+			"CH4":{
+				"name":"CH4",
+				"cov_mat_type":"ZCORRELATED",
+				"par1":5.0,
+				"par2":2.0
+			},
+			"H2O":{
+				"name":"H2O",
+				"cov_mat_type":"DIAGONAL",
+				"par1":1000.0,
+				"par2":""
+			},
+			"CO2":{
+				"name":"CO2",
+				"cov_mat_type":"DIAGONAL",
+				"par1":1000.0,
+				"par2":""
+			}
+		},
+		"temperature":{
+			"add_to_state_vector":"T",
+			"temperature_option":2,
+			"fit_profile_1":{
+				"overwrite_clim_uncertainty":"T",
+				"cov_mat_type":"DIAGONAL",
+				"parameters":5.0
+			},
+			"fit_shift_2":{
+				"overwrite_clim_uncertainty":"T",
+				"shift_unc_k":5.0
+			}
+		},
+		"surface_pressure":{
+			"add_to_state_vector":"T",
+			"overwrite_clim_uncertainty":"T",
+			"uncertainty_hpa":16
+		},
+		"surface_reflectance":{
+			"add_to_state_vector":"T",
+			"init_state_from_obs":"F",
+			"max_poly_order":1,
+			"option_index":1,
+			"polynomial_scaling_1":{
+				"order":1,
+				"coeff_unc_prcnt":[5.0,1.0]
+			},
+			"window_poly_scale_2":{
+				"win_order":1,
+				"win_uncert_prcnt":[100.0]
+			},
+			"eof_fit_3":{
+				"scale_eof_uncert":"F",
+				"scale_factor":2.0
+			}
+		},
+		"radiometric_offset":{
+			"add_to_state_vector":"F",
+			"option_index":2,
+			"polynomial_scaling_1":{
+				"order":1,
+				"coeff_unc_prcnt_rad":5.0
+			},
+			"window_poly_scale_2":{
+				"win_order":1,
+				"win_uncert_prcnt_rad":[5.0]
+			}
+		},
+		"radiometric_scaling":{
+			"add_to_state_vector":"F",
+			"option_index":2,
+			"polynomial_scaling_1":{
+				"order":1,
+				"coeff_unc_prcnt":5.0
+			},
+			"window_poly_scale_2":{
+				"win_order":1,
+				"win_uncert_prcnt":[25.0]
+			}			
+		},
+		"eof_residuals":{
+			"add_to_state_vector":"F",
+			"eofs_to_add":{
+				"a":{
+					"band_index":1,
+					"eof_index":1,
+					"uncertatinty":1.0,
+					"file":"ch4proxy_eof_residuals_v0_01_04_sorted.nc"
+				},
+				"b":{
+					"band_index":1,
+					"eof_index":2,
+					"uncertatinty":1.0,
+					"file":"ch4proxy_eof_residuals_v0_01_04_sorted.nc"
+				}
+			}
+		},
+		"isrf_parameters":{
+			"add_to_state_vector":"T",
+			"parameters_to_fit":{
+				"a":{
+					"window":1,
+					"param":2,
+					"poly_order":0,
+					"uncertainty":0.05,
+					"tbd":0.30
+				}
+			}			
+		},
+		"wavelength_grid":{
+			"add_to_state_vector":"T",
+			"option_index":1,
+			"polynomial_scaling_1":{
+				"order":1,
+				"coeff_unc_prcnt":1.0
+			},
+			"window_poly_scale_2":{
+				"win_order":0,
+				"win_uncert_prcnt":[1.0]
+			}				
+		}
+	},
+
+	"OPTIMIZER OPTIONS":{
+		"max_iter":15,
+		"max_div":5,
+		"convergence_threshold":0.1,
+		"initial_gamma_lm":10.0,
+		"r_divergent":0.25,
+		"r_convergent":0.75,
+		"divergent_scale_factor":4.0,
+		"convergent_scale_factor":0.5,
+		"chi_gof_threshold":10.0,
+		"scale_obs_cov":"T",
+		"obs_cov_scale_factor":1.0,
+		"scale_prior_cov":"T",
+		"prior_cov_scale_factor":1.0
+	},
+
+	"DIAGNOSTICS OPTIONS":{
+		"level1_options":{
+			"viewing_geometry":"T"
+		},
+
+		"profile_output_options":{
+			"outputs":["Prior","Posterior"],
+
+			"pressure_layer_edge":["T","T"],
+			"pressure_layer_mid":["T","T"],
+
+			"temperature_layer_edge":["F","T"],
+			"temperature_layer_mid":["F","F"],
+
+			"altitude_layer_edge":["T","F"],
+			"altitude_layer_mid":["T","F"],
+
+			"air_molecular_weight":["T","F"],
+			"gravity":["T","F"],
+			"relative_humidity":["T","F"],
+
+			"air_partial_column":["T","T"],
+			"gas_partial_columns":["T","T"],
+			"gas_partial_columns_species":["all"],
+
+			"gas_column_uncertainties":["T","T"],
+			"gas_column_uncertainties_species":["all"],
+
+			"gas_mixing_ratios":["T","T"],
+			"gas_mixing_ratios_species":["all"],
+
+			"dry_gas_mixing_ratios":["T","T"],
+			"dry_gas_mixing_ratios_species":["all"],
+
+			"proxy_column_avg_mix_rat":["T","T"],
+			"proxy_column_avg_mix_rat_species":["CO2","CH4"],
+
+			"total_aod":["F","F"],
+			"species_aod":["F","F"],
+			"species_aod_species":["all"],
+
+			"species_profile_params":["F","F"],
+			"species_profile_params_species":["all"],
+
+			"species_profile_par_derivs":["F","F"],
+			"species_profile_par_derivs_species":["all"],
+
+			"cloud_n_pixels":["F","F"],
+			"cloud_fraction_total":["F","F"],
+			"total_cod":["F","F"]
+		},
+
+		"rtm_output_options":{
+			"wavelength":["F","T"],
+			"irradiance":["F","T"],
+
+			"radiance":["F","T"],
+			"radiance_stokes":"F",
+
+			"radiant_flux":["F","F"],
+			"radiant_flux_stokes":"F",
+
+			"direct_flux":["F","F"],
+			"direct_flux_stokes":"F",
+
+			"gas_jacobians":{
+				"trace_gas":["F","F"],
+				"trace_gas_species":["all"],
+				"trace_gas_stokes":"F",
+
+				"trace_gas_part_col":["F","F"],
+				"trace_gas_part_col_species":["CH4","CH4","CO2"],
+				"trace_gas_part_col_lower_index":[1,7,1],
+				"trace_gas_part_col_upper_index":[1,8,20],
+				"trace_gas_part_col_stokes":"F",
+
+				"scattering_weights":["F","F"],
+
+				"air_mass_factors":["F","F"],
+				"air_mass_factors_species":["all"]
+			},
+
+			"met_jacobians":{
+				"temperature_profile":["F","F"],
+				"temperature_profile_stokes":"F",
+
+				"temperature_shift":["F","F"],
+				"temperature_shift_stokes":"F",
+
+				"surface_pressure":["F","F"],
+				"surface_pressure_stokes":"F"
+			},
+
+			"aerosol_jacobians":{
+				"profile_aod":["F","F"],
+				"profile_aod_species":[],
+				"profile_aod_stokes":"F",
+
+				"profile_aod_par":["F","F"],
+				"profile_aod_par_species":["all"],
+				"profile_aod_par_stokes":"F",
+
+				"profile_ssa":["F","F"],
+				"profile_ssa_species":["all"],
+				"profile_ssa_stokes":"F",
+
+				"profile_ssa_par":["F","F"],
+				"profile_ssa_par_species":["all"],
+				"profile_ssa_par_stokes":"F",
+
+				"opt_prop_params":["F","F"],
+				"opt_prop_params_species":["all"],
+				"opt_prop_params_stokes":"F"
+			},
+
+			"surface_jacobians":{
+				"brdf_kernel_factors":["F","F"],
+				"brdf_kernel_factors_stokes":"F",
+
+				"brdf_kernel_parameters":["F","F"],
+				"brdf_kernel_parameters_stokes":"F"
+			},
+
+			"instrument_jacobians":{
+				"isrf":["F","F"],
+				"isrf_stokes":"F",
+
+				"wavelength_shift":["F","F"],
+				"wavelength_shift_stokes":"F"
+			}
+		},
+
+		"optical_property_diagnostics":{
+			"gas_absorption_xsect":["F","F"],
+			"gas_absorption_xsect_species":["all"],
+
+			"total_optical_depth":["F","F"],
+
+			"brdf_kernel_amplitudes":["F","F"]	
+		}
+	},
+
+	"INVERSE DIAG OPTIONS":{
+		"general_fit_statistics":{
+			"cost_function":"T",
+			"chi_square":"T",
+			"uncertatinty_derivative":"T",
+			"spectrum_rms":"T",
+			"number_of_iterations":"T",
+			"fit_quality_flag":"T"
+		},
+
+		"spectrum":{
+			"spectrum_residuals":"T",
+			"level1_spectrum":"T",
+			"level1_uncertainty":"T",
+			"iteration_radiance":"T",
+			"iteration_radiance_max_iter":5
+		},
+
+		"total_state_vector":{
+			"averaging_kernel":"T",
+			"posteriori_covariance":"T",
+			"priori_covariance":"T",
+			"posteriori_state":"T",
+			"priori_state":"T",
+			"iteration_state":"T",
+			"iteration_state_max_iter":5,
+		},
+
+		"sub_state_vector_diagnostics":{
+			"gas_absorption_post_covar":{
+				"profile_mixing_ratio":"T",
+				"profile_mixing_ratio_species":["CH4"],
+
+				"column_avg_mixing_ratio":"T",
+				"column_avg_mixing_ratio_species":["CH4","CO2","H2O"],
+
+				"dry_profile_mixing_ratio":"T",
+				"dry_profile_mixing_ratio_species":["CH4"],
+
+				"dry_column_avg_mixing_ratio":"T",
+				"dry_column_avg_mixing_ratio_species":["CH4"],
+
+				"proxy_posteriori_uncert":"T",
+				"proxy_posteriori_uncert_species":["CO2","CH4"]
+			}
+		},
+
+		"full_matrices_for_offline_err":{
+			"gain_matrix":"F"
+		}
+	}
 }
