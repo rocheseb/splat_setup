@@ -68,6 +68,7 @@ def load_default_controls(json_inputs: Dict) -> Dict:
     for key, val in control_setup_dict.items():
         default_controls.update(val)
 
+    # update fields based on the given --json-file
     for key, val in json_inputs.items():
         nested_dict_set(default_controls, key, val)
 
@@ -85,6 +86,9 @@ def load_default_controls(json_inputs: Dict) -> Dict:
 
 
 def nested_dict_get(d: Dict, path: str, delimiter: str = ".") -> Any:
+    """
+    nested_dict_get(d,"path.to.key") returns d["path"]["to"]["key"]
+    """
     key_list = path.split(delimiter)
     for key in key_list:
         d = d[key]
@@ -92,6 +96,10 @@ def nested_dict_get(d: Dict, path: str, delimiter: str = ".") -> Any:
 
 
 def nested_dict_set(d: Dict, path: str, val: Any, delimiter: str = ".") -> Any:
+    """
+    nested_dict_set(d,"path.to.key",val) does d["path"]["to"]["key"] = val
+    d is modified in place
+    """
     key_list = path.split(delimiter)
     for key in key_list[:-1]:
         d = d.setdefault(key, {})
@@ -99,9 +107,17 @@ def nested_dict_set(d: Dict, path: str, val: Any, delimiter: str = ".") -> Any:
 
 
 def control_setup(control_file: str, json_file: str, template_file: str) -> Dict:
+    """
+    template_file: the control file with jinja fields
+    control_setup.json has all the default input fields to fill the template_file
+
+    json_file: an input json file with a subset of jinja fields, these will overwrite what is defined in control_setup.json
+    control_file: output control file
+    """
     with open(json_file, "rb") as f:
         json_inputs = json.load(f)
 
+    # the fields that must always be specified in the json_file (--json-file)
     required = [
         "root_data_directory",
         "l1_file",
@@ -120,10 +136,10 @@ def control_setup(control_file: str, json_file: str, template_file: str) -> Dict
         if var not in json_inputs:
             raise Exception(f"{var} must be in the input json file, all the required inputs are: {newline+newline.join(required)}")
 
+    # load control_setup.json into a dictionary
+    # then update that dictionary with the fields from json_file
+    # then update the "=key" values
     template_inputs = load_default_controls(json_inputs)
-
-    for key in json_inputs:
-        template_inputs[key] = json_inputs[key]
 
     with open(template_file, "r") as f:
         template = jinja2.Template(f.read())
