@@ -1,11 +1,11 @@
 {
-	"INPUT FILES":{
+	"FILES":{
 		"l1_file": "/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700.nc",
 		"l2_met_file": "/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700_prior.nc",
-		"l2_wind_file":"=l2_met_file",
-		"l2_chlorophyll_file":"=l2_met_file",
-		"l2_ocean_file":"=l2_met_file",
-		"l2_snow_file":"=l2_met_file",
+		"l2_wind_file":"=l1_file",
+		"l2_chlorophyll_file":"=l1_file",
+		"l2_ocean_file":"=l1_file",
+		"l2_snow_file":"=l1_file",
 		"apriori_file": "AFGLUS_apriori_PA.nc",
 		"isrf_file": "o2_isrf_lut_20210722_xflipped.nc",
 		"solar_file":"chance_jpl_mrg_hitran_200-16665nm.nc",
@@ -14,7 +14,10 @@
 		"ler_climatology_file":"OMI-Aura_L3-OMLER_2005m01-2009m12_v003-2010m0503t063707.nc",
 		"modis_fa_file":"spatial_db_scia_mrg_usgs_FA_n16_12Ksamp_splib07a_extended.nc",
 		"brdf_climatology_file":"MARCI_Hapke_clim.nc",
-		"albedo_file":"albedo_bands.nc"
+		"albedo_file":"albedo_bands.nc",
+
+		"log_file":"COMMENT: SETUP FROM PYTHON CALL",
+		"output_file":"COMMENT: SETUP FROM PYTHON CALL"
 	},
 
 	"RETRIEVAL":{
@@ -28,8 +31,7 @@
 		"only_create_file": "F",
 		"root_data_directory":"COMMENT: SETUP FROM PYTHON CALL",
 		"switch_on_debug": "T",
-		"debug_level": 3,
-		"debug_filename":"COMMENT: SETUP FROM PYTHON CALL"
+		"debug_level": 3
 	},
 
 	"LEVEL1 OPTIONS":{
@@ -122,7 +124,7 @@
 			"use_l2_clouds": "F",
 			"use_clouds_from_l2_prof_met": "F",
 			"species": [],
-			"use_aux_lam_clouds": "=l2_met_file",
+			"use_aux_lamb_clouds": "=l1_file",
 			"file_type": "SPLAT"
 		},
 
@@ -187,7 +189,7 @@
 		"two_stream":{
 			"model1":{
 				"name":"TwoStr",
-				"nmoment":1000,
+				"n_moment":1000,
 				"thermax_nm":3000.0
 			}
 		}
@@ -304,7 +306,7 @@
 				"start_nm":1249.2,
 				"end_nm":1287.8,
 				"buffer_nm":2.0,
-				"convultion_grid_sampling":0.002,
+				"convolution_grid_sampling":0.002,
 				"radiative_transfer_model":"TRNMSM",
 				"isrf":"MAirCal",
 				"convolution_width_hw1e":10.0,
@@ -315,19 +317,19 @@
 		"common_options":{
 			"rtm_at_l1_resolution":"F",
 			"solar_io_correction":"F",
-			"use_common_rtm_grid":"F"
+			"use_custom_rtm_grid":"F"
 		}
 	},
 
 	"PROFILE OPTIONS":{
 		"sampling_method":1,
 		"surface_gravity_mps2":9.80991,
-		"planetary_radius":6378.1,
+		"planetary_radius_km":6378.1,
 		"linearize_wrt_hybrid_grid":"T",
-		"profile_trace_gases":["N2","O2","Ar","H2O","CH4","CO2"],
+		"profile_trace_gases":["N2","O2","Ar","H2O","CH4","CO2","PA1"],
 		"wet_trace_gases":["H2O"],
 		"proxy_normalization_species":["CH4"],
-		"tarce_gas_properties":{
+		"trace_gas_properties":{
 			"a":{
 				"name":"N2",
 				"molecular_weight_gpmol":28.014
@@ -359,7 +361,7 @@
 		},
 
 		"profile_aerosols":{
-			"aod_reference_wavelenth_nm":550.0,
+			"aod_reference_wavelength_nm":550.0,
 			"aod_from_profile_file":"T",
 			"profile_aer_opt_prop_params":{
 				"a":{
@@ -437,7 +439,7 @@
 			"cod_reference_wavelength_nm":550.0,
 			"cod_from_profile_file":"F",
 			"n_subpixels":2,
-			"cloud_frations":[0.8,0.01],
+			"cloud_fractions":[0.8,0.01],
 			"cloud_pressure_hpa":[500.0,200.0],
 			"species_proftype":{
 				"a":{
@@ -532,7 +534,7 @@
 			}
 		},
 		"brdf_climatology_6":{},
-		"surface_emissity_option":1,
+		"surface_emissivity_option":1,
 		"fixed_emissivity_1":{
 			"emissivity_value":0.9
 		},
@@ -542,7 +544,7 @@
 	},
 
 	"GAS OPTIONS":{
-		"assum_earth_for_scattering":"T",
+		"assume_earth_for_scattering":"T",
 		"co2_profile_gas_name":"CO2",
 		"scattering_gases":["N2"],
 		"scattering_gas_entries":{
@@ -721,7 +723,7 @@
 				"file":"GGG2020_O2_1200_1310_PACIA_scaled_e46.nc"
 			}
 		},
-		"airglow_species":{
+		"airglow_cross_section_entries":{
 				"a":{
 					"name":"O2DG",
 					"brd1":"-",
@@ -828,8 +830,8 @@
 				"coeff_unc_prcnt":[5.0,1.0]
 			},
 			"window_poly_scale_2":{
-				"win_order":1,
-				"win_uncert_prcnt":[100.0]
+				"order":[1],
+				"uncert_prcnt":[100.0]
 			},
 			"eof_fit_3":{
 				"scale_eof_uncert":"F",
@@ -844,8 +846,8 @@
 				"coeff_unc_prcnt_rad":5.0
 			},
 			"window_poly_scale_2":{
-				"win_order":1,
-				"win_uncert_prcnt_rad":[5.0]
+				"order":[1],
+				"uncert_prcnt":[5.0]
 			}
 		},
 		"radiometric_scaling":{
@@ -856,8 +858,8 @@
 				"coeff_unc_prcnt":5.0
 			},
 			"window_poly_scale_2":{
-				"win_order":1,
-				"win_uncert_prcnt":[25.0]
+				"order":[1],
+				"uncert_prcnt":[25.0]
 			}			
 		},
 		"eof_residuals":{
@@ -866,13 +868,13 @@
 				"a":{
 					"band_index":1,
 					"eof_index":1,
-					"uncertatinty":1.0,
+					"uncertainty":1.0,
 					"file":"ch4proxy_eof_residuals_v0_01_04_sorted.nc"
 				},
 				"b":{
 					"band_index":1,
 					"eof_index":2,
-					"uncertatinty":1.0,
+					"uncertainty":1.0,
 					"file":"ch4proxy_eof_residuals_v0_01_04_sorted.nc"
 				}
 			}
@@ -897,8 +899,8 @@
 				"coeff_unc_prcnt":1.0
 			},
 			"window_poly_scale_2":{
-				"win_order":0,
-				"win_uncert_prcnt":[1.0]
+				"order":[0],
+				"uncert_prcnt":[1.0]
 			}				
 		}
 	},
@@ -941,8 +943,8 @@
 			"relative_humidity":["T","F"],
 
 			"air_partial_column":["T","T"],
-			"gas_partial_columns":["T","T"],
-			"gas_partial_columns_species":["all"],
+			"gas_partial_column":["T","T"],
+			"gas_partial_column_species":["all"],
 
 			"gas_column_uncertainties":["T","T"],
 			"gas_column_uncertainties_species":["all"],
@@ -1086,7 +1088,7 @@
 			"posteriori_state":"T",
 			"priori_state":"T",
 			"iteration_state":"T",
-			"iteration_state_max_iter":5,
+			"iteration_state_max_iter":5
 		},
 
 		"sub_state_vector_diagnostics":{

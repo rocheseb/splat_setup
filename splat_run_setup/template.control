@@ -2,24 +2,24 @@ MethaneSAT Full Physics Retrieval: Test File
 --------------------------------+------------------------------------------------------
 %%% RETRIEVAL MENU %%%          :
 Calculation Mode                : {{calculation_mode}}
-Output File                     : {{outfile}}
+Output File                     : {{output_file}}
 Compute all pixels              : {{compute_all_pixels}}
- (F) - X Retrieval Range        : {% for x in x_retrieval_range %}{{x+" "}}{%- endfor %}
-     - Y Retrieval Range        : {% for y in y_retrieval_range %}{{y+" "}}{%- endfor %}
+ (F) - X Retrieval Range        : {% for x in x_retrieval_range %}{{x}} {% endfor %}
+     - Y Retrieval Range        : {% for y in y_retrieval_range %}{{y}} {% endfor %}
      - Output to XY?            : {{output_to_xy}}
         (T) Use file lock?      : {{use_file_lock}}
             Overwrite Existing? : {{overwrite_existing}}
             Only Create file    : {{only_create_file}}
-Root data directory             : {{data_dir}}
+Root data directory             : {{root_data_directory}}
 Switch on debug?                : {{switch_on_debug}} {{debug_level}}
-Debug filename                  : {{log}}
+Debug filename                  : {{log_file}}
 --------------------------------+------------------------------------------------------
 %%% LEVEL1 OPTIONS %%%          :
 Do Single Pixel Calc from Inp.  : F
   (T) - Band Definition ------> :  BandName BandStart[nm] BandEnd[nm] Sampling[nm] ViewDirIdx
-{% for band_dict in band_definition -%}
-                         Band {{loop.index}} :  {{band_dict.name}}  {{band_dict.start}}  {{band_dict.end}}  {{band_dict.sampling}} {{band_dict.view_dir_idx}}
-{% endfor %}
+{%- for key,val in band_definition.items() %}
+                         Band {{loop.index}} :  {{"{:>8}{:>14}{:>12}{:>13}{:>11}".format(val.name,val.start_nm,val.end_nm,val.sampling_nm,val.view_dir_idx)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
       - Date [YYYYMMDD]         : {{date_yyyymmdd}}
       - Hour [decimal UTC]      : {{hour_decimal_utc}}
@@ -31,8 +31,8 @@ Do Single Pixel Calc from Inp.  : F
       - Longitude [deg]         : {{longitude_deg}}
       - Latitude [deg]          : {{latitude_deg}}
       - Pixel Corners --------->:    BotLeft  TopLeft TopRight BotRight
-            - Longitudes [deg]  :     {{pixel_corners.longitudes_deg.bot_left}}    {{pixel_corners.longitudes_deg.top_left}}    {{pixel_corners.longitudes_deg.top_right}}    {{pixel_corners.longitudes_deg.bot_right}}
-            - Latitudes [deg]   :     {{pixel_corners.latitudes_deg.bot_left}}    {{pixel_corners.latitudes_deg.top_left}}    {{pixel_corners.latitudes_deg.top_right}}    {{pixel_corners.latitudes_deg.bot_right}}
+            - Longitudes [deg]  :    {{"{:>7}{:>9}{:>9}{:>9}".format(pixel_corners.longitudes_deg.bot_left,pixel_corners.longitudes_deg.top_left,pixel_corners.longitudes_deg.top_right,pixel_corners.longitudes_deg.bot_right)}}
+            - Latitudes  [deg]  :    {{"{:>7}{:>9}{:>9}{:>9}".format(pixel_corners.latitudes_deg.bot_left,pixel_corners.latitudes_deg.top_left,pixel_corners.latitudes_deg.top_right,pixel_corners.latitudes_deg.bot_right)}}
       - Surface Altitude [km]   : {{surface_altitude_km}}
       - Obs. Altitude [km]      : {{obs_altitude_km}}
       - Cloud Fraction          : {{cloud_fraction}}
@@ -40,22 +40,22 @@ Do Single Pixel Calc from Inp.  : F
       - Wind Speed [m/s]        : {{wind_speed_mps}}
       - Wind Dir.[deg,c/w frm N]: {{wind_dir_deg}}
       - Chlorphyll [mg/m3]      : {{chlorophyll_mgpm3}}
-      - Ocean Salinity [pptv]   : {{ocean_salinity}}
+      - Ocean Salinity [pptv]   : {{ocean_salinity_pptv}}
       - Snow Fraction           : {{snow_fraction}}
       - Sea Ice Fraction        : {{sea_ice_fraction}}
       - Snow Depth [m]          : {{snow_depth_m}}
       - Snow Age [days]         : {{snow_age_days}}
   (F) L1 Radiance Band Input    : BandIndex BandName FileType InputFile
-{% for band_dict in l1_radiance_band_input -%}
-                                :         {{band_dict.index}}  {{band_dict.name}}    {{band_dict.file_type}} {{l1_file}}
-{% endfor %}
+{%- for key,val in l1_radiance_band_input.items() %}
+                                : {{"{:>9}{:>9}{:>9} {}".format(val.index,val.name,val.file_type,l1_file)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 L2 2D Support Data              : Use  AuxFileType AuxFileName
-  - Surface Altitude            :   {{l2_2d_support_data.surface_altitude.use}}        {{l2_2d_support_data.surface_altitude.aux_file_type}} {{l2_met_file}}
-  - Surface Winds               :   {{l2_2d_support_data.surface_winds.use}}        {{l2_2d_support_data.surface_winds.aux_file_type}} {{l2_wind_file}}
-  - Chlorophyll                 :   {{l2_2d_support_data.chlorophyll.use}}        {{l2_2d_support_data.chlorophyll.aux_file_type}} {{l2_chloro_file}}
-  - OceanSalinity               :   {{l2_2d_support_data.ocean_salinity.use}}        {{l2_2d_support_data.ocean_salinity.aux_file_type}} {{l2_ocean_file}}
-  - Snow Parameters             :   {{l2_2d_support_data.snow_parameters.use}}        {{l2_2d_support_data.snow_parameters.aux_file_type}} {{l2_snow_file}}
+  - Surface Altitude            : {{"{:>3}{:>13} {}".format(l2_2d_support_data.surface_altitude.use,l2_2d_support_data.surface_altitude.aux_file_type,l1_file)}}
+  - Surface Winds               : {{"{:>3}{:>13} {}".format(l2_2d_support_data.surface_winds.use,l2_2d_support_data.surface_winds.aux_file_type,l2_wind_file)}}
+  - Chlorophyll                 : {{"{:>3}{:>13} {}".format(l2_2d_support_data.chlorophyll.use,l2_2d_support_data.chlorophyll.aux_file_type,l2_chloro_file)}}
+  - OceanSalinity               : {{"{:>3}{:>13} {}".format(l2_2d_support_data.ocean_salinity.use,l2_2d_support_data.ocean_salinity.aux_file_type,l2_ocean_file)}}
+  - Snow Parameters             : {{"{:>3}{:>13} {}".format(l2_2d_support_data.snow_parameters.use,l2_2d_support_data.snow_parameters.aux_file_type,l2_snow_file)}}
 L2 Profile Support Data         :
   - Use L2 Profile Met?         : {{l2_profile_support_data.use_l2_profile_met}}
      (T) Input Filename         : {{l2_profile_support_data.input_filename}}
@@ -65,122 +65,122 @@ L2 Profile Support Data         :
 Use L2 Clouds                   : {{clouds.use_l2_clouds}}
   (T) Use Clds from L2 Prof Met : {{clouds.use_clouds_from_l2_prof_met}}
       (T) Species               : {% for species in clouds.species %}{{species}} {% endfor %}
-      (F) Use Aux Lamb. Clouds  : {{l2_met_file}}
+      (F) Use Aux Lamb. Clouds  : {{clouds.use_aux_lamb_clouds}}
               File Type         : {{clouds.file_type}}
 L2 Surface Reflectance          :
-  - Use L2 Surface?             : T
+  - Use L2 Surface?             : {{l2_surface_reflectance.use_l2_surface}}
      (T) ---------------------->: BandName FileType FileBandIndex InputFile
-{% for info in l2_surface_reflectance -%}
-                                :  {{info.name}} {{info.file_type}} {{info.index}} {{l2_met_file}}
-{% endfor %}
+{%- for key,val in l2_surface_reflectance.band_inputs.items()%}
+                                :  {{"{:>7}{:>9}{:>14} {}".format(val.name,val.file_type,val.index,l2_met_file)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 --------------------------------+------------------------------------------------------
 %%% RTM OPTIONS %%%             :
 VLIDORT Line-By-Line ---------->: ModelName NStoke NStrm NMomnt ThermMax[nm] Debug
-{% for info in vlidort_line_by_line -%}
-                                :  {{info.name}} {{info.n_stoke}} {{info.n_stream}} {{info.n_moment}} {{info.thermax_nm}} {{info.debug}}
-{% endfor %}
+{%- for key,val in vlidort_line_by_line.items() %}
+                                :  {{"{:>8}{:>7}{:>6}{:>7}{:>13}{:>6}".format(val.name,val.n_stoke,val.n_stream,val.n_moment,val.thermax_nm,val.debug)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
-VLIDORT PCA-------------------->: ModelName NStoke NStrm NMomnt ThermMax[nm]  Debug ControlFile
-{% for info in vlidort_pca -%}
-                                :  {{info.name}} {{info.n_stoke}} {{info.n_stream}} {{info.n_moment}} {{info.thermax_nm}} {{info.debug}} {{info.control_file}}
-{% endfor %}
+VLIDORT PCA-------------------->: ModelName NStoke NStrm NMomnt ThermMax[nm] Debug ControlFile
+{%- for key,val in vlidort_pca.items() %}
+                                :  {{"{:>8}{:>7}{:>6}{:>7}{:>13}{:>6} {}".format(val.name,val.n_stoke,val.n_stream,val.n_moment,val.thermax_nm,val.debug,val.control_file)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 FIRST ORDER-------------------->: ModelName NStoke NMomnt ThermMax[nm]
-{% for info in first_order -%}
-                                :  {{info.name}} {{info.n_stoke}} {{info.n_moment}} {{info.thermax_nm}}
-{% endfor %}
+{%- for key,val in first_order.items() %}
+                                : {{"{:>9}{:>7}{:>7}{:>13}".format(val.name,val.n_stoke,val.n_moment,val.thermax_nm)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 TWO STREAM--------------------->: ModelName NMomnt ThermMax[nm]
-{% for info in two_stream -%}
-                                :  {{info.name}} {{info.n_moment}} {{info.thermax_nm}}
-{% endfor %}
+{%- for key,val in two_stream.items() %}
+                                : {{"{:>9}{:>7}{:>13}".format(val.name,val.n_moment,val.thermax_nm)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 --------------------------------+------------------------------------------------------
 %%% WINDOW OPTIONS %%%          :
 ISRF Parameterizations -------->:
   (1.1) Fixed Supergaussian     :      Name     HW1E     Asymm    ShapeFac WavenumberUnits
-{% for info in isrf_parametrization.fixed_supergaussian -%}
-                                :  {{info.name}} {{info.hw1e}} {{info.asym}} {{info.shape_fac}} {{info.wavenumber_units}}
-{% endfor %}  
+{%- for key,val in isrf_parametrization.fixed_supergaussian.items()%}
+                                :  {{"{:>8}{:>9}{:>10}{:>12}{:>16}".format(val.name,val.hw1e,val.asym,val.shape_fac,val.wavenumber_units)}}
+{%- endfor %}  
                                 : ###END_OF_LIST###
   (1.2) Fixed TROPOMI           :      Name       c0      d      s      w    eta  gamma      m  WavenumberUnits
-{% for info in isrf_parametrization.fixed_tropomi -%}
-                                :  {{info.name}} {{info.c0}} {{info.d}} {{info.s}} {{info.w}} {{info.eta}} {{info.gamma}} {{info.m}} {{info.wavenumber_units}}
-{% endfor %} 
+{%- for key,val in isrf_parametrization.fixed_tropomi.items()%}
+                                :  {{"{:>8}{:>9}{:>7}{:>7}{:>7}{:>7}{:>7}{:>7}{:>17}".format(val.name,val.c0,val.d,val.s,val.w,val.eta,val.gamma,val.m,val.wavenumber_units)}}
+{%- endfor %} 
                                 : ###END_OF_LIST###
   (2) ISRF Input File           :      Name BandIndex WavenumberUnits InputFile
-{% for info in isrf_parametrization.isrf_input_file -%}
-                                :  {{info.name}} {{info.band_index}} {{info.wavenumber_units}} {{data_dir}}/../../{{info.input_file}} {{info.isrf_agg}}
-{% endfor %}
+{%- for key,val in isrf_parametrization.isrf_input_file.items()%}
+                                :  {{"{:>8}{:>10}{:>16} {}/../../{} {}".format(val.name,val.band_index,val.wavenumber_units,root_data_directory,val.input_file,val.isrf_agg)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 AMF Mode Options--------------->:
   Convolution Buffer (nm)       : {{amf_mode_options.convolution_buffer}}
   Radiative Transfer Model      : {{amf_mode_options.radiative_transfer_model}}
   ISRF Option                   : {{amf_mode_options.isrf_option}}
 FORWARD/INVERSE Mode Options -->:
-  Band Index                    :  {% for band in fwd_inv_mode_options %}{{band.index}}{% endfor %}
-  Start Wavelength (nm)         :  {% for band in fwd_inv_mode_options %}{{band.start_nm}}{% endfor %}
-  End Wavelength (nm)           :  {% for band in fwd_inv_mode_options %}{{band.end_nm}}{% endfor %}
-  Buffer (nm)                   :  {% for band in fwd_inv_mode_options %}{{band.buffer_nm}}{% endfor %}
-  Convolution Grid Sampling     :  {% for band in fwd_inv_mode_options %}{{band.convolution_grid_sampling}}{% endfor %}
-  Radiative Transfer Model      :  {% for band in fwd_inv_mode_options %}{{band.radiative_transfer_model}}{% endfor %}
-  ISRF                          :  {% for band in fwd_inv_mode_options %}{{band.isrf}}{% endfor %}
-  Convolution Width (# HW1E)    :  {% for band in fwd_inv_mode_options %}{{band.convolution_width_hw1e}}{% endfor %}
-  Use FFT For Convolution       :  {% for band in fwd_inv_mode_options %}{{band.use_fft_for_convolution}}{% endfor %}
+  Band Index                    :  {% for key,val in fwd_inv_mode_options.items() %}{{"{:>10}".format(val.index)}}{% endfor %}
+  Start Wavelength (nm)         :  {% for key,val in fwd_inv_mode_options.items() %}{{"{:>10}".format(val.start_nm)}}{% endfor %}
+  End Wavelength (nm)           :  {% for key,val in fwd_inv_mode_options.items() %}{{"{:>10}".format(val.end_nm)}}{% endfor %}
+  Buffer (nm)                   :  {% for key,val in fwd_inv_mode_options.items() %}{{"{:>10}".format(val.buffer_nm)}}{% endfor %}
+  Convolution Grid Sampling     :  {% for key,val in fwd_inv_mode_options.items() %}{{"{:>10}".format(val.convolution_grid_sampling)}}{% endfor %}
+  Radiative Transfer Model      :  {% for key,val in fwd_inv_mode_options.items() %}{{"{:>10}".format(val.radiative_transfer_model)}}{% endfor %}
+  ISRF                          :  {% for key,val in fwd_inv_mode_options.items() %}{{"{:>10}".format(val.isrf)}}{% endfor %}
+  Convolution Width (# HW1E)    :  {% for key,val in fwd_inv_mode_options.items() %}{{"{:>10}".format(val.convolution_width_hw1e)}}{% endfor %}
+  Use FFT For Convolution       :  {% for key,val in fwd_inv_mode_options.items() %}{{"{:>10}".format(val.use_fft_for_convolution)}}{% endfor %}
 Common Options ---------------->:
-Solar Reference                 : {{data_dir}}/SolarSpectra/{{solar_file}}
-RTM at L1 Resolution?           : {{rtm_at_l1_resolution}}
-  (T) Solar I0 Correction?      : {{solar_io_correction}}
-  (F) Use Custom RTM Grid?      : {{use_custom_rtm_grid}}
-        - Custom Grid filename  : {{data_dir}}/../../custom_rtm_grid.nc
+Solar Reference                 : {{root_data_directory}}/SolarSpectra/{{solar_file}}
+RTM at L1 Resolution?           : {{common_options.rtm_at_l1_resolution}}
+  (T) Solar I0 Correction?      : {{common_options.solar_io_correction}}
+  (F) Use Custom RTM Grid?      : {{common_options.use_custom_rtm_grid}}
+        - Custom Grid filename  : {{root_data_directory}}/../../custom_rtm_grid.nc
 --------------------------------+------------------------------------------------------
 %%% PROFILE OPTIONS %%%         :
-Profile Input File              : {{data_dir}}/../../{{apriori_file}}
+Profile Input File              : {{root_data_directory}}/../../{{apriori_file}}
 Sampling Method                 : {{sampling_method}}
   (1) Nearest Neighbor          : 
   (2) Point-in-Polygon          : 
-Surface Gravity (m/s)           : {{surface_gravity}}
-Planetary Radius (km)           : {{planetary_radius}}
+Surface Gravity (m/s)           : {{surface_gravity_mps2}}
+Planetary Radius (km)           : {{planetary_radius_km}}
 Linearize w.r.t Hybrid Grid?    : {{linearize_wrt_hybrid_grid}}
 Profile Trace Gases             : {% for gas in profile_trace_gases %}{{gas}} {% endfor %}
 "Wet" Trace Gases               : {% for gas in wet_trace_gases %}{{gas}} {% endfor %}
-Proxy Normalization species     : {% for gas in proxy_normalization_spcies %}{{gas}} {% endfor %}
+Proxy Normalization species     : {% for gas in proxy_normalization_species %}{{gas}} {% endfor %}
    Trace Gas Properties ------->:  Name   MW(g/mol)
-{% for gas in trace_gas_properties -%}
-                                :  {{gas.name}} {{gas.molecular_weight_gpmol}}
-{% endfor %}
+{%- for key,val in trace_gas_properties.items() %}
+                                :  {{"{:>4}{:>12}".format(val.name,val.molecular_weight_gpmol)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 Profile Aerosols                : 
 AOD Reference wavelength (nm)   : {{profile_aerosols.aod_reference_wavelength_nm}}
 Profile Aer Opt. Prop. Params.  :
 AOD from profile file           : {{profile_aerosols.aod_from_profile_file}}
         (F) - Profile Par.----->: Name   AOD ProfType LowerZ UpperZ PeakZ  H.Width  Relaxation  <-(km)
-{% for info in profile_aerosols.profile_aer_opt_prop_params -%}
-                                :   {{info.name}} {{info.aod}} {{info.prof_type}} {{info.lower_z}} {{info.upper_z}} {{info.peak_z}} {{info.h_width}} {{info.relaxation}}
-{% endfor %}
+{%- for key,val in profile_aerosols.profile_aer_opt_prop_params.items()%}
+                                : {{"{:>4}{:>6}{:>9}{:>7}{:>7}{:>6}{:>9}{:>12}".format(val.name,val.aod,val.prof_type,val.lower_z,val.upper_z,val.peak_z,val.h_width,val.relaxation)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
-Aer Opt. Par. from Profile file?: {{aer_opt_par_from_profile_file}}
+Aer Opt. Par. from Profile file?: {{profile_aerosols.aer_opt_par_from_profile_file}}
         (F) - Const. Values --->: Name      Value  ColumnUncertainty
-{% for info in profile_aerosols.const_values -%}
-                                : {{info.name}} {{info.value}} {{info.column_uncertainty}}
-{% endfor %}
+{%- for key,val in profile_aerosols.const_values.items()%}
+                                : {{"{:>4}{:>11}{:>19}".format(val.name,val.value,val.column_uncertainty)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 Profile Cloud Species           : 
-COD Reference wavelength (nm)   : {{profile_cloud_species.cod_reference_wavelength}}
+COD Reference wavelength (nm)   : {{profile_cloud_species.cod_reference_wavelength_nm}}
 COD from profile file           : {{profile_cloud_species.cod_from_profile_file}}
        (F) - # Subpixels        : {{profile_cloud_species.n_subpixels}}
            - Cloud Fractions    : {% for elem in profile_cloud_species.cloud_fractions%}{{elem}} {% endfor %}
   (Lam.)-> - C.Pres(hpa)        : {% for elem in profile_cloud_species.cloud_pressure_hpa%}{{elem}} {% endfor %}
  (scat.)-> - Species Proftype-->:  Name ProfType
-{% for info in profile_cloud_species.species_proftype -%}
-                                :    {{info.name}} {{info.prof_type}}
-{% endfor %}
+{%- for key,val in profile_cloud_species.species_proftype.items()%}
+                                :  {{"{:>4}{:>9}".format(val.name,val.prof_type)}}
+{%- endfor %}
                                 : ###END_OF_LIST###  
            - Profile Params---->:  Name Pixel   COD LowerZ UpperZ PeakZ  H.Width  Relaxation  <-(km)
-{% for info in profile_cloud_species.profile_params -%}
-                                :    {{info.name}} {{info.pixel}} {{info.cod}} {{info.lower_z}} {{info.upper_z}} {{info.peak_z}} {{info.h_width}} {{info.relaxation}}
-{% endfor %}
+{%- for key,val in profile_cloud_species.profile_params.items()%}
+                                :  {{"{:>4}{:>6}{:>6}{:>7}{:>7}{:>6}{:>9}{:>12}".format(val.name,val.pixel,val.cod,val.lower_z,val.upper_z,val.peak_z,val.h_width,val.relaxation)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 --------------------------------+------------------------------------------------------
 %%% SURFACE OPTIONS %%%         :
@@ -188,31 +188,31 @@ Surface Reflectance  Option     : {{surface_reflectance_option}}
  (1) Fixed Lambertian           :
      - Albedo Value             : {{fixed_lambertian_1.albedo_value}}
  (2) Lambertian Spectrum        :
-     - Path to file             : {{data_dir}}/ReflSpectra/{{lambertian_surface_file}}
+     - Path to file             : {{root_data_directory}}/ReflSpectra/{{lambertian_surface_file}}
  (3) LER Climatology            :
-     - Path to file             : {{data_dir}}/LER_climatologies/{{ler_climatology_file}}
+     - Path to file             : {{root_data_directory}}/LER_climatologies/{{ler_climatology_file}}
      - Use Constant Wavelength? : {{ler_climatology_3.use_constant_wavelength}}
         (T) LER Wavelength (nm) : {{ler_climatology_3.ler_wavelength_nm}}
  (4) MODIS-FA                   :
-     - Input FA file            : {{data_dir}}/BRDF_EOF/AlbSpec/{{modis_fa_file}}
+     - Input FA file            : {{root_data_directory}}/BRDF_EOF/AlbSpec/{{modis_fa_file}}
      - Refl. Clim. Directory    : {{modis_fa_4.refl_clim_directory}}
      - Do Isotropic             : {{modis_fa_4.do_isotropic}}
       (T) 1-Blck/2-Whte/3-Blue  : {{modis_fa_4.black_white_blue}}
       (F) Ocean Glint BRDF      : {{modis_fa_4.ocean_glint_brdf}}
  (5) Fixed Kernel BRDF          :
      - VLIDORT option---------->: KernelName Idx Amplitude #Par     Par1     Par2     Par3
-{% for info in fixed_kernel_brdf_5.vlidort_options -%}
-                - Kernel {{loop.index}}      : {{info.name}} {{info.index}} {{info.amplitude}} {{info.n_par}} {{info.par1}} {{info.par2}} {{info.par3}}
-{% endfor %}
+{%- for key,val in fixed_kernel_brdf_5.vlidort_options.items()%}
+                - Kernel {{loop.index}}      : {{"{:>10}{:>4}{:>10}{:>5}{:>9}{:>9}{:>9}".format(val.name,val.index,val.amplitude,val.n_par,val.par1,val.par2,val.par3)}}
+{%- endfor %}
  (6) BRDF Climatology           :
      - Input climatology        : {{brdf_climatology_file}}
 Surface Emissivity Option       : {{surface_emissivity_option}}
  (1) Fixed Emissivity           :
      - Emissivity Value         : {{fixed_emissivity_1.emissivity_value}}
  (2) Emissivity Spectrum        :
-     - Path to file             : {{data_dir}}/Emissivity/
+     - Path to file             : {{root_data_directory}}/Emissivity/
  (3) Emissivity Climatology     :
-     - Path to file             : {{data_dir}}/Emiisivity/
+     - Path to file             : {{root_data_directory}}/Emiisivity/
 Do plant fluorescence?          : {{do_plant_fluorescence}}
 --------------------------------+------------------------------------------------------
 %%% GAS OPTIONS %%%             : 
@@ -220,58 +220,60 @@ Assume Earth for Scattering?    : {{assume_earth_for_scattering}}
   (T) CO2 Profile Gas Name      : {{co2_profile_gas_name}}
   (F) Scattering Gases          : {% for gas in scattering_gases %}{{gas}} {% endfor %}
         Gas Entries ----------->:  Name  RI File (Root/GasScattering/)
-{% for info in scattering_gas_entries -%}
-                                :   {{info.name}} {{info.file}}
-{% endfor %}
+{%- for key,val in scattering_gas_entries.items()%}
+                                :  {{"{:>4} {}".format(val.name,val.file)}}
+{%- endfor %}
                                 :  ###END_OF_LIST###
 Do Raman Scattering?            : {{do_raman_scattering}}
   (T) RRS Ref. Temperature [K]  : {{rss_ref_temperature_k}}
       Raman Gases               : {% for gas in raman_gases %}{{gas}} {% endfor %}
        Gas Entries ------------>:  Name RRS File (Root/GasScattering/)
-{% for info in raman_gas_entries -%}
-                                :   {{info.name}} {{info.file}}
-{% endfor %}       
+{%- for key,val in raman_gas_entries.items()%}
+                                :  {{"{:>4} {}".format(val.name,val.file)}}
+{%- endfor %}       
                                 :  ###END_OF_LIST###
-Absorbing Gases                 : {% for gas in abs_species %}{{gas+" "}}{%- endfor %}
+Absorbing Gases                 : {% for gas in abs_species %}{{gas}} {% endfor %}
 # Fine Layers for XS Calc.      : {{nfl}}
 Full LUT To Memory              : {{full_lut_to_memory}}
-  Cross Section Entries-------->: Name   CIA1  CIA2  BRD1 XsectFilename (Full path:RootDataDirectory/SAO_crosssections/splatv2_xsect)
-{% for info in cross_section_entries -%}
-                                :  {{info.name}} {{info.cia1}} {{info.cia2}} {{info.brd1}} {{info.file}}
-{% endfor %}
+  Cross Section Entries-------->:  Name   CIA1  CIA2  BRD1 XsectFilename (Full path:RootDataDirectory/SAO_crosssections/splatv2_xsect)
+{%- for key,val in cross_section_entries.items()%}
+                                : {{"{:>5}{:>7}{:>6}{:>6} {}".format(val.name,val.cia1,val.cia2,val.brd1,val.file)}}
+{%- endfor %}
                                 :  ###END_OF_LIST###
 Airglow Gases                   : 
   Emiss Cross Section Entries ->:  Name    BRD1   XsectFilename (Full path:RootDataDirectory/SAO_crosssections/splatv2_xsect)
-                                :  O2DG       -   GGG2020_O2_1200_1310_SDVP_Airglow.nc
+{%- for key,val in airglow_cross_section_entries.items() %}
+                                :  {{"{:>4}{:>8}   {}".format(val.name,val.brd1,val.file)}}
+{%- endfor %}
                                 :  ###END_OF_LIST###
 --------------------------------+------------------------------------------------------
 %%% AEROSOL OPTIONS %%%         :
 Do aerosols?                    : {{do_aerosols}}
-  Aerosol Optical Properties -->: Name  AerOptFilename (Full Path:Root/AerCldProp/)
-{% for info in aerosol_optical_properties -%}
-                                :   {{info.name}} {{info.file}}
-{% endfor %}
+  Aerosol Optical Properties -->: Name AerOptFilename (Full Path:Root/AerCldProp/)
+{%- for key,val in aerosol_optical_properties.items()%}
+                                : {{"{:>4} {}".format(val.name,val.file)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 --------------------------------+------------------------------------------------------
 %%% CLOUD OPTIONS %%%           :
 Do Clouds?                      : {{do_clouds}}
  (T) Do Lambertian Clouds?      : {{do_lambertian_clouds}}
      (T) Cloud Albedo           : {{cloud_albedo}} 
-     (F) Cld Opt. Prop. ------->: Name  CldOptFilename (Full Path:Root/AerCldProp/)
-{% for info in cloud_opt_prop -%}
-                                :   {{info.name}} {{info.file}}
-{% endfor %}
+     (F) Cld Opt. Prop. ------->: Name CldOptFilename (Full Path:Root/AerCldProp/)
+{%- for key,val in cloud_opt_prop.items()%}
+                                : {{"{:>4} {}".format(val.name,val.file)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 --------------------------------+------------------------------------------------------
 %%% STATE VECTOR OPTIONS %%%    :
 Trace Gas                       : <....................................................>
- - Profile Species              : {% for gas in prf_species %}{{gas+" "}}{%- endfor %}
- - Column Species               : {% for gas in col_species %}{{gas+" "}}{%- endfor %}
+ - Profile Species              : {% for gas in prf_species %}{{gas}} {% endfor %}
+ - Column Species               : {% for gas in col_species %}{{gas}} {% endfor %}
  - Overwrite Clim. Uncertainty? : {{overwrite_clim_uncertainty}}
    (T) Uncertainty Option ----->: Name CovarMatrixType    Par1   Par2
-{% for info in uncertainty_option -%}
-                                :  {{info.name}} {{info.cov_mat_type}} {{info.par1}} {{info.par2}}
-{% endfor %}
+{%- for key,val in uncertainty_option.items()%}
+                                : {{"{:>4}{:>16}{:>8}{:>7}".format(val.name,val.cov_mat_type,val.par1,val.par2)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 Aerosol                         : <....................................................>
  - Profile Species AOD          :
@@ -287,7 +289,7 @@ Temperature                     : <.............................................
              - Parameters       : {{temperature.fit_profile_1.parameters}}
     (2) Fit Shift               :
         - Overwrite Clim. Unc?  : {{temperature.fit_shift_2.overwrite_clim_uncertainty}}
-          (T) - Shift Unc. (K)  : {{temperature.fit_shift2.shift_unc_k}}
+          (T) - Shift Unc. (K)  : {{temperature.fit_shift_2.shift_unc_k}}
 Surface Pressure                :
  - Add to state vector?         : {{surface_pressure.add_to_state_vector}}
  (T) Overwrite Clim. Unc.?      : {{surface_pressure.overwrite_clim_uncertainty}}
@@ -295,17 +297,17 @@ Surface Pressure                :
 Surface Reflectance             : <....................................................>
  - Add to state vector?         : {{surface_reflectance.add_to_state_vector}}
    (T) - Init State from obs?   : {{surface_reflectance.init_state_from_obs}}
-         (T) - Alb Wvl File     : {{data_dir}}/../../{{albedo_file}}
+         (T) - Alb Wvl File     : {{root_data_directory}}/../../{{albedo_file}}
              - Max Poly Order   : {{surface_reflectance.max_poly_order}}
        Option Index             : {{surface_reflectance.option_index}}
          (1) Polynomial Scaling :
             - Order             : {{surface_reflectance.polynomial_scaling_1.order}}
-            - Coeff Uncert. (%) : {% for elem in surface_reflectance.polynomial_scaling_1.coeff_unc_prcnt %}{{elem}}{% endfor %}
+            - Coeff Uncert. (%) : {% for elem in surface_reflectance.polynomial_scaling_1.coeff_unc_prcnt %}{{elem}} {% endfor %}
          (2) Window Poly. Scale.:
-            - Win. Order        : {{surface_reflectance.window_poly_scale_2.order}}
-{% for elem in surface_reflectance.window_poly_scale_2.win_uncert_prcnt -%}
+            - Win. Order        : {% for elem in surface_reflectance.window_poly_scale_2.order %}{{elem}} {% endfor %}
+{%- for elem in surface_reflectance.window_poly_scale_2.uncert_prcnt %}
             - Win. {{loop.index}} Uncert (%) : {{elem}} 
-{% endfor %}
+{%- endfor %}
          (3) EOF Fit(Case4 only):
             - Scale EOF Uncert. : {{surface_reflectance.eof_fit_3.scale_eof_uncert}}
              (T) Scale Factor   : {{surface_reflectance.eof_fit_3.scale_factor}}
@@ -316,34 +318,34 @@ Radiometric Offset              : <.............................................
            - Order              : {{radiometric_offset.polynomial_scaling_1.order}}
            - Coeff Unc. (% Rad) : {{radiometric_offset.polynomial_scaling_1.coeff_unc_prcnt_rad}}
        (2) Win. Polynomial Scl. :
-           - Win. Order         :   1
-{% for elem in radiometric_offset.window_poly_scale_2.win_uncert_prcnt_rad -%}
+           - Win. Order         : {% for elem in radiometric_offset.window_poly_scale_2.order %}{{elem}} {% endfor %}
+{%- for elem in radiometric_offset.window_poly_scale_2.uncert_prcnt_rad %}
             - Win. {{loop.index}} Uncert (%Rad) : {{elem}} 
-{% endfor %}           
+{%- endfor %}           
 Radiometric Scaling             : <....................................................>
  - Add to State Vector          : {{radiometric_scaling.add_to_state_vector}}
    (T) Option Index             : {{radiometric_scaling.option_index}}
        (1) Polynomial Scaling   :
            - Order              : {{radiometric_scaling.polynomial_scaling_1.order}}
-           - Coeff Unc. (%)     : {{radiometric_scaling.polynomial_scaling_1.coeff_unc_prcnt_rad}}
+           - Coeff Unc. (%)     : {{radiometric_scaling.polynomial_scaling_1.coeff_unc_prcnt}}
        (2) Win. Polynomial Scl. :
-           - Win. Order         :   {{radiometric_scaling.window_poly_scale_2.win_order}}
-{% for elem in radiometric_scaling.window_poly_scale_2.win_uncert_prcnt_rad -%}
+           - Win. Order         : {% for elem in radiometric_scaling.window_poly_scale_2.order %}{{elem}} {% endfor %}
+{%- for elem in radiometric_scaling.window_poly_scale_2.uncert_prcnt %}
             - Win. {{loop.index}} Uncert (%) : {{elem}} 
-{% endfor %}  
+{%- endfor %}  
 EOF Residuals                   : <....................................................>
  - Add to State Vector          : {{eof_residuals.add_to_state_vector}}
    (T) EOFs to add              : Band EOF_Index Uncertainty FileName
-{% for info in eof_residuals.eofs_to_add -%}
-                                :    {{info.band_index}} {{info.eof_index}} {{info.uncertainty}} {{info.file}}
-{% endfor %}
+{%- for key,val in eof_residuals.eofs_to_add.items()%}
+                                : {{"{:>4}{:>10}{:>12} {}".format(val.band_index,val.eof_index,val.uncertainty,val.file)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 ISRF Parameters                 : <....................................................>
  - Add to State Vector          : T
    (T) Parameters to fit ------>: Window Param PolyOrder  Uncertainty
-{% for info in isrf_parameters.parameters_to_fit -%}
-                                :    {{info.window}} {{info.param}} {{info.poly_order}} {{info.uncertainty}} {{info.tbd}}
-{% endfor %}
+{%- for key,val in isrf_parameters.parameters_to_fit.items()%}
+                                : {{"{:>6}{:>6}{:>10}{:>13}".format(val.window,val.param,val.poly_order,val.uncertainty,val.tbd)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
 Wavelength Grid                 : <....................................................>
  - Add to State Vector          : {{wavelength_grid.add_to_state_vector}}
@@ -352,10 +354,10 @@ Wavelength Grid                 : <.............................................
            - Order              : {{wavelength_grid.polynomial_scaling_1.order}}
            - Coeff Unc. (%)     : {{wavelength_grid.polynomial_scaling_1.coeff_unc_prcnt}}
        (2) Win. Polynomial Scl. :
-           - Win. Order         :   {{wavelength_grid.window_poly_scale_2.win_order}}
-{% for elem in wavelength_grid.window_poly_scale_2.win_uncert_prcnt -%}
+           - Win. Order         : {% for elem in wavelength_grid.window_poly_scale_2.order %}{{elem}}{% endfor %}
+{%- for elem in wavelength_grid.window_poly_scale_2.uncert_prcnt %}
             - Win. {{loop.index}} Uncert (%) : {{elem}} 
-{% endfor %}  
+{%- endfor %}  
 --------------------------------+------------------------------------------------------
 %%% OPTIMIZER OPTIONS %%%       :
 Maximum # Iterations            : {{max_iter}}
@@ -380,19 +382,19 @@ Profile Output Options         @: {% for elem in profile_output_options.outputs 
    Temperature (Layer Edge)    @: {% for elem in profile_output_options.temperature_layer_edge %}{{elem}} {% endfor %}
    Temperature (Layer Mid)     @: {% for elem in profile_output_options.temperature_layer_mid %}{{elem}} {% endfor %}
    Altitude (Layer Edge)       @: {% for elem in profile_output_options.altitude_layer_edge %}{{elem}} {% endfor %}
-   Altitude (Layer Mid)        @: {% for elem in profile_output_options.altitude_layer_mod %}{{elem}} {% endfor %}
+   Altitude (Layer Mid)        @: {% for elem in profile_output_options.altitude_layer_mid %}{{elem}} {% endfor %}
    Air Molecular Weight        @: {% for elem in profile_output_options.air_molecular_weight %}{{elem}} {% endfor %}
    Gravity                     @: {% for elem in profile_output_options.gravity %}{{elem}} {% endfor %}
    RH                          @: {% for elem in profile_output_options.relative_humidity %}{{elem}} {% endfor %}
    Air Partial Column          @: {% for elem in profile_output_options.air_partial_column %}{{elem}} {% endfor %}
    Gas Partial Columns         @: {% for elem in profile_output_options.gas_partial_column %}{{elem}} {% endfor %}
      --> Species                : {% for elem in profile_output_options.gas_partial_column_species %}{{elem}} {% endfor %}
-   Gas Column Uncertainties    @: {% for elem in profile_output_options.gas_partial_column_uncertainties %}{{elem}} {% endfor %}
-     --> Species                : {% for elem in profile_output_options.gas_partial_column_uncertainties_species %}{{elem}} {% endfor %}
+   Gas Column Uncertainties    @: {% for elem in profile_output_options.gas_column_uncertainties %}{{elem}} {% endfor %}
+     --> Species                : {% for elem in profile_output_options.gas_column_uncertainties_species %}{{elem}} {% endfor %}
    Gas Mixing Ratios           @: {% for elem in profile_output_options.gas_mixing_ratios %}{{elem}} {% endfor %}
      --> Species                : {% for elem in profile_output_options.gas_mixing_ratios_species %}{{elem}} {% endfor %}
-   Dry Gas Mixing Ratios       @: {% for elem in profile_output_options.gas_dry_mixing_ratios %}{{elem}} {% endfor %}
-     --> Species                : {% for elem in profile_output_options.gas_dry_mixing_ratios_species %}{{elem}} {% endfor %}
+   Dry Gas Mixing Ratios       @: {% for elem in profile_output_options.dry_gas_mixing_ratios %}{{elem}} {% endfor %}
+     --> Species                : {% for elem in profile_output_options.dry_gas_mixing_ratios_species %}{{elem}} {% endfor %}
    Proxy Column Avg. Mix. Rat. @: {% for elem in profile_output_options.proxy_column_avg_mix_rat %}{{elem}} {% endfor %}
      --> Species                : {% for elem in profile_output_options.proxy_column_avg_mix_rat_species %}{{elem}} {% endfor %}
    Total AOD                   @: {% for elem in profile_output_options.total_aod %}{{elem}} {% endfor %}
@@ -416,7 +418,7 @@ RTM Output Options              :
      --> Stokes Q,U?            : {{rtm_output_options.direct_flux_stokes}}
    Gas Jacobians                :
      Trace Gas Jacobians       @: {% for elem in rtm_output_options.gas_jacobians.trace_gas %}{{elem}} {% endfor %}
-       --> Species              : {% for elem in rtm_output_options.gas_jacobians.trace_gas %}{{elem}} {% endfor %}
+       --> Species              : {% for elem in rtm_output_options.gas_jacobians.trace_gas_species %}{{elem}} {% endfor %}
        --> Stokes Q,U?          : {{rtm_output_options.gas_jacobians.trace_gas_stokes}}
      Trace Gas Part. Col.      @: {% for elem in rtm_output_options.gas_jacobians.trace_gas_part_col %}{{elem}} {% endfor %}
        --> Species              : {% for elem in rtm_output_options.gas_jacobians.trace_gas_part_col_species %}{{elem}} {% endfor %} 
@@ -455,15 +457,15 @@ RTM Output Options              :
      BRDF Kernel Parameters    @: {% for elem in rtm_output_options.surface_jacobians.brdf_kernel_parameters %}{{elem}} {% endfor %}
        --> Stokes Q,U?          : {{rtm_output_options.surface_jacobians.brdf_kernel_parameters_stokes}}
    Instrument Jacobians         :
-     ISRF                      @: {% for elem in rtm_output_options.isrf %}{{elem}} {% endfor %}
-       --> Stokes Q,U           : {{rtm_output_options.isrf_stokes}}
-     Wavelength Shift          @: {% for elem in rtm_output_options.wavelength_shift %}{{elem}} {% endfor %}
-       --> Stokes Q,U           : {{rtm_output_options.wavelength_shift_stokes}}
+     ISRF                      @: {% for elem in rtm_output_options.instrument_jacobians.isrf %}{{elem}} {% endfor %}
+       --> Stokes Q,U           : {{rtm_output_options.instrument_jacobians.isrf_stokes}}
+     Wavelength Shift          @: {% for elem in rtm_output_options.instrument_jacobians.wavelength_shift %}{{elem}} {% endfor %}
+       --> Stokes Q,U           : {{rtm_output_options.instrument_jacobians.wavelength_shift_stokes}}
 Optical Property Diagnostics    :
-   Gas Absorption XSect        @: {% for elem in profile_output_options.optical_property_diagnostics.gas_absorption_xsect %}{{elem}} {% endfor %}
-       --> Species              : {% for elem in profile_output_options.optical_property_diagnostics.gas_absorption_xsect_species %}{{elem}} {% endfor %}
-   Total Optical Depth         @: {% for elem in profile_output_options.optical_property_diagnostics.total_optical_depth %}{{elem}} {% endfor %}
-   BRDF Kernel Amplitudes      @: {% for elem in profile_output_options.optical_property_diagnostics.brdf_kernel_amplitudes %}{{elem}} {% endfor %}
+   Gas Absorption XSect        @: {% for elem in optical_property_diagnostics.gas_absorption_xsect %}{{elem}} {% endfor %}
+       --> Species              : {% for elem in optical_property_diagnostics.gas_absorption_xsect_species %}{{elem}} {% endfor %}
+   Total Optical Depth         @: {% for elem in optical_property_diagnostics.total_optical_depth %}{{elem}} {% endfor %}
+   BRDF Kernel Amplitudes      @: {% for elem in optical_property_diagnostics.brdf_kernel_amplitudes %}{{elem}} {% endfor %}
 --------------------------------+------------------------------------------------------
 %%% INVERSE DIAG OPTIONS %%%    :
 General Fit Statistics          :
@@ -489,16 +491,16 @@ Total State Vector              :
        (T) Max Iterations       : {{total_state_vector.iteration_state_max_iter}} 
 Sub State Vector Diagnostics    :
    Gas Absorption Post. Covar.  :
-     Profile Mixing ratio       : {{sub_state_vector_diagnostics.profile_mixing_ratio}} 
-       --> Species              : {% for elem in sub_state_vector_diagnostics.profile_mixing_ratio_species %}{{elem}} {% endfor %}
-     Column Avg. Mixing Ratio   : {{sub_state_vector_diagnostics.column_avg_mixing_ratio}}
-       --> Species              : {% for elem in sub_state_vector_diagnostics.column_avg_mixing_ratio_species %}{{elem}} {% endfor %}
-     Dry Profile Mixing Ratio   : {{sub_state_vector_diagnostics.dry_profile_mixing_ratio}}
-       --> Species              : {% for elem in sub_state_vector_diagnostics.dry_profile_mixing_ratio_species %}{{elem}} {% endfor %}
-     Dry Column Avg. Mix. Ratio : {{sub_state_vector_diagnostics.dry_column_avg_mixing_ratio}}
-       --> Species              : {% for elem in sub_state_vector_diagnostics.dry_column_avg_mixing_ratio_species %}{{elem}} {% endfor %}
-     Posteriori Proxy Uncert.   : {{sub_state_vector_diagnostics.proxy_posteriori_uncert}}
-       --> Species              : {% for elem in profile_output_options.proxy_posteriori_uncert_species %}{{elem}} {% endfor %}
+     Profile Mixing ratio       : {{sub_state_vector_diagnostics.gas_absorption_post_covar.profile_mixing_ratio}} 
+       --> Species              : {% for elem in sub_state_vector_diagnostics.gas_absorption_post_covar.profile_mixing_ratio_species %}{{elem}} {% endfor %}
+     Column Avg. Mixing Ratio   : {{sub_state_vector_diagnostics.gas_absorption_post_covar.column_avg_mixing_ratio}}
+       --> Species              : {% for elem in sub_state_vector_diagnostics.gas_absorption_post_covar.column_avg_mixing_ratio_species %}{{elem}} {% endfor %}
+     Dry Profile Mixing Ratio   : {{sub_state_vector_diagnostics.gas_absorption_post_covar.dry_profile_mixing_ratio}}
+       --> Species              : {% for elem in sub_state_vector_diagnostics.gas_absorption_post_covar.dry_profile_mixing_ratio_species %}{{elem}} {% endfor %}
+     Dry Column Avg. Mix. Ratio : {{sub_state_vector_diagnostics.gas_absorption_post_covar.dry_column_avg_mixing_ratio}}
+       --> Species              : {% for elem in sub_state_vector_diagnostics.gas_absorption_post_covar.dry_column_avg_mixing_ratio_species %}{{elem}} {% endfor %}
+     Posteriori Proxy Uncert.   : {{sub_state_vector_diagnostics.gas_absorption_post_covar.proxy_posteriori_uncert}}
+       --> Species              : {% for elem in sub_state_vector_diagnostics.gas_absorption_post_covar.proxy_posteriori_uncert_species %}{{elem}} {% endfor %}
 Full matrices for offline Err.  :
    Gain matrix                  : {{full_matrices_for_offline_err.gain_matrix}}
 --------------------------------+------------------------------------------------------
