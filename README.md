@@ -2,7 +2,11 @@
 
 This aims to breakup the long splat control files into a smaller file where only the inputs that most commonly change from run to run appear
 
-### [template.control](template.control): this is the splat control file with all input fields translated into a jinja template
+## A. Breakup control file
+
+### [template.control](template.control): 
+
+this is the splat control file with all input fields translated into a jinja template
 
 ### [control_setup.json](control_setup.json):
 
@@ -35,3 +39,10 @@ It accepts a list to setup multiple windows **"window":["co2_window","ch4_window
 ### [xsec.json](xsec.json)
 
 similar to [window.json](window.json) but to set up the cross section files to be used
+
+
+## B. Generate many control files
+
+### [generate_controls.py](generate_controls.py)
+
+This code reads in file like [controls.json](controls.json) where the **value** of each **key:value** pair is a list of different inputs for the given **key** , then the code calls [control_setup.py](control_setup.py) with all possible permutations of the given inputs (e.g. to setup control files with different versions of cross section tables)
