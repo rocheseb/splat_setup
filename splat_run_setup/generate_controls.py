@@ -26,12 +26,11 @@ def generate_controls(**kwargs):
             kwargs[key] = elem[i]
         arguments = control_setup(**kwargs)
         outdir = os.path.dirname(arguments['outfile'])
-        commands_list += [f"cd {outdir}; /n/home11/sroche/gitrepos/sci-level2-splat/MASTER_MODULE/splat.exe {arguments['fname']}.control\n"]
-
+        commands_list += [f"cd {outdir}; {os.path.join(os.environ['splat'],'MASTER_MODULE/splat.exe')} {arguments['fname']}.control\n"]
 
     with open(os.path.join(outdir,'splat_parallel.txt'),'w') as f:
         f.writelines(commands_list)
-    
+            
 
 def main():
     parser = argparse.ArgumentParser(
@@ -42,7 +41,7 @@ def main():
     parser.add_argument('run_dir',help='full path to the splat run directory')
     parser.add_argument('data_dir',help='full path to the data directory for the splat run')
     parser.add_argument('-t','--template',default='/n/home11/sroche/gitrepos/methanesat/template.control')
-    parser.add_argument('-j','--json',default=None,help='full path to control_setup input json file')
+    parser.add_argument('-j','--json',default=None,help='full path to controls input json file')
     args = parser.parse_args()
 
     generate_controls(**args.__dict__)

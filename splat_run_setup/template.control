@@ -6,10 +6,10 @@ Output File                     : {{output_file}}
 Compute all pixels              : {{compute_all_pixels}}
  (F) - X Retrieval Range        : {% for x in x_retrieval_range %}{{x}} {% endfor %}
      - Y Retrieval Range        : {% for y in y_retrieval_range %}{{y}} {% endfor %}
-     - Output to XY?            : {{output_to_xy}}
-        (T) Use file lock?      : {{use_file_lock}}
-            Overwrite Existing? : {{overwrite_existing}}
-            Only Create file    : {{only_create_file}}
+Write directly to file?         : {{write_directly_to_file}}
+Use file lock?                  : {{use_file_lock}}
+Overwrite Existing?             : {{overwrite_existing}}
+Cache pixel output?             : {{cache_pixel_output}}
 Root data directory             : {{root_data_directory}}
 Switch on debug?                : {{switch_on_debug}} {{debug_level}}
 Debug filename                  : {{log_file}}
@@ -53,7 +53,7 @@ Do Single Pixel Calc from Inp.  : F
 L2 2D Support Data              : Use  AuxFileType AuxFileName
   - Surface Altitude            : {{"{:>3}{:>13} {}".format(l2_2d_support_data.surface_altitude.use,l2_2d_support_data.surface_altitude.aux_file_type,l1_file)}}
   - Surface Winds               : {{"{:>3}{:>13} {}".format(l2_2d_support_data.surface_winds.use,l2_2d_support_data.surface_winds.aux_file_type,l2_wind_file)}}
-  - Chlorophyll                 : {{"{:>3}{:>13} {}".format(l2_2d_support_data.chlorophyll.use,l2_2d_support_data.chlorophyll.aux_file_type,l2_chloro_file)}}
+  - Chlorophyll                 : {{"{:>3}{:>13} {}".format(l2_2d_support_data.chlorophyll.use,l2_2d_support_data.chlorophyll.aux_file_type,l2_chlorophyll_file)}}
   - OceanSalinity               : {{"{:>3}{:>13} {}".format(l2_2d_support_data.ocean_salinity.use,l2_2d_support_data.ocean_salinity.aux_file_type,l2_ocean_file)}}
   - Snow Parameters             : {{"{:>3}{:>13} {}".format(l2_2d_support_data.snow_parameters.use,l2_2d_support_data.snow_parameters.aux_file_type,l2_snow_file)}}
 L2 Profile Support Data         :
@@ -214,6 +214,7 @@ Surface Emissivity Option       : {{surface_emissivity_option}}
  (3) Emissivity Climatology     :
      - Path to file             : {{root_data_directory}}/Emiisivity/
 Do plant fluorescence?          : {{do_plant_fluorescence}}
+   (T) Path to Spectrum         : {{chlorophyll_spectrum_file}}
 --------------------------------+------------------------------------------------------
 %%% GAS OPTIONS %%%             : 
 Assume Earth for Scattering?    : {{assume_earth_for_scattering}}
@@ -319,8 +320,8 @@ Radiometric Offset              : <.............................................
            - Coeff Unc. (% Rad) : {{radiometric_offset.polynomial_scaling_1.coeff_unc_prcnt_rad}}
        (2) Win. Polynomial Scl. :
            - Win. Order         : {% for elem in radiometric_offset.window_poly_scale_2.order %}{{elem}} {% endfor %}
-{%- for elem in radiometric_offset.window_poly_scale_2.uncert_prcnt_rad %}
-            - Win. {{loop.index}} Uncert (%Rad) : {{elem}} 
+{%- for elem in radiometric_offset.window_poly_scale_2.uncert_prcnt %}
+            - Win. {{loop.index}} Uncert (%) : {{elem}} 
 {%- endfor %}           
 Radiometric Scaling             : <....................................................>
  - Add to State Vector          : {{radiometric_scaling.add_to_state_vector}}
@@ -501,8 +502,16 @@ Sub State Vector Diagnostics    :
        --> Species              : {% for elem in sub_state_vector_diagnostics.gas_absorption_post_covar.dry_column_avg_mixing_ratio_species %}{{elem}} {% endfor %}
      Posteriori Proxy Uncert.   : {{sub_state_vector_diagnostics.gas_absorption_post_covar.proxy_posteriori_uncert}}
        --> Species              : {% for elem in sub_state_vector_diagnostics.gas_absorption_post_covar.proxy_posteriori_uncert_species %}{{elem}} {% endfor %}
+     Column Averaging Kernel    : {{sub_state_vector_diagnostics.column_averaging_kernel}}
+       --> Species              : {% for elem in sub_state_vector_diagnostics.column_averaging_kernel_species %}{{elem}} {% endfor %}
 Full matrices for offline Err.  :
    Gain matrix                  : {{full_matrices_for_offline_err.gain_matrix}}
+Error Analysis                  :
+     Do Error Analysis          : {{error_analysis.do_error_analysis}}
+     Proxy Name                 : {{error_analysis.proxy_name}}
+     Gas Column Components      : {% for elem in error_analysis.gas_column_components %}{{elem}} {% endfor %}
+     Print Outputs              : {% for elem in error_analysis.print_outputs %}{{elem}} {% endfor %}
+     XGas Components            : {% for elem in error_analysis.proxy_xgas_components %}{{elem}} {% endfor %}
 --------------------------------+------------------------------------------------------
 END OF FILE                     :
 --------------------------------+------------------------------------------------------

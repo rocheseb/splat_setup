@@ -149,9 +149,7 @@ def control_setup(control_file: str, json_file: str, template_file: str) -> Dict
     with open(os.path.join(code_dir,"xsec.json"), "rb") as f:
         xsec_data = json.load(f)
     for gas in xsec_data[json_inputs["xsec"]]:
-        template_inputs["cross_section_entries"][gas]["file"] = xsec_data[
-            json_inputs["xsec"]
-        ][gas]
+        template_inputs["cross_section_entries"][gas]["file"] = xsec_data[json_inputs["xsec"]][gas]
 
     # dedicated windows inputs
     with open(os.path.join(code_dir,"window.json"), "rb") as f:
