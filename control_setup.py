@@ -56,6 +56,10 @@ def load_default_controls(splat_inputs: Dict) -> Dict:
     """
     Read control_setup.toml, get rid of 1st level keys and update the "macro" values
     In control_setup.toml values can be set to the value of an existing key with the "=key" syntax
+    update the info read from control_setup.py by using the info in --toml-file
+
+    Inputs:
+        - splat_inputs (Dict): the contents of --toml-file
     """
     with open(os.path.join(os.path.dirname(__file__), "control_setup.toml"), "r") as f:
         control_setup_dict = toml.load(f)
@@ -101,13 +105,9 @@ def nested_dict_set(d: Dict, path: str, val: Any, delimiter: str = ".") -> Any:
     d[key_list[-1]] = val
 
 
-def control_setup(control_file: str, toml_file: str, template_file: str) -> Dict:
+def check_required_variables(toml_file: str) -> None:
     """
-    template_file: the control file with jinja fields
-    control_setup.toml has all the default input fields to fill the template_file
-
-    toml_file: an input toml file with a subset of jinja fields, these will overwrite what is defined in control_setup.toml
-    control_file: output control file
+    Check that the --toml-file has the expected inputs
     """
     with open(toml_file, "r") as f:
         toml_inputs = toml.load(f)
@@ -133,6 +133,19 @@ def control_setup(control_file: str, toml_file: str, template_file: str) -> Dict
                 f"{var} must be in the input toml file, all the required inputs are: {newline+newline.join(required)}"
             )
 
+    return toml_inputs
+
+
+def control_setup(control_file: str, toml_file: str, template_file: str) -> Dict:
+    """
+    template_file: the control file with jinja fields
+    control_setup.toml has all the default input fields to fill the template_file
+
+    toml_file: an input toml file with a subset of jinja fields, these will overwrite what is defined in control_setup.toml
+    control_file: output control file
+    """
+    toml_inputs = check_required_variables(toml_file)
+
     # load control_setup.toml into a dictionary
     # then update that dictionary with the fields from toml_file
     # then update the "=key" values
@@ -145,8 +158,9 @@ def control_setup(control_file: str, toml_file: str, template_file: str) -> Dict
     # dedicated cross-section inputs
     with open(os.path.join(code_dir, "xsec.toml"), "r") as f:
         xsec_data = toml.load(f)
-    for gas in xsec_data[toml_inputs["xsec"]]:
-        template_inputs["cross_section_entries"][gas]["file"] = xsec_data[toml_inputs["xsec"]][gas]
+    for gas, gas_data in xsec_data[toml_inputs["xsec"]].items():
+        for key, value in gas_data.items():
+            nested_dict_set(template_inputs, key, value)
 
     # dedicated windows inputs
     with open(os.path.join(code_dir, "window.toml"), "r") as f:
@@ -156,6 +170,8 @@ def control_setup(control_file: str, toml_file: str, template_file: str) -> Dict
         window: window_data[window]["fwd_inv_mode_options"] for window in window_list
     }
 
+    # Some fields are lists that will have a list of values corresponding to each band
+    # We have to check if different windows are in the same band when building them
     new_band_inputs = {
         window: window_data[window]["l2_surface_reflectance"]["band_inputs"]
         for window in window_list
