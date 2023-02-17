@@ -1,0 +1,1072 @@
+# special syntax: use "=key" as a value so that control_setup.py will replace it with the value of the given key
+
+####################
+#################### Files
+####################
+[FILES]
+root_data_directory = "COMMENT: SET IN CONTROL_SETUP.PY"
+log_file = "COMMENT: SET IN CONTROL_SETUP.PY"
+output_file = "COMMENT: SET IN CONTROL_SETUP.PY"
+l1_file = "/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700.nc"
+l2_met_file = "/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700_prior.nc"
+# the following files must be under the root_data_directory
+isrf_file = "o2_isrf_lut_20210722_xflipped.nc"
+albedo_file = "albedo_bands.nc"
+
+####################
+#################### Retrieval Options
+####################
+[RETRIEVAL]
+# one of ["INVERSE","FORWARD"]
+calculation_mode = "INVERSE"
+compute_all_pixels = "F"
+# if compute_all_pixels is False, use these pixel ranges:
+x_retrieval_range = [ 100, 100,]
+y_retrieval_range = [ 30, 30,]
+# if write_directly_to_file is "F", will create a subset directory
+write_directly_to_file = "F"
+use_file_lock = "T"
+overwrite_existing = "F"
+cache_pixel_output = "T"
+switch_on_debug = "T"
+# debug levels 1,2,3 in increasing order of verbosity
+debug_level = ""
+
+####################
+#################### Level1 Options
+####################
+["LEVEL1 OPTIONS"]
+# if "T", will compute a spectrum from parameters under single_pixel_calc
+# if "F", will use an input L1 spectrum specified under l1_radiance_band_input
+do_single_pixel_calc_from_inp = "F"
+
+["LEVEL1 OPTIONS".single_pixel_calc_inp]
+date_yyyymmdd = "20070715"
+hour_decimal_utc = 17
+sza_deg = 30.0
+vza_deg = 30.0
+aza_deg = 45.0
+saa_deg = 0.0
+vaa_deg = 45.0
+longitude_deg = -87.95
+latitude_deg = 32.05
+surface_altitude_km = 0.0
+obs_altitude_km = 0.0
+cloud_fraction = 0.2
+cloud_pressure_hpa = 500.0
+# wind speed units: m/s
+wind_speed_mps = 5.0
+wind_dir_deg = 0.0
+# chlorophyll units: mg/m^3
+chlorophyll_mgpm3 = 30.0
+ocean_salinity_pptv = 300.0
+snow_fraction = 0.0
+sea_ice_fraction = 0.0
+snow_depth_m = 0.0
+snow_age_days = 0.0
+
+["LEVEL1 OPTIONS".single_pixel_calc_inp.pixel_corners.longitudes_deg]
+bot_left = -88.0
+top_left = -88.0
+top_right = -87.9
+bot_right = -87.9
+
+["LEVEL1 OPTIONS".single_pixel_calc_inp.pixel_corners.latitudes_deg]
+bot_left = 32.0
+top_left = 32.1
+top_right = 32.1
+bot_right = 32.0
+
+["LEVEL1 OPTIONS".single_pixel_calc_inp.band_definition.band1]
+name = "TEMPOVis"
+start_nm = 540.0
+end_nm = 740.0
+sampling_nm = 0.01
+view_dir_idx = 1
+
+# when do_single_pixel_calc_from_inp is "F"
+["LEVEL1 OPTIONS".l1_radiance_band_input.band1]
+index = 1
+name = "O2Delta"
+file_type = "SPLAT"
+file = "=l1_file"
+
+["LEVEL1 OPTIONS".l2_2d_support_data.surface_altitude]
+use = "T"
+file_type = "SPLAT"
+file = "=l1_file"
+
+["LEVEL1 OPTIONS".l2_2d_support_data.surface_winds]
+use = "F"
+file_type = "SPLAT"
+file = "=l1_file"
+
+["LEVEL1 OPTIONS".l2_2d_support_data.chlorophyll]
+use = "F"
+file_type = "SPLAT"
+file = "=l1_file"
+
+["LEVEL1 OPTIONS".l2_2d_support_data.ocean_salinity]
+use = "F"
+file_type = "SPLAT"
+file = "=l1_file"
+
+["LEVEL1 OPTIONS".l2_2d_support_data.snow_parameters]
+use = "F"
+file_type = "SPLAT"
+file = "=l1_file"
+
+["LEVEL1 OPTIONS".l2_profile_support_data]
+use_l2_profile_met = "T"
+file_type = "SPLAT"
+file = "=l2_met_file"
+gases = [ "CH4", "CO2", "H2O",]
+aerosols = []
+
+["LEVEL1 OPTIONS".clouds]
+use_l2_clouds = "F"
+use_clouds_from_l2_prof_met = "F"
+species = []
+file_type = "SPLAT"
+file = "=l1_file"
+
+["LEVEL1 OPTIONS".l2_surface_reflectance]
+use_l2_surface = "T"
+
+["LEVEL1 OPTIONS".l2_surface_reflectance.band_inputs.o2_window]
+index = 2
+name = "O2Delta"
+file_type = "SPLAT"
+file = "=l2_met_file"
+
+####################
+#################### RTM Options
+####################
+["RTM OPTIONS".vlidort_line_by_line.model1]
+name = "LBL_IQU"
+n_stoke = 3
+n_stream = 4
+n_moment = 1000
+thermax_nm = 3000.0
+debug = "F"
+
+["RTM OPTIONS".vlidort_line_by_line.model2]
+name = "LBL_I"
+n_stoke = 1
+n_stream = 4
+n_moment = 1000
+thermax_nm = 3000.0
+debug = "F"
+
+["RTM OPTIONS".vlidort_line_by_line.model3]
+name = "LBL_16S"
+n_stoke = 3
+n_stream = 16
+n_moment = 1000
+thermax_nm = 3000.0
+debug = "F"
+
+["RTM OPTIONS".vlidort_pca.model1]
+name = "PCA_IQU"
+n_stoke = 3
+n_stream = 4
+n_moment = 1000
+thermax_nm = 3000.0
+debug = "F"
+control_file = "pca_bin.control"
+
+["RTM OPTIONS".first_order.model1]
+name = "FrstOrd"
+n_stoke = 1
+n_moment = 200
+thermax_nm = 3000.0
+
+["RTM OPTIONS".two_stream.model1]
+name = "TwoStr"
+n_moment = 1000
+thermax_nm = 3000.0
+
+####################
+#################### Window Options
+####################
+
+# ISRF parametrization: fixed super-gaussian
+["WINDOW OPTIONS".isrf_parametrization.fixed_supergaussian.a]
+name = "MSatCH4"
+hw1e = 0.189
+asym = 0.0
+shape_fac = 2.0
+wavenumber_units = "F"
+
+["WINDOW OPTIONS".isrf_parametrization.fixed_supergaussian.b]
+name = "MSatFix"
+hw1e = 0.05
+asym = 0.0
+shape_fac = 2.0
+wavenumber_units = "F"
+
+["WINDOW OPTIONS".isrf_parametrization.fixed_supergaussian.c]
+name = "MSatdw"
+hw1e = 0.05001
+asym = 0.0
+shape_fac = 2.0
+wavenumber_units = "F"
+
+["WINDOW OPTIONS".isrf_parametrization.fixed_supergaussian.d]
+name = "OMVISFix"
+hw1e = 0.34
+asym = 0.0
+shape_fac = 2.0
+wavenumber_units = "F"
+
+["WINDOW OPTIONS".isrf_parametrization.fixed_supergaussian.e]
+name = "MSatWnum"
+hw1e = 0.3
+asym = 0.0
+shape_fac = 2.0
+wavenumber_units = "T"
+
+# ISRF parametrization: fixed TROPOMI
+["WINDOW OPTIONS".isrf_parametrization.fixed_tropomi.a]
+name = "SWIR"
+c0 = 0.0
+d = 0.5703
+s = 2.7202
+w = 2.6464
+eta = 0.0989
+gamma = 1.477
+m = 1.6701
+wavenumber_units = "F"
+
+# ISRF input file
+# This creates a table of all available ISRFs
+# The one that will be used for the retrieval is specified by "name" under "WINDOW OPTIONS".fwd_inv_mode_options.o2_window.isrf
+["WINDOW OPTIONS".isrf_parametrization.isrf_file.a]
+name = "MSatB1"
+band_index = 1
+wavenumber_units = "F"
+file = "methanesat_isrf_parameters.nc"
+# isrf_agg is the aggregation factor in the across-track dimension (e.g. 1 for 1x1, 5 for 5x1)
+isrf_agg = ""
+
+["WINDOW OPTIONS".isrf_parametrization.isrf_file.b]
+name = "MSatB2"
+band_index = 2
+wavenumber_units = "F"
+file = "methanesat_isrf_parameters.nc"
+isrf_agg = ""
+
+["WINDOW OPTIONS".isrf_parametrization.isrf_file.c]
+name = "MAirCal"
+band_index = 1
+wavenumber_units = "F"
+file = "=isrf_file"
+isrf_agg = 1
+
+["WINDOW OPTIONS".isrf_parametrization.isrf_file.d]
+name = "TROPSWIR"
+band_index = 1
+wavenumber_units = "F"
+file = "tropomi_isrf_test_parameters.nc"
+isrf_agg = ""
+
+["WINDOW OPTIONS".isrf_parametrization.isrf_file.e]
+name = "LUTSIR"
+band_index = 1
+wavenumber_units = "F"
+file = "tropomi_isrf_test_lut.nc"
+isrf_agg = ""
+
+["WINDOW OPTIONS".isrf_parametrization.isrf_file.f]
+name = "GOSATB2"
+band_index = 1
+wavenumber_units = "T"
+file = "gosat_isrf_lut.nc"
+isrf_agg = ""
+
+["WINDOW OPTIONS".amf_mode_options]
+convolution_buffer = 2.0
+radiative_transfer_model = "LBL_IQU"
+isrf_option = "OMVISFix"
+
+["WINDOW OPTIONS".fwd_inv_mode_options.o2_window]
+index = 1
+start_nm = 1249.2
+end_nm = 1287.8
+buffer_nm = 2.0
+convolution_grid_sampling = 0.002
+radiative_transfer_model = "TRNMSM"
+isrf = "MAirCal"
+convolution_width_hw1e = 10.0
+use_fft_for_convolution = "F"
+
+["WINDOW OPTIONS".common_options]
+# will look for solar_file under {{root_data_directory}}/SolarSpectra/
+solar_file = "chance_jpl_mrg_hitran_200-16665nm.nc"
+# if rtm_at_l1_resolution is "T", check if solar_io_correction, else check if use_custom_rtm_grid
+rtm_at_l1_resolution = "F"
+solar_io_correction = "F"
+use_custom_rtm_grid = "F"
+# will look for custom_grid_file under {{root_data_directory}}/../../
+custom_grid_file = "custom_rtm_grid.nc"
+
+####################
+#################### Profile Options
+####################
+["PROFILE OPTIONS"]
+# will look for apriori_file under {{root_data_directory}}/../../
+apriori_file = "AFGLUS_apriori_PA.nc"
+# sampling method: {1: Nearest Neighbor, 2: Point-in-Polygon}
+sampling_method = 1
+# surface_gravity units: m/s^2
+surface_gravity_mps2 = 9.80991
+planetary_radius_km = 6378.1
+linearize_wrt_hybrid_grid = "T"
+profile_trace_gases = [ "N2", "O2", "Ar", "H2O", "CH4", "CO2", "PA1",]
+wet_trace_gases = [ "H2O",]
+proxy_normalization_species = [ "CH4",]
+
+# properties of gases listed under profile_trace_gases
+# molecular weights are in g/mol
+["PROFILE OPTIONS".trace_gas_properties.a]
+name = "N2"
+molecular_weight_gpmol = 28.014
+
+["PROFILE OPTIONS".trace_gas_properties.b]
+name = "O2"
+molecular_weight_gpmol = 31.998
+
+["PROFILE OPTIONS".trace_gas_properties.c]
+name = "Ar"
+molecular_weight_gpmol = 39.948
+
+["PROFILE OPTIONS".trace_gas_properties.d]
+name = "H2O"
+molecular_weight_gpmol = 18.015
+
+["PROFILE OPTIONS".trace_gas_properties.e]
+name = "CH4"
+molecular_weight_gpmol = 16.043
+
+["PROFILE OPTIONS".trace_gas_properties.f]
+name = "CO2"
+molecular_weight_gpmol = 44.009
+
+["PROFILE OPTIONS".trace_gas_properties.g]
+name = "PA1"
+molecular_weight_gpmol = 28.965
+
+["PROFILE OPTIONS".profile_aerosols]
+aod_reference_wavelength_nm = 550.0
+aod_from_profile_file = "T"
+aer_opt_par_from_profile_file = "F"
+
+# if aod_from_profile_file is "F"
+["PROFILE OPTIONS".profile_aerosols.profile_aer_opt_prop_params.a]
+name = "SU"
+aod = 1.0
+prof_type = "GDF"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 0.0
+
+["PROFILE OPTIONS".profile_aerosols.profile_aer_opt_prop_params.b]
+# black carbon
+name = "BC"
+aod = 0.01
+prof_type = "EXP"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 1.0
+
+["PROFILE OPTIONS".profile_aerosols.profile_aer_opt_prop_params.c]
+name = "OC"
+aod = 0.01
+prof_type = "BOX"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 0.0
+
+["PROFILE OPTIONS".profile_aerosols.profile_aer_opt_prop_params.d]
+name = "SF"
+aod = 0.01
+prof_type = "GDF"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 0.0
+
+["PROFILE OPTIONS".profile_aerosols.profile_aer_opt_prop_params.e]
+name = "SC"
+aod = 0.01
+prof_type = "GDF"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 0.0
+
+["PROFILE OPTIONS".profile_aerosols.profile_aer_opt_prop_params.f]
+name = "DU"
+aod = 0.01
+prof_type = "GDF"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 0.0
+
+# used if aer_opt_par_from_profile_file is "F"
+["PROFILE OPTIONS".profile_aerosols.const_values.a]
+name = "SU_alpha"
+value = 3.0
+column_uncertainty = 1.0
+
+["PROFILE OPTIONS".profile_cloud_species]
+cod_reference_wavelength_nm = 550.0
+cod_from_profile_file = "F"
+n_subpixels = 2
+cloud_fractions = [ 0.8, 0.01,]
+cloud_pressure_hpa = [ 500.0, 200.0,]
+
+# used if cod_from_profile_file is "F"
+["PROFILE OPTIONS".profile_cloud_species.species_proftype.a]
+name = "CW"
+prof_type = "BOX"
+
+["PROFILE OPTIONS".profile_cloud_species.species_proftype.b]
+name = "CI"
+prof_type = "BOX"
+
+# used if cod_from_profile_file is "F"
+["PROFILE OPTIONS".profile_cloud_species.profile_params.a]
+name = "CW"
+pixel = 1
+cod = 10.0
+lower_z = 2.0
+upper_z = 5.0
+peak_z = 4.0
+h_width = 1.0
+relaxation = 0.0
+
+["PROFILE OPTIONS".profile_cloud_species.profile_params.b]
+name = "CW"
+pixel = 2
+cod = 0.1
+lower_z = 10.0
+upper_z = 12.0
+peak_z = 11.0
+h_width = 1.0
+relaxation = 0.0
+
+["PROFILE OPTIONS".profile_cloud_species.profile_params.c]
+name = "CI"
+pixel = 2
+cod = 0.9
+lower_z = 10.0
+upper_z = 12.0
+peak_z = 11.0
+h_width = 1.0
+relaxation = 0.0
+
+####################
+#################### Surface Options
+####################
+["SURFACE OPTIONS"]
+# surface refletance options: {1:fixed lambertian, 2: lambertian spectrum, 3: LER climatology, 4: MODIS-FA, 5: fixed kernel BRDF, 6: BRDF climatology}
+surface_reflectance_option = 1
+# surface emissivity options: {1: fixed emissivity, 2: emissivity spectrum, 3: emissivity climatology}
+surface_emissivity_option = 1
+do_plant_fluorescence = "F"
+chlorophyll_spectrum_file = "data/SIF/chlorophyll_fl_734nm_norm.nc"
+
+# surface_reflectance options
+["SURFACE OPTIONS".surface_reflectance_options.fixed_lambertian]
+albedo_value = 0.3
+
+["SURFACE OPTIONS".surface_reflectance_options.lambertian_spectrum]
+# will look for the file under {{root_data_directory}}/ReflSpectra/
+lambertian_surface_file = "grass_ASTAR.dat"
+
+["SURFACE OPTIONS".surface_reflectance_options.ler_climatology]
+use_constant_wavelength = "T"
+ler_wavelength_nm = 335.0
+# will look for the file under {{root_data_directory}}/LER_climatologies/
+ler_climatology_file = "OMI-Aura_L3-OMLER_2005m01-2009m12_v003-2010m0503t063707.nc"
+
+["SURFACE OPTIONS".surface_reflectance_options.modis_fa]
+refl_clim_directory = "./mcd43cmg_0p05"
+do_isotropic = "T"
+black_white_blue = 1
+ocean_glint_brdf = "T"
+# will look for the file under {{root_data_directory}}/BRDF_EOF/AlbSpec/
+modis_fa_file = "spatial_db_scia_mrg_usgs_FA_n16_12Ksamp_splib07a_extended.nc"
+
+["SURFACE OPTIONS".surface_reflectance_options.fixed_kernel_brdf.vlidort_options.a]
+name = "Lambertian"
+index = 1
+amplitude = 0.5
+n_par = 0
+par1 = 0.0
+par2 = 0.0
+par3 = 0.0
+
+["SURFACE OPTIONS".surface_reflectance_options.fixed_kernel_brdf.vlidort_options.b]
+name = "LiSparse"
+index = 4
+amplitude = 0.01
+n_par = 2
+par1 = 2.0
+par2 = 1.0
+par3 = 0.0
+
+["SURFACE OPTIONS".surface_reflectance_options.fixed_kernel_brdf.vlidort_options.c]
+name = "Ross-thick"
+index = 3
+amplitude = 0.01
+n_par = 0
+par1 = 0.0
+par2 = 0.0
+par3 = 0.0
+
+["SURFACE OPTIONS".surface_reflectance_options.brdf_climatology]
+brdf_climatology_file = "MARCI_Hapke_clim.nc"
+
+# surface emissivity options
+["SURFACE OPTIONS".surface_emissivity_options.fixed_emissivity]
+emissivity_value = 0.9
+
+["SURFACE OPTIONS".surface_emissivity_options.emissivity_spectrum]
+emissivity_spectrum_file = ""
+
+["SURFACE OPTIONS".surface_emissivity_options.emissivity_climatology]
+emissivity_climatology_file = ""
+
+####################
+#################### Gas Options
+####################
+["GAS OPTIONS"]
+# if assume_earth_for_scattering is "F", use sctarring_gases and scattering_gas_entries
+# if "T", use co2_profile_gas_name
+assume_earth_for_scattering = "T"
+co2_profile_gas_name = "CO2"
+scattering_gases = [ "N2",]
+# if do_raman_scattering is "T", use rss_def_temperature_k and raman_gas_entries
+do_raman_scattering = "F"
+rss_ref_temperature_k = "250.0"
+raman_gases = [ "N2", "O2",]
+# lits of gases to be included in the spectrum calculation
+abs_species = [ "O2", "H2O", "CO2", "PACIA",]
+# number of fine layers for the cross section calculations
+number_of_fine_layers = 2
+# if "T", read the cross sections in memory
+full_lut_to_memory = "T"
+
+# used if assume_earth_for_scattering is "F"
+["GAS OPTIONS".scattering_gas_entries.a]
+name = "CO2"
+file = "CO2_rayleigh_optprop.nc"
+
+["GAS OPTIONS".scattering_gas_entries.b]
+name = "Ar"
+file = "Ar_rayleigh_optprop.nc"
+
+["GAS OPTIONS".scattering_gas_entries.c]
+name = "N2"
+file = "N2_rayleigh_optprop.nc"
+
+["GAS OPTIONS".scattering_gas_entries.d]
+name = "O2"
+file = "O2_rayleigh_optprop.nc"
+
+# used if do_raman_scattering is "T"
+["GAS OPTIONS".raman_gas_entries.a]
+name = "N2"
+file = "N2_rrs_optprop.nc"
+
+["GAS OPTIONS".raman_gas_entries.b]
+name = "O2"
+file = "O2_rrs_optprop.nc"
+
+# use to specify the absorption cross section lookup table files corresponding to abs_species
+["GAS OPTIONS".cross_section_entries.H2O]
+name = "H2O"
+cia1 = "-"
+cia2 = "-"
+brd1 = "-"
+file = "GGG2020_H2O_1550_1710_VP_0p01.nc"
+
+["GAS OPTIONS".cross_section_entries.CO2]
+name = "CO2"
+cia1 = "-"
+cia2 = "-"
+brd1 = "-"
+file = "GGG2020_CO2_1550_1710_SDVP_LM_0p01.nc"
+
+["GAS OPTIONS".cross_section_entries.O2]
+name = "O2"
+cia1 = "-"
+cia2 = "-"
+brd1 = "-"
+file = "GGG2020_O2_1200_1310_SDVP.nc"
+
+["GAS OPTIONS".cross_section_entries.PACIA]
+name = "PACIA"
+cia1 = "PA1"
+cia2 = "PA1"
+brd1 = "-"
+file = "GGG2020_O2_1200_1310_PACIA_scaled_e46.nc"
+
+# use to specify the emission lookup table for Airglow
+["GAS OPTIONS".airglow_cross_section_entries.a]
+name = "O2DG"
+brd1 = "-"
+file = "GGG2020_O2_1235_1300_SDVP_0p004_airglow.nc"
+
+####################
+#################### Aerosol Options
+####################
+["AEROSOL OPTIONS"]
+do_aerosols = "F"
+
+# used if do_aerosols is "T"
+["AEROSOL OPTIONS".aerosol_optical_properties.SU]
+name = "SU"
+file = "SU_200nm-20um_wgphase_flexinput.nc"
+
+["AEROSOL OPTIONS".aerosol_optical_properties.BC]
+name = "BC"
+file = "BC_200nm-20um_wgphase_flexinput.nc"
+
+["AEROSOL OPTIONS".aerosol_optical_properties.OC]
+name = "OC"
+file = "OC_200nm-20um_wgphase_flexinput.nc"
+
+["AEROSOL OPTIONS".aerosol_optical_properties.SF]
+name = "SF"
+file = "SF_200nm-20um_wgphase_flexinput.nc"
+
+["AEROSOL OPTIONS".aerosol_optical_properties.SC]
+name = "SC"
+file = "SC_200nm-20um_wgphase_flexinput.nc"
+
+["AEROSOL OPTIONS".aerosol_optical_properties.DU]
+name = "DU"
+file = "DU_200nm-20um_wgphase_flexinput.nc"
+
+####################
+#################### Cloud Options
+####################
+["CLOUD OPTIONS"]
+# if do_clouds is "T", check do_lambertian_cloud
+do_clouds = "F"
+do_lambertian_clouds = "T"
+# cloud albedo is used if do_lambertian_clouds is "T"
+cloud_albedo = 0.8
+
+# used if do_lambertian_cloud is "F"
+["CLOUD OPTIONS".cloud_opt_prop.a]
+name = "CW"
+file = "WC_200nm-20um_wgphase_flexinput.nc"
+
+["CLOUD OPTIONS".cloud_opt_prop.b]
+name = "CI"
+file = "WC_200nm-20um_wgphase_flexinput.nc"
+
+####################
+#################### State Vector Options
+####################
+["STATE VECTOR OPTIONS"]
+## Trace gases
+# list of gases to retrieve with a profile retrieval
+prf_species = []
+# list of gases to retrieve with a scaling retrieval
+col_species = [ "H2O", "CO2", "PA1",]
+overwrite_clim_uncertainty = "F"
+
+# used if overwrite_clim_uncertainty is "T"
+["STATE VECTOR OPTIONS".uncertainty_option.CH4]
+name = "CH4"
+cov_mat_type = "ZCORRELATED"
+par1 = 5.0
+par2 = 2.0
+
+["STATE VECTOR OPTIONS".uncertainty_option.H2O]
+name = "H2O"
+cov_mat_type = "DIAGONAL"
+par1 = 1000.0
+par2 = ""
+
+["STATE VECTOR OPTIONS".uncertainty_option.CO2]
+name = "CO2"
+cov_mat_type = "DIAGONAL"
+par1 = 1000.0
+par2 = ""
+
+["STATE VECTOR OPTIONS".temperature]
+add_to_state_vector = "T"
+# temperature_option: {1: Fit profile, 2: Fit shift}
+temperature_option = 2
+
+["STATE VECTOR OPTIONS".temperature.fit_profile]
+overwrite_clim_uncertainty = "T"
+# cov_mat_type and parameters are used if overwrite_clim_uncertainty is "T"
+cov_mat_type = "DIAGONAL"
+parameters = 5.0
+
+["STATE VECTOR OPTIONS".temperature.fit_shift]
+overwrite_clim_uncertainty = "T"
+# shift_unc_k is used if overwrite_clim_uncertainty is "T"
+shift_unc_k = 5.0
+
+["STATE VECTOR OPTIONS".surface_pressure]
+# if add_to_state_vector is "F", do not check the other surface_pressure parameters
+add_to_state_vector = "T"
+overwrite_clim_uncertainty = "T"
+# uncertainty_hpa is used if overwrite_clim_unc is "T"
+uncertainty_hpa = 16
+
+["STATE VECTOR OPTIONS".surface_reflectance]
+# if add_to_state_vector is "F", do not check the other surface_reflectance parameters
+add_to_state_vector = "T"
+# is init_from_obs is "F", do not check max_poly_order and albedo_file
+init_state_from_obs = "F"
+# will look for albedo_file under {{root_data_directory}}/../../
+albedo_file = "albedo_bands.nc"
+max_poly_order = 1
+# option_index: {1: polynomial scaling, 2: window poly scale, 3: eof fit}
+option_index = 1
+
+["STATE VECTOR OPTIONS".surface_reflectance.polynomial_scaling]
+order = 1
+coeff_unc_prcnt = [ 5.0, 1.0,]
+
+["STATE VECTOR OPTIONS".surface_reflectance.window_poly_scale]
+order = [ 1,]
+uncert_prcnt = [ 100.0,]
+
+["STATE VECTOR OPTIONS".surface_reflectance.eof_fit]
+scale_eof_uncert = "F"
+scale_factor = 2.0
+
+["STATE VECTOR OPTIONS".radiometric_offset]
+# if add_to_state_vector is "F", do not check the other radiometric_offset parameters
+add_to_state_vector = "F"
+# option_index: {1: polynomial scaling, 2: window poly scale}
+option_index = 2
+
+["STATE VECTOR OPTIONS".radiometric_offset.polynomial_scaling]
+order = 1
+coeff_unc_prcnt_rad = 5.0
+
+["STATE VECTOR OPTIONS".radiometric_offset.window_poly_scale]
+order = [ 1,]
+uncert_prcnt = [ 5.0,]
+
+["STATE VECTOR OPTIONS".radiometric_scaling]
+# if add_to_state_vector is "F", do not check the other radiometric_scaling parameters
+add_to_state_vector = "F"
+# option_index: {1: polynomial scaling, 2: window poly scale}
+option_index = 2
+
+["STATE VECTOR OPTIONS".radiometric_scaling.polynomial_scaling]
+order = 1
+coeff_unc_prcnt = 5.0
+
+["STATE VECTOR OPTIONS".radiometric_scaling.window_poly_scale]
+order = [ 1,]
+uncert_prcnt = [ 25.0,]
+
+["STATE VECTOR OPTIONS".eof_residuals]
+# if add_to_state_vector is "F", do not check the other eof_residuals parameters
+add_to_state_vector = "F"
+
+["STATE VECTOR OPTIONS".eof_residuals.eofs_to_add.a]
+band_index = 1
+eof_index = 1
+uncertainty = 1.0
+file = "ch4proxy_eof_residuals_v0_01_04_sorted.nc"
+
+["STATE VECTOR OPTIONS".eof_residuals.eofs_to_add.b]
+band_index = 1
+eof_index = 2
+uncertainty = 1.0
+file = "ch4proxy_eof_residuals_v0_01_04_sorted.nc"
+
+["STATE VECTOR OPTIONS".isrf_parameters]
+# if add_to_state_vector is "F", do not check the other isrf_parameters parameters
+add_to_state_vector = "T"
+
+["STATE VECTOR OPTIONS".isrf_parameters.parameters_to_fit.a]
+window = 1
+param = 2
+poly_order = 0
+uncertainty = 0.05
+tbd = 0.3
+
+["STATE VECTOR OPTIONS".wavelength_grid]
+# if add_to_state_vector is "F", do not check the other wavelength_grid parameters
+add_to_state_vector = "T"
+# option_index: {1: polynomial scaling, 2: window poly scale}
+option_index = 1
+
+["STATE VECTOR OPTIONS".wavelength_grid.polynomial_scaling]
+order = 1
+coeff_unc_prcnt = 1.0
+
+["STATE VECTOR OPTIONS".wavelength_grid.window_poly_scale]
+order = [ 0,]
+uncert_prcnt = [ 1.0,]
+
+####################
+#################### Optimizer Options
+####################
+["OPTIMIZER OPTIONS"]
+# maximum number of iterations
+max_iter = 15
+# maximum number of consecutive divergent iterations
+max_div = 5
+convergence_threshold = 0.1
+# initial value of the Levenberg-Marquardt parameter
+initial_gamma_lm = 10.0
+# cost function update ratio threshold for a divergent iteration
+r_divergent = 0.25
+# cost function update ratio threshold for a convergent iteration
+r_convergent = 0.75
+# factor multiplying the Levenberg-Marquardt parameter after a divergent iteration
+divergent_scale_factor = 4.0
+# factor multiplying the Levenberg-Marquardt parameter after a convergent iteration
+convergent_scale_factor = 0.5
+chi_gof_threshold = 10.0
+# if scale_obs_cov is "T", multiply the observation covariance matrix with obs_cov_scale_factor
+scale_obs_cov = "T"
+obs_cov_scale_factor = 1.0
+# if scale_obs_cov is "T", multiply the a priori covariance matrix with prior_cov_scale_factor
+scale_prior_cov = "T"
+prior_cov_scale_factor = 1.0
+
+####################
+#################### Diagnostics Options
+####################
+["DIAGNOSTICS OPTIONS".level1_options]
+viewing_geometry = "T"
+
+["DIAGNOSTICS OPTIONS".profile_output_options]
+outputs = [ "Prior", "Posterior",]
+
+air_molecular_weight = [ "T", "T",]
+gravity = [ "T", "F",]
+relative_humidity = [ "F", "F",]
+
+air_partial_column = [ "T", "T",]
+
+total_aod = [ "F", "F",]
+
+cloud_n_pixels = [ "F", "F",]
+cloud_fraction_total = [ "F", "F",]
+total_cod = [ "F", "F",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.pressure_layer]
+edge = [ "F", "T",]
+mid = [ "F", "F",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.temperature_layer]
+edge = [ "F", "F",]
+mid = [ "F", "F",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.altitude_layer]
+edge = [ "F", "F",]
+mid = [ "F", "F",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.gas_partial_column]
+save = [ "F", "F",]
+species = [ "all",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.gas_column_uncertainties]
+save = [ "F", "F",]
+species = [ "all",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.gas_mixing_ratios]
+save = [ "T", "T",]
+species = [ "all",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.dry_gas_mixing_ratios]
+save = [ "F", "F",]
+species = [ "all",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.proxy_column_avg_mix_rat]
+save = [ "F", "F",]
+species = [ "CO2", "CH4",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.species_aod]
+save = [ "F", "F",]
+species = [ "all",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.species_profile_params]
+save = [ "F", "F",]
+species = [ "all",]
+
+["DIAGNOSTICS OPTIONS".profile_output_options.species_profile_par_derivs]
+save = [ "F", "F",]
+species = [ "all",]
+
+["DIAGNOSTICS OPTIONS".rtm_output_options]
+wavelength = [ "F", "F",]
+irradiance = [ "F", "F",]
+radiance = [ "F", "F",]
+radiance_stokes = "F"
+radiant_flux = [ "F", "F",]
+radiant_flux_stokes = "F"
+direct_flux = [ "F", "F",]
+direct_flux_stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.gas_jacobians]
+
+scattering_weights = [ "F", "F",]
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.gas_jacobians.trace_gas]
+save = [ "F", "F",]
+species = [ "all",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.gas_jacobians.trace_gas_part_col]
+save = [ "F", "F",]
+species = [ "CH4", "CH4", "CO2",]
+lower_index = [ 1, 7, 1,]
+upper_index = [ 1, 8, 20,]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.gas_jacobians.air_mass_factors]
+save = [ "F", "F",]
+species = [ "all",]
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.met_jacobians.temperature_profile]
+save = [ "F", "F",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.met_jacobians.temperature_shift]
+save = [ "F", "F",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.met_jacobians.surface_pressure]
+save = [ "F", "F",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.aerosol_jacobians.profile_aod]
+save = [ "F", "F",]
+species = []
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.aerosol_jacobians.profile_aod_par]
+save = [ "F", "F",]
+species = [ "all",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.aerosol_jacobians.profile_ssa]
+save = [ "F", "F",]
+species = [ "all",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.aerosol_jacobians.profile_ssa_par]
+save = [ "F", "F",]
+species = [ "all",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.aerosol_jacobians.opt_prop_params]
+save = [ "F", "F",]
+species = [ "all",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.surface_jacobians.brdf_kernel_factors]
+save = [ "F", "F",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.surface_jacobians.brdf_kernel_parameters]
+save = [ "F", "F",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.instrument_jacobians.isrf]
+save = [ "F", "F",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.instrument_jacobians.wavelength_shift]
+save = [ "F", "F",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".optical_property_diagnostics]
+total_optical_depth = [ "F", "F",]
+brdf_kernel_amplitudes = [ "F", "F",]
+
+["DIAGNOSTICS OPTIONS".optical_property_diagnostics.gas_absorption_xsect]
+save = [ "F", "F",]
+species = [ "all",]
+
+####################
+#################### Inverse Diag Options
+####################
+["INVERSE DIAG OPTIONS".general_fit_statistics]
+cost_function = "T"
+chi_square = "T"
+uncertatinty_derivative = "T"
+spectrum_rms = "T"
+number_of_iterations = "T"
+fit_quality_flag = "T"
+
+["INVERSE DIAG OPTIONS".spectrum]
+spectrum_residuals = "F"
+level1_spectrum = "F"
+level1_uncertainty = "F"
+iteration_radiance = "F"
+# used if iteration_radiance is "T", sets the maximum number of iterations to save
+iteration_radiance_max_iter = 5
+
+["INVERSE DIAG OPTIONS".total_state_vector]
+averaging_kernel = "F"
+posteriori_covariance = "F"
+priori_covariance = "F"
+posteriori_state = "T"
+priori_state = "T"
+iteration_state = "F"
+# used if iteration_state is "T", sets the maximum number of iterations to save
+iteration_state_max_iter = 5
+
+["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.profile_mixing_ratio]
+save = "F"
+species = [ "CH4",]
+
+["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.column_avg_mixing_ratio]
+save = "F"
+species = [ "CH4", "CO2", "H2O",]
+
+["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.dry_profile_mixing_ratio]
+save = "F"
+species = [ "CH4",]
+
+["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.dry_column_avg_mixing_ratio]
+save = "F"
+species = [ "CH4",]
+
+["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.proxy_posteriori_uncert]
+save = "F"
+species = [ "CO2", "CH4",]
+
+["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel]
+save = "T"
+species = [ "CO2", "CH4", "H2O",]
+
+["INVERSE DIAG OPTIONS".full_matrices_for_offline_err]
+gain_matrix = "F"
+
+["INVERSE DIAG OPTIONS".error_analysis]
+do_error_analysis = "T"
+proxy_name = "CO2"
+gas_column_components = [ "CO2", "CH4", "H2O",]
+print_outputs = [ "F", "T", "F",]
+proxy_xgas_components = [ "CH4",]

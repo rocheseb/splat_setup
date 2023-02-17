@@ -3,11 +3,8 @@ Create a splat control file based on an input template modified with command lin
 """
 
 import os
-import sys
-import numpy as np
-
 import jinja2
-import json
+import toml
 import argparse
 
 from typing import List, Dict, Any
@@ -55,21 +52,21 @@ def flat_dict_val(d: Dict, x: List = [], first: bool = True) -> List:
     return x
 
 
-def load_default_controls(json_inputs: Dict) -> Dict:
+def load_default_controls(splat_inputs: Dict) -> Dict:
     """
-    Read control_setup.json, get rid of 1st level keys and update the "macro" values
-    In control_setup.json values can be set to the value of an existing key with the "=key" syntax
+    Read control_setup.toml, get rid of 1st level keys and update the "macro" values
+    In control_setup.toml values can be set to the value of an existing key with the "=key" syntax
     """
-    with open(os.path.join(os.path.dirname(__file__), "control_setup.json"), "rb") as f:
-        control_setup_dict = json.load(f)
+    with open(os.path.join(os.path.dirname(__file__), "control_setup.toml"), "r") as f:
+        control_setup_dict = toml.load(f)
 
     # remove first level keys
     default_controls = {}
     for key, val in control_setup_dict.items():
         default_controls.update(val)
 
-    # update fields based on the given --json-file
-    for key, val in json_inputs.items():
+    # update fields based on the given --toml-file
+    for key, val in splat_inputs.items():
         nested_dict_set(default_controls, key, val)
 
     # update all values that refer to a base level key with "=base_key"
@@ -104,18 +101,18 @@ def nested_dict_set(d: Dict, path: str, val: Any, delimiter: str = ".") -> Any:
     d[key_list[-1]] = val
 
 
-def control_setup(control_file: str, json_file: str, template_file: str) -> Dict:
+def control_setup(control_file: str, toml_file: str, template_file: str) -> Dict:
     """
     template_file: the control file with jinja fields
-    control_setup.json has all the default input fields to fill the template_file
+    control_setup.toml has all the default input fields to fill the template_file
 
-    json_file: an input json file with a subset of jinja fields, these will overwrite what is defined in control_setup.json
+    toml_file: an input toml file with a subset of jinja fields, these will overwrite what is defined in control_setup.toml
     control_file: output control file
     """
-    with open(json_file, "rb") as f:
-        json_inputs = json.load(f)
+    with open(toml_file, "r") as f:
+        toml_inputs = toml.load(f)
 
-    # the fields that must always be specified in the json_file (--json-file)
+    # the fields that must always be specified in the toml_file (--toml-file)
     required = [
         "root_data_directory",
         "l1_file",
@@ -131,30 +128,30 @@ def control_setup(control_file: str, json_file: str, template_file: str) -> Dict
 
     newline = "\n"
     for var in required:
-        if var not in json_inputs:
+        if var not in toml_inputs:
             raise Exception(
-                f"{var} must be in the input json file, all the required inputs are: {newline+newline.join(required)}"
+                f"{var} must be in the input toml file, all the required inputs are: {newline+newline.join(required)}"
             )
 
-    # load control_setup.json into a dictionary
-    # then update that dictionary with the fields from json_file
+    # load control_setup.toml into a dictionary
+    # then update that dictionary with the fields from toml_file
     # then update the "=key" values
-    template_inputs = load_default_controls(json_inputs)
+    template_inputs = load_default_controls(toml_inputs)
 
     with open(template_file, "r") as f:
         template = jinja2.Template(f.read())
 
     code_dir = os.path.dirname(__file__)
     # dedicated cross-section inputs
-    with open(os.path.join(code_dir, "xsec.json"), "rb") as f:
-        xsec_data = json.load(f)
-    for gas in xsec_data[json_inputs["xsec"]]:
-        template_inputs["cross_section_entries"][gas]["file"] = xsec_data[json_inputs["xsec"]][gas]
+    with open(os.path.join(code_dir, "xsec.toml"), "r") as f:
+        xsec_data = toml.load(f)
+    for gas in xsec_data[toml_inputs["xsec"]]:
+        template_inputs["cross_section_entries"][gas]["file"] = xsec_data[toml_inputs["xsec"]][gas]
 
     # dedicated windows inputs
-    with open(os.path.join(code_dir, "window.json"), "rb") as f:
-        window_data = json.load(f)
-    window_list = json_inputs["windows"]
+    with open(os.path.join(code_dir, "window.toml"), "r") as f:
+        window_data = toml.load(f)
+    window_list = toml_inputs["windows"]
     template_inputs["fwd_inv_mode_options"] = {
         window: window_data[window]["fwd_inv_mode_options"] for window in window_list
     }
@@ -164,27 +161,27 @@ def control_setup(control_file: str, json_file: str, template_file: str) -> Dict
         for window in window_list
     }
     seen = {}
-    window_poly_scale_2 = {
-        "radiometric_offset.window_poly_scale_2.order": [],
-        "radiometric_offset.window_poly_scale_2.uncert_prcnt": [],
-        "radiometric_scaling.window_poly_scale_2.order": [],
-        "radiometric_scaling.window_poly_scale_2.uncert_prcnt": [],
-        "surface_reflectance.window_poly_scale_2.order": [],
-        "surface_reflectance.window_poly_scale_2.uncert_prcnt": [],
-        "wavelength_grid.window_poly_scale_2.order": [],
-        "wavelength_grid.window_poly_scale_2.uncert_prcnt": [],
+    window_poly_scale = {
+        "radiometric_offset.window_poly_scale.order": [],
+        "radiometric_offset.window_poly_scale.uncert_prcnt": [],
+        "radiometric_scaling.window_poly_scale.order": [],
+        "radiometric_scaling.window_poly_scale.uncert_prcnt": [],
+        "surface_reflectance.window_poly_scale.order": [],
+        "surface_reflectance.window_poly_scale.uncert_prcnt": [],
+        "wavelength_grid.window_poly_scale.order": [],
+        "wavelength_grid.window_poly_scale.uncert_prcnt": [],
     }
     for window in window_list:
         if new_band_inputs[window]["name"] not in seen:
             seen[new_band_inputs[window]["name"]] = 1
         else:
             del new_band_inputs[window]
-        for key in window_poly_scale_2:
-            window_poly_scale_2[key] += [window_data[window][key]]
+        for key in window_poly_scale:
+            window_poly_scale[key] += [window_data[window][key]]
     template_inputs["l2_surface_reflectance"]["band_inputs"] = new_band_inputs
     template_inputs["l1_radiance_band_input"] = new_band_inputs
 
-    for key, val in window_poly_scale_2.items():
+    for key, val in window_poly_scale.items():
         nested_dict_set(template_inputs, key, val)
 
     # write output control file
@@ -192,37 +189,39 @@ def control_setup(control_file: str, json_file: str, template_file: str) -> Dict
         f.write(template.render(**template_inputs))
     print(f"Creating {control_file}")
 
-    return json_inputs
+    return toml_inputs
 
 
 def main():
     code_dir = os.path.dirname(__file__)
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description="Generate a control file from input json files",
+        description="Generate a control file from input toml files",
     )
     parser.add_argument("control_file", help="full path to the output control file")
     parser.add_argument(
-        "-t", "--template-file", default=os.path.join(code_dir, "template.control"),
+        "-t",
+        "--template-file",
+        default=os.path.join(code_dir, "template.control"),
     )
     parser.add_argument(
         "-j",
-        "--json-file",
-        help="full path to input json file that will be used to complement/overwrite the command line arguments",
+        "--toml-file",
+        help="full path to input toml file that will be used to complement/overwrite the command line arguments",
     )
     args = parser.parse_args()
 
     path_list = [
-        args.json_file,
+        args.toml_file,
         args.template_file,
-        os.path.join(code_dir, "xsec.json"),
-        os.path.join(code_dir, "window.json"),
+        os.path.join(code_dir, "xsec.toml"),
+        os.path.join(code_dir, "window.toml"),
     ]
     for path in path_list:
         if not os.path.exists(path):
             raise Exception(f"Wong path: {path}")
 
-    arguments = control_setup(args.control_file, args.json_file, args.template_file)
+    arguments = control_setup(args.control_file, args.toml_file, args.template_file)
 
 
 if __name__ == "__main__":

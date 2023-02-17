@@ -1,0 +1,45 @@
+# README
+# control_setup.py reads inputs from control_setup.toml
+# It then reads this file (o2_test_setup.toml) as well as xsec.toml and window.toml to overwrite the fields from control_setup.toml
+# finally it fills the template.control with this information
+
+# control_setup.py expects a special syntax for keys in order to overwrite nested fields read from control_setup.toml, use dot-separated keys
+# e.g. to refer to mydict["a"]["b"]["c"] use "a.b.c"
+
+##################################
+#### START OF REQUIRED fields ####
+##################################
+# the root data directory contains the static splat inputs
+root_data_directory = "/n/holylfs04/LABS/wofsy_lab/Lab/sroche/splat_static/SPLAT/data"
+l1_file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+l2_met_file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/RF06_V3_Seb/L2_Prior_O2_1x1/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340_prior.nc"
+output_file = "/n/home11/sroche/testing/mair_json_setup_o2_test.nc"
+log_file = "/n/home11/sroche/testing/mair_json_setup_o2_test.log"
+debug_level = "3"
+# specify the absorption cross section lookup table files
+# Special key: xsec must specify a key defined in xsec.toml
+xsec = "ggg2020_o2"
+# specify the retrieval spectral window
+# Special key: windows must specify keys defined in window.toml
+windows = [ "o2_window",]
+# List of gases included in the modelled atmosphere
+abs_species = [ "PACIA", "O2", "H2O", "CO2",]
+# List of gases retrieved as profiles
+prf_species = []
+# List of gases retrieved as total columns
+col_species = [ "H2O", "CO2", "PA1",]
+##################################
+####  END OF REQUIRED fields  ####
+##################################
+
+# Ranges of pixels to process, x is across-track, y is along-track
+x_retrieval_range = [ 200, 200,]
+y_retrieval_range = [ 1, 1,]
+
+# name of gas used for proxy normalization
+"error_analysis.proxy_name" = ""
+"error_analysis.gas_column_components" = [ "O2", "H2O",]
+"error_analysis.print_outputs" = [ "T", "F",]
+"error_analysis.proxy_xgas_components" = []
+
+"sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel.species" = [ "H2O", "CO2",]

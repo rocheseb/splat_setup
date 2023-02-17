@@ -1,23 +1,21 @@
 """
-Calls control_setup.py for all permutations of sets of input parameters defined in an input json file.
+Calls control_setup.py for all permutations of sets of input parameters defined in an input toml file.
 """
 
 import os
-import sys
-import numpy as np
-import json
+import toml
 import argparse
-from control_setup import *
+import control_setup
 import itertools
 from collections import OrderedDict
 
 
 def generate_controls(**kwargs):
-    if kwargs["json"] is not None:
-        update_dict_from_json(kwargs, kwargs["json"])
+    if kwargs["toml"] is not None:
+        control_setup.update_dict_from_toml(kwargs, kwargs["toml"])
 
-    with open(kwargs["infile"], "rb") as f:
-        c = json.load(f, object_pairs_hook=OrderedDict)
+    with open(kwargs["infile"], "r") as f:
+        c = toml.load(f, object_pairs_hook=OrderedDict)
 
     product = itertools.product(*list(c.values()))
 
@@ -37,18 +35,19 @@ def generate_controls(**kwargs):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate splat control files corresponding to a set of parameters from an input json file, write a list of splat commands to run them with parallel",
+        description="Generate splat control files corresponding to a set of parameters from an input toml file, write a list of splat commands to run them with parallel",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "infile", help="json file of parameter set for which control files will be generated",
+        "infile",
+        help="toml file of parameter set for which control files will be generated",
     )
     parser.add_argument("run_dir", help="full path to the splat run directory")
     parser.add_argument("data_dir", help="full path to the data directory for the splat run")
     parser.add_argument(
         "-t", "--template", default="/n/home11/sroche/gitrepos/methanesat/template.control"
     )
-    parser.add_argument("-j", "--json", default=None, help="full path to controls input json file")
+    parser.add_argument("-j", "--toml", default=None, help="full path to controls input toml file")
     args = parser.parse_args()
 
     generate_controls(**args.__dict__)

@@ -1,0 +1,81 @@
+# README
+# use this file to store different setup for retrieval spectral windows
+# use the "windows" key in the --toml-file you want to use (e.g. see o2_test_setup.toml) to complement the control_setup.toml information
+
+[co2_window]
+"radiometric_offset.polynomial_scaling.order" = 1
+"radiometric_offset.polynomial_scaling.uncert_prcnt" = 5.0
+"radiometric_scaling.window_poly_scale.order" = 1
+"radiometric_scaling.window_poly_scale.uncert_prcnt" = 25.0
+"surface_reflectance.window_poly_scale.order" = 3.0
+"surface_reflectance.window_poly_scale.uncert_prcnt" = 100.0
+"wavelength_grid.window_poly_scale.order" = 1.0
+"wavelength_grid.window_poly_scale.uncert_prcnt" = 100.0
+
+[co2_window.fwd_inv_mode_options]
+index = 1
+start_nm = 1595.0
+end_nm = 1618.0
+buffer_nm = 2.0
+convolution_grid_sampling = 0.01
+radiative_transfer_model = "TRNMSN"
+isrf = "MAirCal"
+convolution_width_hw1e = 10.0
+use_fft_for_convolution = "F"
+
+[co2_window.l2_surface_reflectance.band_inputs]
+name = "WeakCH4"
+file_type = "SPLAT"
+index = 1
+
+[ch4_window]
+"radiometric_offset.polynomial_scaling.order" = 1
+"radiometric_offset.polynomial_scaling.uncert_prcnt" = 5.0
+"radiometric_scaling.window_poly_scale.order" = 1
+"radiometric_scaling.window_poly_scale.uncert_prcnt" = 25.0
+"surface_reflectance.window_poly_scale.order" = 3.0
+"surface_reflectance.window_poly_scale.uncert_prcnt" = 100.0
+"wavelength_grid.window_poly_scale.order" = 1.0
+"wavelength_grid.window_poly_scale.uncert_prcnt" = 100.0
+
+[ch4_window.fwd_inv_mode_options]
+index = 1
+start_nm = 1629.0
+end_nm = 1654.0
+buffer_nm = 2.0
+convolution_grid_sampling = 0.01
+radiative_transfer_model = "TRNMSN"
+isrf = "MAirCal"
+convolution_width_hw1e = 10.0
+use_fft_for_convolution = "F"
+
+[ch4_window.l2_surface_reflectance.band_inputs]
+name = "WeakCH4"
+file_type = "SPLAT"
+index = 1
+
+[o2_window]
+"radiometric_offset.window_poly_scale.order" = 1
+"radiometric_offset.window_poly_scale.uncert_prcnt" = 5.0
+"radiometric_scaling.window_poly_scale.order" = 1
+"radiometric_scaling.window_poly_scale.uncert_prcnt" = 25.0
+"surface_reflectance.window_poly_scale.order" = 3.0
+"surface_reflectance.window_poly_scale.uncert_prcnt" = 100.0
+"wavelength_grid.window_poly_scale.order" = 1.0
+"wavelength_grid.window_poly_scale.uncert_prcnt" = 100.0
+
+[o2_window.fwd_inv_mode_options]
+index = 1
+start_nm = 1249.2
+end_nm = 1287.8
+buffer_nm = 2.0
+convolution_grid_sampling = 0.004
+radiative_transfer_model = "TRNMSN"
+isrf = "MAirCal"
+convolution_width_hw1e = 10.0
+use_fft_for_convolution = "F"
+
+[o2_window.l2_surface_reflectance.band_inputs]
+name = "O2Delta"
+file_type = "SPLAT"
+index = 1

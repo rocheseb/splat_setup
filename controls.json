@@ -1,7 +1,0 @@
-{
-	"xsec":["ggg2014","ggg2020","hit2016","hit2020_co2_VP","hit2020_co2_VP_LM","hit2020_co2_SDVP","hit2020_co2_SDVP_LM","hit2020_co2_VP_fullLM"],
-	"windows":[["co2_window","ch4_window"]],
-	"nfl":[2],
-	"surface_reflectance.window_poly_scale_2.order":[[5]],
-	"surface_reflectance.init_state_from_obs":["T","F"]
-}
