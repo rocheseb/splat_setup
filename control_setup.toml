@@ -1,4 +1,8 @@
-# special syntax: use "=key" as a value so that control_setup.py will replace it with the value of the given key
+# README
+# this file contains fields for all the possible inputs of SPLAT
+# it is meant to be a default file where parameters that do not typically change from run to run are set
+# it will be read by control_setup.py and updated with the run-specific information from a different toml file (e.g. see o2_test_setup.toml)
+# special syntax: use "=key" as a value so that control_setup.py will replace it with the value of the given key (only works when referring to first level keys)
 
 ####################
 #################### Files
@@ -9,9 +13,8 @@ log_file = "COMMENT: SET IN CONTROL_SETUP.PY"
 output_file = "COMMENT: SET IN CONTROL_SETUP.PY"
 l1_file = "/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700.nc"
 l2_met_file = "/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700_prior.nc"
-# the following files must be under the root_data_directory
+# the following files must be under the {{root_data_directory}}
 isrf_file = "o2_isrf_lut_20210722_xflipped.nc"
-albedo_file = "albedo_bands.nc"
 
 ####################
 #################### Retrieval Options
@@ -239,6 +242,7 @@ m = 1.6701
 wavenumber_units = "F"
 
 # ISRF input file
+# SPLAT will look for ISRF files under {{root_data_directory}}
 # This creates a table of all available ISRFs
 # The one that will be used for the retrieval is specified by "name" under "WINDOW OPTIONS".fwd_inv_mode_options.o2_window.isrf
 ["WINDOW OPTIONS".isrf_parametrization.isrf_file.a]

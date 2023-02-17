@@ -298,7 +298,7 @@ Surface Pressure                :
 Surface Reflectance             : <....................................................>
  - Add to state vector?         : {{surface_reflectance.add_to_state_vector}}
    (T) - Init State from obs?   : {{surface_reflectance.init_state_from_obs}}
-         (T) - Alb Wvl File     : {{root_data_directory}}/../../{{albedo_file}}
+         (T) - Alb Wvl File     : {{root_data_directory}}/../../{{surface_reflectance.albedo_file}}
              - Max Poly Order   : {{surface_reflectance.max_poly_order}}
        Option Index             : {{surface_reflectance.option_index}}
          (1) Polynomial Scaling :
