@@ -2,7 +2,8 @@
 # this file contains fields for all the possible inputs of SPLAT
 # it is meant to be a default file where parameters that do not typically change from run to run are set
 # it will be read by control_setup.py and updated with the run-specific information from a different toml file (e.g. see o2_test_setup.toml)
-# special syntax: use "=key" as a value so that control_setup.py will replace it with the value of the given key (only works when referring to first level keys)
+# control_setup.py will strip the first-level keys from the dictionary it will read from this file (e.g. "FILES", "RETRIEVAL" etc.)
+# special syntax: use "=key" as a value so that control_setup.py will replace it with the value of the given key (only works when referring to first level keys, ignoring "FILES", "RETRIEVAL" etc)
 
 ####################
 #################### Files
