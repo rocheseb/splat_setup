@@ -115,9 +115,9 @@ def dict_update(d1: Dict, d2: Dict) -> Dict:
     dict_update(d1,d2) returns {"a":{"b":1,"c":5,"d":3}}
     """
     for k2, v2 in d2.items():
-        if k2 not in d1 or type(v2) != dict:
+        if k2 not in d1 or not isinstance(v2, dict):
             d1[k2] = v2
-        elif type(v2) == dict:
+        elif isinstance(v2, dict):
             sub_d1 = d1.setdefault(k2, {})
             sub_d2 = d2.setdefault(k2, {})
             dict_update(sub_d1, sub_d2)
