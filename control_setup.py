@@ -187,7 +187,10 @@ def control_setup(control_file: str, toml_file: str, template_file: str) -> Dict
 
     # write output control file
     with open(control_file, "w") as f:
-        f.write(template.render(**template_inputs))
+        if control_file.endswith(".control"):
+            f.write(template.render(**template_inputs))
+        elif control_file.endswith(".toml"):
+            toml.dump(template_inputs, f)
     print(f"Creating {control_file}")
 
     return toml_inputs
