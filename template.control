@@ -46,7 +46,7 @@ Do Single Pixel Calc from Inp.  : F
       - Snow Depth [m]          : {{single_pixel_calc_inp.snow_depth_m}}
       - Snow Age [days]         : {{single_pixel_calc_inp.snow_age_days}}
   (F) L1 Radiance Band Input    : BandIndex BandName FileType InputFile
-{%- for key,val in l1_radiance_band_input.items() %}
+{%- for key,val in l1_radiance.band_inputs.items() %}
                                 : {{"{:>9}{:>9}{:>9} {}".format(val.index,val.name,val.file_type,val.file)}}
 {%- endfor %}
                                 : ###END_OF_LIST###

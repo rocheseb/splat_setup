@@ -8,13 +8,16 @@
 #################### Files
 ####################
 [FILES]
+# the next 5 entries would typically change from run to run and should be set via a separate toml file using control_setup.py
 root_data_directory = "COMMENT: SET IN CONTROL_SETUP.PY"
 log_file = "COMMENT: SET IN CONTROL_SETUP.PY"
 output_file = "COMMENT: SET IN CONTROL_SETUP.PY"
-l1_file = "/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700.nc"
-l2_met_file = "/n/holyscratch01/wofsy_lab/sroche/o2_test/inputs/MethaneAIR_L1B_O2_20210728T200107_20210728T200117_20210730T173700_prior.nc"
+l1_file = "COMMENT: SET IN CONTROL_SETUP.PY"
+l2_met_file = "COMMENT: SET IN CONTROL_SETUP.PY"
 # the following files must be under the {{root_data_directory}}
 isrf_file = "o2_isrf_lut_20210722_xflipped.nc"
+
+# some fields in this default file are setup using the special keys "=l1_file", "=l2_met_file", and "=isrf_file"
 
 ####################
 #################### Retrieval Options
@@ -88,7 +91,7 @@ sampling_nm = 0.01
 view_dir_idx = 1
 
 # when do_single_pixel_calc_from_inp is "F"
-["LEVEL1 OPTIONS".l1_radiance_band_input.band1]
+["LEVEL1 OPTIONS".l1_radiance_band_input.o2delta]
 index = 1
 name = "O2Delta"
 file_type = "SPLAT"
@@ -136,7 +139,7 @@ file = "=l1_file"
 ["LEVEL1 OPTIONS".l2_surface_reflectance]
 use_l2_surface = "T"
 
-["LEVEL1 OPTIONS".l2_surface_reflectance.band_inputs.o2_window]
+["LEVEL1 OPTIONS".l2_surface_reflectance.band_inputs.o2delta]
 index = 2
 name = "O2Delta"
 file_type = "SPLAT"

@@ -26,8 +26,6 @@ Because [control_setup.toml](control_setup.toml) is read into a dictionary, it c
 
 Example of the more modular input toml file, it is given to [control_setup.py](control_setup.py) along [template.control](template.control) and overwrites the template fields with new values.
 
-[o2_test_setup.toml](o2_test_setup.toml) uses a special syntax for keys to access fields in the nested structure read from [control_setup.toml](control_setup.toml) as **"key1.key2.key3":"value"**
-
 To keep [o2_test_setup.toml](o2_test_setup.toml) more compact, I also added a separate toml file to set up the spectral windows ([window.toml](window.toml)) and the cross sections ([xsec.toml](xsec.toml)).
 
 ### [window.toml](window.toml)

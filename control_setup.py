@@ -70,8 +70,7 @@ def load_default_controls(splat_inputs: Dict) -> Dict:
         default_controls.update(val)
 
     # update fields based on the given --toml-file
-    for key, val in splat_inputs.items():
-        nested_dict_set(default_controls, key, val)
+    dict_update(default_controls, splat_inputs)
 
     # update all values that refer to a base level key with "=base_key"
     dupe_var_list = [i for i in flat_dict_val(default_controls) if i.startswith("=")]
@@ -103,6 +102,25 @@ def nested_dict_set(d: Dict, path: str, val: Any, delimiter: str = ".") -> Any:
     for key in key_list[:-1]:
         d = d.setdefault(key, {})
     d[key_list[-1]] = val
+
+
+def dict_update(d1: Dict, d2: Dict) -> Dict:
+    """
+    Update dictionary d1 IN PLACE using dictionary d2
+    Difference with built-in update method:
+    - only overwrites non-dictionary values
+    - preserves keys that exist in d1 but not in d2
+    e.g. if we have d1 = {"a":{"b":1,"c":2}}; d2 = {"a":{"c":5,"d":3}}
+    d1.update(d2) returns {"a":{"c":5,"d":3}}
+    dict_update(d1,d2) returns {"a":{"b":1,"c":5,"d":3}}
+    """
+    for k2, v2 in d2.items():
+        if k2 not in d1 or type(v2) != dict:
+            d1[k2] = v2
+        elif type(v2) == dict:
+            sub_d1 = d1.setdefault(k2, {})
+            sub_d2 = d2.setdefault(k2, {})
+            dict_update(sub_d1, sub_d2)
 
 
 def check_required_variables(toml_file: str) -> None:
@@ -158,47 +176,14 @@ def control_setup(control_file: str, toml_file: str, template_file: str) -> Dict
     # dedicated cross-section inputs
     with open(os.path.join(code_dir, "xsec.toml"), "r") as f:
         xsec_data = toml.load(f)
-    for gas, gas_data in xsec_data[toml_inputs["xsec"]].items():
-        for key, value in gas_data.items():
-            nested_dict_set(template_inputs, key, value)
+    dict_update(template_inputs, xsec_data[toml_inputs["xsec"]])
 
     # dedicated windows inputs
     with open(os.path.join(code_dir, "window.toml"), "r") as f:
         window_data = toml.load(f)
     window_list = toml_inputs["windows"]
-    template_inputs["fwd_inv_mode_options"] = {
-        window: window_data[window]["fwd_inv_mode_options"] for window in window_list
-    }
-
-    # Some fields are lists that will have a list of values corresponding to each band
-    # We have to check if different windows are in the same band when building them
-    new_band_inputs = {
-        window: window_data[window]["l2_surface_reflectance"]["band_inputs"]
-        for window in window_list
-    }
-    seen = {}
-    window_poly_scale = {
-        "radiometric_offset.window_poly_scale.order": [],
-        "radiometric_offset.window_poly_scale.uncert_prcnt": [],
-        "radiometric_scaling.window_poly_scale.order": [],
-        "radiometric_scaling.window_poly_scale.uncert_prcnt": [],
-        "surface_reflectance.window_poly_scale.order": [],
-        "surface_reflectance.window_poly_scale.uncert_prcnt": [],
-        "wavelength_grid.window_poly_scale.order": [],
-        "wavelength_grid.window_poly_scale.uncert_prcnt": [],
-    }
     for window in window_list:
-        if new_band_inputs[window]["name"] not in seen:
-            seen[new_band_inputs[window]["name"]] = 1
-        else:
-            del new_band_inputs[window]
-        for key in window_poly_scale:
-            window_poly_scale[key] += [window_data[window][key]]
-    template_inputs["l2_surface_reflectance"]["band_inputs"] = new_band_inputs
-    template_inputs["l1_radiance_band_input"] = new_band_inputs
-
-    for key, val in window_poly_scale.items():
-        nested_dict_set(template_inputs, key, val)
+        dict_update(template_inputs, window_data[window])
 
     # write output control file
     with open(control_file, "w") as f:

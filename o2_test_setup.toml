@@ -3,9 +3,6 @@
 # It then reads this file (o2_test_setup.toml) as well as xsec.toml and window.toml to overwrite the fields from control_setup.toml
 # finally it fills the template.control with this information
 
-# control_setup.py expects a special syntax for keys in order to overwrite nested fields read from control_setup.toml, use dot-separated keys
-# e.g. to refer to mydict["a"]["b"]["c"] use "a.b.c"
-
 ##################################
 #### START OF REQUIRED fields ####
 ##################################
@@ -37,9 +34,9 @@ x_retrieval_range = [ 200, 200,]
 y_retrieval_range = [ 1, 1,]
 
 # name of gas used for proxy normalization
-"error_analysis.proxy_name" = ""
-"error_analysis.gas_column_components" = [ "O2", "H2O",]
-"error_analysis.print_outputs" = [ "T", "F",]
-"error_analysis.proxy_xgas_components" = []
+error_analysis.proxy_name = ""
+error_analysis.gas_column_components = [ "O2", "H2O",]
+error_analysis.print_outputs = [ "T", "F",]
+error_analysis.proxy_xgas_components = []
 
-"sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel.species" = [ "H2O", "CO2",]
+sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel.species = [ "H2O", "CO2",]
