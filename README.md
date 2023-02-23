@@ -28,18 +28,35 @@ Example of the more modular input toml file, it is given to [control_setup.py](c
 
 To keep [o2_test_setup.toml](o2_test_setup.toml) more compact, I also added a separate toml file to set up the spectral windows ([window.toml](window.toml)) and the cross sections ([xsec.toml](xsec.toml)).
 
+It accepts a list to setup multiple windows **"window":["co2_window","ch4_window"]**
+
+Also accepts the **"=X"** special syntax. 
+
 ### [window.toml](window.toml)
 
 Input toml file that defines the input for spectral windows. Then in [o2_test_setup.toml](o2_test_setup.toml) there just need to be a **"window":["window_name"]** key:value pair where **window_name** is one of the first level keys of [window.toml](window.toml)
 
-It accepts a list to setup multiple windows **"window":["co2_window","ch4_window"]**
+Also accepts the **"=X"** special syntax. 
 
 ### [xsec.toml](xsec.toml)
 
 similar to [window.toml](window.toml) but to set up the cross section files to be used
 
+Also accepts the **"=X"** special syntax. 
 
-## B. Generate many control files
+## B. Utilities
+
+### [toml_to_control.py](toml_to_control.py)
+
+Can be used to converted a full .toml input file (e.g. output by [control_setup.py](control_setup.py) when the output file is given with a .toml extension) to a .control file. 
+
+	python toml_to_control.py output.control --toml-file full_toml.toml
+
+### [update_toml.py](update_toml.py)
+
+Can be used to update a .toml file using a second .toml file (preserving keys that exist in the 1st but not the 2nd file)
+
+	python update_toml.py -i input_file.toml -u update_file.toml -o output_file.toml
 
 ### [generate_controls.py](generate_controls.py)
 
