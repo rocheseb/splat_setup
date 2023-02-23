@@ -16,9 +16,11 @@ output_file = "COMMENT: SET IN CONTROL_SETUP.PY"
 l1_file = "COMMENT: SET IN CONTROL_SETUP.PY"
 l2_met_file = "COMMENT: SET IN CONTROL_SETUP.PY"
 # the following files must be under the {{root_data_directory}}
-isrf_file = "o2_isrf_lut_20210722_xflipped.nc"
+isrf_file = "ch4_isrf_lut_20210722_xtrkflip.nc"
 
 # some fields in this default file are setup using the special keys "=l1_file", "=l2_met_file", and "=isrf_file"
+
+# some fields that depend on the spectral windows are only included as examples in comments (ctrl-f examples to find them), these will be filled in control_setup.py using window.toml
 
 ####################
 #################### Retrieval Options
@@ -92,11 +94,12 @@ sampling_nm = 0.01
 view_dir_idx = 1
 
 # when do_single_pixel_calc_from_inp is "F"
-["LEVEL1 OPTIONS".l1_radiance_band_input.o2delta]
-index = 1
-name = "O2Delta"
-file_type = "SPLAT"
-file = "=l1_file"
+# example setting l1_radiance.band_inputs, will be set via window.toml
+# ["LEVEL1 OPTIONS".l1_radiance.band_inputs.weakch4]
+# index = 1
+# name = "WeakCH4"
+# file_type = "SPLAT"
+# file = "=l1_file"
 
 ["LEVEL1 OPTIONS".l2_2d_support_data.surface_altitude]
 use = "T"
@@ -140,11 +143,12 @@ file = "=l1_file"
 ["LEVEL1 OPTIONS".l2_surface_reflectance]
 use_l2_surface = "T"
 
-["LEVEL1 OPTIONS".l2_surface_reflectance.band_inputs.o2delta]
-index = 2
-name = "O2Delta"
-file_type = "SPLAT"
-file = "=l2_met_file"
+# exampel setting l2_surface_reflectance.band_inputs, will be set via window.toml
+# ["LEVEL1 OPTIONS".l2_surface_reflectance.band_inputs.weakch4]
+# index = 1
+# name = "WeakCH4"
+# file_type = "SPLAT"
+# file = "=l2_met_file"
 
 ####################
 #################### RTM Options
@@ -248,14 +252,14 @@ wavenumber_units = "F"
 # ISRF input file
 # SPLAT will look for ISRF files under {{root_data_directory}}
 # This creates a table of all available ISRFs
-# The one that will be used for the retrieval is specified by "name" under "WINDOW OPTIONS".fwd_inv_mode_options.o2_window.isrf
+# The one that will be used for the retrieval is specified by "name" under "WINDOW OPTIONS".fwd_inv_mode_options
 ["WINDOW OPTIONS".isrf_parametrization.isrf_file.a]
 name = "MSatB1"
 band_index = 1
 wavenumber_units = "F"
 file = "methanesat_isrf_parameters.nc"
 # isrf_agg is the aggregation factor in the across-track dimension (e.g. 1 for 1x1, 5 for 5x1)
-isrf_agg = ""
+isrf_agg = 1
 
 ["WINDOW OPTIONS".isrf_parametrization.isrf_file.b]
 name = "MSatB2"
@@ -297,16 +301,17 @@ convolution_buffer = 2.0
 radiative_transfer_model = "LBL_IQU"
 isrf_option = "OMVISFix"
 
-["WINDOW OPTIONS".fwd_inv_mode_options.o2_window]
-index = 1
-start_nm = 1249.2
-end_nm = 1287.8
-buffer_nm = 2.0
-convolution_grid_sampling = 0.002
-radiative_transfer_model = "TRNMSM"
-isrf = "MAirCal"
-convolution_width_hw1e = 10.0
-use_fft_for_convolution = "F"
+# example window options, set via window.toml
+# ["WINDOW OPTIONS".fwd_inv_mode_options.o2_window]
+# index = 1
+# start_nm = 1249.2
+# end_nm = 1287.8
+# buffer_nm = 2.0
+# convolution_grid_sampling = 0.002
+# radiative_transfer_model = "TRNMSM"
+# isrf = "MAirCal"
+# convolution_width_hw1e = 10.0
+# use_fft_for_convolution = "F"
 
 ["WINDOW OPTIONS".common_options]
 # will look for solar_file under {{root_data_directory}}/SolarSpectra/
@@ -326,6 +331,8 @@ custom_grid_file = "custom_rtm_grid.nc"
 apriori_file = "AFGLUS_apriori_PA.nc"
 # sampling method: {1: Nearest Neighbor, 2: Point-in-Polygon}
 sampling_method = 1
+assume_earth_for_gravity = "T"
+# surface_gravity_mps2 and planetary_radius_km are used if assume_earth_for_gravity is "F"
 # surface_gravity units: m/s^2
 surface_gravity_mps2 = 9.80991
 planetary_radius_km = 6378.1
@@ -771,7 +778,7 @@ add_to_state_vector = "F"
 option_index = 2
 
 ["STATE VECTOR OPTIONS".radiometric_offset.polynomial_scaling]
-order = 1
+order = 0
 coeff_unc_prcnt_rad = 5.0
 
 ["STATE VECTOR OPTIONS".radiometric_offset.window_poly_scale]
@@ -860,6 +867,26 @@ obs_cov_scale_factor = 1.0
 scale_prior_cov = "T"
 prior_cov_scale_factor = 1.0
 
+["OPTIMIZER OPTIONS".init_state]
+init_state_with_prev_fit = "T"
+# if init_state_with_prev_fit is "T", check the following parameters
+filter_chi_squared = "F"
+# max_chi_squared is used if filter_chi_squared is "T"
+max_chi_squared = 5.0
+filter_rms = "F"
+# max_rms is used if filter_rms is "T"
+max_rms = 5e-2
+gas_substate = "F"
+aerosol_substate = "F"
+temperature_substate = "F"
+surface_pressure_substate = "F"
+brdf_substate = "F"
+radiance_offset_substate = "F"
+radiance_scaling_substate = "F"
+residual_eof_substate = "F"
+isrf_substate = "T"
+wavelength_substate = "T"
+
 ####################
 #################### Diagnostics Options
 ####################
@@ -869,8 +896,8 @@ viewing_geometry = "T"
 ["DIAGNOSTICS OPTIONS".profile_output_options]
 outputs = [ "Prior", "Posterior",]
 
-air_molecular_weight = [ "T", "T",]
-gravity = [ "T", "F",]
+air_molecular_weight = [ "F", "F",]
+gravity = [ "F", "F",]
 relative_humidity = [ "F", "F",]
 
 air_partial_column = [ "T", "T",]
@@ -903,14 +930,14 @@ species = [ "all",]
 
 ["DIAGNOSTICS OPTIONS".profile_output_options.gas_mixing_ratios]
 save = [ "T", "T",]
-species = [ "all",]
+species = [ "CO2", "CH4", "H2O",]
 
 ["DIAGNOSTICS OPTIONS".profile_output_options.dry_gas_mixing_ratios]
 save = [ "F", "F",]
 species = [ "all",]
 
 ["DIAGNOSTICS OPTIONS".profile_output_options.proxy_column_avg_mix_rat]
-save = [ "F", "F",]
+save = [ "T", "T",]
 species = [ "CO2", "CH4",]
 
 ["DIAGNOSTICS OPTIONS".profile_output_options.species_aod]
@@ -926,14 +953,20 @@ save = [ "F", "F",]
 species = [ "all",]
 
 ["DIAGNOSTICS OPTIONS".rtm_output_options]
-wavelength = [ "F", "F",]
+wavelength = [ "F", "T",]
 irradiance = [ "F", "F",]
-radiance = [ "F", "F",]
-radiance_stokes = "F"
-radiant_flux = [ "F", "F",]
-radiant_flux_stokes = "F"
-direct_flux = [ "F", "F",]
-direct_flux_stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.radiance]
+save = [ "F", "F",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.radiant_flux]
+save = [ "F", "F",]
+stokes = "F"
+
+["DIAGNOSTICS OPTIONS".rtm_output_options.direct_flux]
+save = [ "F", "F",]
+stokes = "F"
 
 ["DIAGNOSTICS OPTIONS".rtm_output_options.gas_jacobians]
 
@@ -1010,7 +1043,7 @@ stokes = "F"
 
 ["DIAGNOSTICS OPTIONS".optical_property_diagnostics]
 total_optical_depth = [ "F", "F",]
-brdf_kernel_amplitudes = [ "F", "F",]
+brdf_kernel_amplitudes = [ "T", "T",]
 
 ["DIAGNOSTICS OPTIONS".optical_property_diagnostics.gas_absorption_xsect]
 save = [ "F", "F",]
@@ -1050,7 +1083,7 @@ save = "F"
 species = [ "CH4",]
 
 ["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.column_avg_mixing_ratio]
-save = "F"
+save = "T"
 species = [ "CH4", "CO2", "H2O",]
 
 ["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.dry_profile_mixing_ratio]
@@ -1058,23 +1091,16 @@ save = "F"
 species = [ "CH4",]
 
 ["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.dry_column_avg_mixing_ratio]
-save = "F"
+save = "T"
 species = [ "CH4",]
 
 ["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.proxy_posteriori_uncert]
-save = "F"
-species = [ "CO2", "CH4",]
-
-["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel]
 save = "T"
 species = [ "CO2", "CH4", "H2O",]
 
+["INVERSE DIAG OPTIONS".sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel]
+save = "T"
+species = [ "CO2", "CH4",]
+
 ["INVERSE DIAG OPTIONS".full_matrices_for_offline_err]
 gain_matrix = "F"
-
-["INVERSE DIAG OPTIONS".error_analysis]
-do_error_analysis = "T"
-proxy_name = "CO2"
-gas_column_components = [ "CO2", "CH4", "H2O",]
-print_outputs = [ "F", "T", "F",]
-proxy_xgas_components = [ "CH4",]

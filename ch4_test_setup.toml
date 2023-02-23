@@ -3,20 +3,18 @@
 # It then reads this file (ch4_test_setup.toml) as well as xsec.toml and window.toml to overwrite the fields from control_setup.toml
 # finally it fills the template.control with this information
 
-# control_setup.py expects a special syntax for keys in order to overwrite nested fields read from control_setup.toml, use dot-separated keys
-# e.g. to refer to mydict["a"]["b"]["c"] use "a.b.c"
-
 ##################################
 #### START OF REQUIRED fields ####
 ##################################
-root_data_directory = "/n/holyscratch01/wofsy_lab/sroche/o2_test/static_datasets/SPLAT/data"
+root_data_directory = "/n/holylfs04/LABS/wofsy_lab/Lab/sroche/splat_static/SPLAT/data"
 l1_file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level1/RF06_V3/CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856.nc"
-l2_met_file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/RF06_V3/L2_Prior_1x1/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856_prior.nc"
+l2_met_file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2Met_CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856_prior.nc"
 output_file = "/n/home11/sroche/testing/mair_json_setup_ch4_test.nc"
 log_file = "/n/home11/sroche/testing/mair_json_setup_ch4_test.log"
+isrf_file = "ch4_isrf_lut_20210722_xtrkflip.nc"
 # specify the absorption cross section lookup table files
 # Special key: xsec must specify a key defined in xsec.toml
-xsec = "ggg2020"
+xsec = "ggg2020_ch4"
 # specify the retrieval spectral window
 # Special key: windows must specify keys defined in window.toml
 windows = [ "co2_window", "ch4_window",]
@@ -27,5 +25,13 @@ col_species = [ "H2O",]
 ####  END OF REQUIRED fields  ####
 ##################################
 
+isrf_agg = 1
+
 x_retrieval_range = [ 600, 600,]
 y_retrieval_range = [ 1, 1,]
+
+# the elements in these lists correspond to each window listed in the "windows" key
+radiometric_offset.window_poly_scale.order = [ 1, 1,]
+radiometric_scaling.window_poly_scale.order = [ 1, 1,]
+surface_reflectance.window_poly_scale.order = [ 3, 3,]
+wavelength_grid.window_poly_scale.order = [ 0, 0,]

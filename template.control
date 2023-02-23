@@ -11,8 +11,8 @@ Use file lock?                  : {{use_file_lock}}
 Overwrite Existing?             : {{overwrite_existing}}
 Cache pixel output?             : {{cache_pixel_output}}
 Root data directory             : {{root_data_directory}}
-Switch on debug?                : {{switch_on_debug}} {{debug_level}}
-Debug filename                  : {{log_file}}
+Use Log File?/Log Verbosity Lev : {{switch_on_debug}} {{debug_level}}
+  (T) Logfile path              : {{log_file}}
 --------------------------------+------------------------------------------------------
 %%% LEVEL1 OPTIONS %%%          :
 Do Single Pixel Calc from Inp.  : F
@@ -139,9 +139,10 @@ RTM at L1 Resolution?           : {{common_options.rtm_at_l1_resolution}}
 Profile Input File              : {{root_data_directory}}/../../{{apriori_file}}
 Sampling Method                 : {{sampling_method}}
   (1) Nearest Neighbor          : 
-  (2) Point-in-Polygon          : 
-Surface Gravity (m/s)           : {{surface_gravity_mps2}}
-Planetary Radius (km)           : {{planetary_radius_km}}
+  (2) Point-in-Polygon          :
+Assume Earth for gravity?       : {{assume_earth_for_gravity}} 
+  (F) - Surface Gravity (m/s)   : {{surface_gravity_mps2}}
+      - Planetary Radius (km)   : {{planetary_radius_km}}
 Linearize w.r.t Hybrid Grid?    : {{linearize_wrt_hybrid_grid}}
 Profile Trace Gases             : {% for gas in profile_trace_gases %}{{gas}} {% endfor %}
 "Wet" Trace Gases               : {% for gas in wet_trace_gases %}{{gas}} {% endfor %}
@@ -373,6 +374,21 @@ Scale Observation Covariance    : {{scale_obs_cov}}
    --> Scale Factor             : {{obs_cov_scale_factor}}
 Scale A Priori Covariance       : {{scale_prior_cov}}
    --> Scale Factor             : {{prior_cov_scale_factor}}
+Init. State w. Prev. Fit?       : {{init_state.init_state_with_prev_fit}}
+  (T) - Filter Chi Sq.          : {{init_state.filter_chi_squared}}
+          (T) Max Chi Sq.       : {{init_state.max_chi_squared}}
+      - Filter RMS              : {{init_state.filter_rms}}
+          (T) Max RMS           : {{init_state.max_rms}} 
+      - Gas Substate            : {{init_state.gas_substate}} F
+      - Aerosol Substate        : {{init_state.aerosol_substate}} F
+      - Temperature Substate    : {{init_state.temperature_substate}} F
+      - Surf. Pres. Substate    : {{init_state.surface_pressure_substate}} F
+      - BRDF Substate           : {{init_state.brdf_substate}} F
+      - Rad. Offset Substate    : {{init_state.radiance_offset_substate}} F
+      - Rad, Scaling Substate   : {{init_state.radiance_scaling_substate}} F
+      - Residual EOF Substate   : {{init_state.residual_eof_substate}} F
+      - ISRF Substate           : {{init_state.isrf_substate}} T
+      - Wavelength Substate     : {{init_state.wavelength_substate}} T
 --------------------------------+------------------------------------------------------
 %%% DIAGNOSTIC OPTIONS %%%      :
 Level 1 Output Options          :
@@ -411,12 +427,12 @@ Profile Output Options         @: {% for elem in profile_output_options.outputs 
 RTM Output Options              : 
    Wavelength                  @: {% for elem in rtm_output_options.wavelength %}{{elem}} {% endfor %}
    Irradiance                  @: {% for elem in rtm_output_options.irradiance %}{{elem}} {% endfor %}
-   Radiance                    @: {% for elem in rtm_output_options.radiance %}{{elem}} {% endfor %}
-     --> Stokes Q,U?            : {{rtm_output_options.radiance_stokes}}
-   Radiant Flux                @: {% for elem in rtm_output_options.radiant_flux %}{{elem}} {% endfor %}
-     --> Stokes Q,U?            : {{rtm_output_options.radiant_flux_stokes}}
-   Direct Flux                 @: {% for elem in rtm_output_options.direct_flux %}{{elem}} {% endfor %}
-     --> Stokes Q,U?            : {{rtm_output_options.direct_flux_stokes}}
+   Radiance                    @: {% for elem in rtm_output_options.radiance.save %}{{elem}} {% endfor %}
+     --> Stokes Q,U?            : {{rtm_output_options.radiance.stokes}}
+   Radiant Flux                @: {% for elem in rtm_output_options.radiant_flux.save %}{{elem}} {% endfor %}
+     --> Stokes Q,U?            : {{rtm_output_options.radiant_flux.stokes}}
+   Direct Flux                 @: {% for elem in rtm_output_options.direct_flux.save %}{{elem}} {% endfor %}
+     --> Stokes Q,U?            : {{rtm_output_options.direct_flux.stokes}}
    Gas Jacobians                :
      Trace Gas Jacobians       @: {% for elem in rtm_output_options.gas_jacobians.trace_gas.save %}{{elem}} {% endfor %}
        --> Species              : {% for elem in rtm_output_options.gas_jacobians.trace_gas.species %}{{elem}} {% endfor %}
@@ -506,12 +522,6 @@ Sub State Vector Diagnostics    :
        --> Species              : {% for elem in sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel.species %}{{elem}} {% endfor %}
 Full matrices for offline Err.  :
    Gain matrix                  : {{full_matrices_for_offline_err.gain_matrix}}
-Error Analysis                  :
-     Do Error Analysis          : {{error_analysis.do_error_analysis}}
-     Proxy Name                 : {{error_analysis.proxy_name}}
-     Gas Column Components      : {% for elem in error_analysis.gas_column_components %}{{elem}} {% endfor %}
-     Print Outputs              : {% for elem in error_analysis.print_outputs %}{{elem}} {% endfor %}
-     XGas Components            : {% for elem in error_analysis.proxy_xgas_components %}{{elem}} {% endfor %}
 --------------------------------+------------------------------------------------------
 END OF FILE                     :
 --------------------------------+------------------------------------------------------

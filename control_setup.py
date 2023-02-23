@@ -72,14 +72,6 @@ def load_default_controls(splat_inputs: Dict) -> Dict:
     # update fields based on the given --toml-file
     dict_update(default_controls, splat_inputs)
 
-    # update all values that refer to a base level key with "=base_key"
-    dupe_var_list = [i for i in flat_dict_val(default_controls) if i.startswith("=")]
-    for var in dupe_var_list:
-        if var[1:] not in default_controls.keys():
-            print(f"could not update {var}")
-            continue
-        default_controls = dict_replace_value(default_controls, var, default_controls[var[1:]])
-
     return default_controls
 
 
@@ -109,7 +101,7 @@ def dict_update(d1: Dict, d2: Dict) -> Dict:
     Update dictionary d1 IN PLACE using dictionary d2
     Difference with built-in update method:
     - only overwrites non-dictionary values
-    - preserves keys that exist in d1 but not in d2
+    - for dictionaries: preserves keys that exist in d1 but not in d2
     e.g. if we have d1 = {"a":{"b":1,"c":2}}; d2 = {"a":{"c":5,"d":3}}
     d1.update(d2) returns {"a":{"c":5,"d":3}}
     dict_update(d1,d2) returns {"a":{"b":1,"c":5,"d":3}}
@@ -137,6 +129,7 @@ def check_required_variables(toml_file: str) -> None:
         "l2_met_file",
         "output_file",
         "log_file",
+        "isrf_file",
         "xsec",
         "windows",
         "abs_species",
@@ -184,6 +177,14 @@ def control_setup(control_file: str, toml_file: str, template_file: str) -> Dict
     window_list = toml_inputs["windows"]
     for window in window_list:
         dict_update(template_inputs, window_data[window])
+
+    # update all values that refer to a base level key with "=base_key"
+    dupe_var_list = [i for i in flat_dict_val(template_inputs) if i.startswith("=")]
+    for var in dupe_var_list:
+        if var[1:] not in template_inputs.keys():
+            print(f"could not update {var}")
+            continue
+        template_inputs = dict_replace_value(template_inputs, var, template_inputs[var[1:]])
 
     # write output control file
     with open(control_file, "w") as f:
