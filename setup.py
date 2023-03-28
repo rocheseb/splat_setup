@@ -14,6 +14,7 @@ setup(
         "console_scripts": [
             "ctrlsetup=splatsetup.conttrol_setup:main",
             "toml2ctrl=splatsetup.toml_to_control:main",
+            "updtoml=splatsetup.update_toml:main",
             "splatsetup=splatsetup.main:main",
         ],
     },
