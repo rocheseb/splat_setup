@@ -3,14 +3,6 @@
 # use the "windows" key in the --toml-file you want to use (e.g. see o2_test_setup.toml) to complement the control_setup.toml information
 # special syntax: use "=key" as a value so that control_setup.py will replace it with the value of the given key (only works when referring to first level keys, ignoring "FILES", "RETRIEVAL" etc)
 
-[co2_window]
-radiometric_offset.polynomial_scaling.uncert_prcnt = [5.0]
-radiometric_offset.window_poly_scale.uncert_prcnt = [5.0]
-radiometric_scaling.polynomial_scaling.uncert_prcnt = [5.0]
-radiometric_scaling.window_poly_scale.uncert_prcnt = [25.0]
-surface_reflectance.window_poly_scale.uncert_prcnt = [100.0]
-wavelength_grid.window_poly_scale.uncert_prcnt = [100.0]
-
 [co2_window.fwd_inv_mode_options.co2_window]
 index = 1
 start_nm = 1595.0
@@ -32,14 +24,6 @@ name = "WeakCH4"
 file_type = "SPLAT"
 index = 1
 file = "=l1_file"
-
-[ch4_window]
-radiometric_offset.polynomial_scaling.uncert_prcnt = [5.0]
-radiometric_offset.window_poly_scale.uncert_prcnt = [5.0]
-radiometric_scaling.polynomial_scaling.uncert_prcnt = [5.0]
-radiometric_scaling.window_poly_scale.uncert_prcnt = [25.0]
-surface_reflectance.window_poly_scale.uncert_prcnt = [100.0]
-wavelength_grid.window_poly_scale.uncert_prcnt = [100.0]
 
 [ch4_window.fwd_inv_mode_options.ch4_window]
 index = 1
@@ -63,12 +47,6 @@ name = "WeakCH4"
 file_type = "SPLAT"
 index = 1
 file = "=l1_file"
-
-[o2_window]
-radiometric_offset.window_poly_scale.uncert_prcnt = [5.0]
-radiometric_scaling.window_poly_scale.uncert_prcnt = [25.0]
-surface_reflectance.window_poly_scale.uncert_prcnt = [100.0]
-wavelength_grid.window_poly_scale.uncert_prcnt = [100.0]
 
 [o2_window.fwd_inv_mode_options.o2_window]
 index = 1

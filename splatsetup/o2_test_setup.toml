@@ -33,14 +33,34 @@ col_species = [ "H2O", "CO2", "PA1",]
 isrf_agg = 1
 
 # Ranges of pixels to process, x is across-track, y is along-track
-x_retrieval_range = [ 200, 200,]
-y_retrieval_range = [ 1, 1,]
+x_start = 200
+x_end = 200
+y_start = 1
+y_end = 1
 
-# the elements in these lists correspond to each window listed in the "windows" key
-radiometric_offset.window_poly_scale.order = [1]
-radiometric_scaling.window_poly_scale.order = [1]
-surface_reflectance.window_poly_scale.order = [3.0]
-wavelength_grid.window_poly_scale.order = [1.0]
+# Surface Reflectance State Vector Options
+surface_reflectance.polynomial_scaling.order = 1
+surface_reflectance.polynomial_scaling.uncert_prcnt = [5, 1]
+surface_reflectance.window_poly_scale.window1.order = 3
+surface_reflectance.window_poly_scale.window1.uncert_prcnt = 100
+
+# Radiometric Offset State Vector Options
+radiometric_offset.polynomial_scaling.order = 0
+radiometric_offset.polynomial_scaling.uncert_prcnt = [5]
+radiometric_offset.window_poly_scale.window1.order = 1
+radiometric_offset.window_poly_scale.window1.uncert_prcnt = 5
+
+# Radiometric Scaling State Vector Options
+radiometric_scaling.polynomial_scaling.order = 1
+radiometric_scaling.polynomial_scaling.uncert_prcnt = [5, 5]
+radiometric_scaling.window_poly_scale.window1.order = 1
+radiometric_scaling.window_poly_scale.window1.uncert_prcnt = 25
+
+# Wavelength Grid State Vector Options
+wavelength_grid.polynomial_scaling.order = 1
+wavelength_grid.polynomial_scaling.uncert_prcnt = [1, 1]
+wavelength_grid.window_poly_scale.window1.order = 0
+wavelength_grid.window_poly_scale.window1.uncert_prcnt = 100
 
 # The defaults for diagnostics options in control_setup.toml are set for the CH4 + CO2 windows
 # Below we update fields for the O2 diagnostics

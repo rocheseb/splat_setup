@@ -4,8 +4,8 @@ MethaneSAT Full Physics Retrieval: Test File
 Calculation Mode                : {{calculation_mode}}
 Output File                     : {{output_file}}
 Compute all pixels              : {{compute_all_pixels}}
- (F) - X Retrieval Range        : {% for x in x_retrieval_range %}{{x}} {% endfor %}
-     - Y Retrieval Range        : {% for y in y_retrieval_range %}{{y}} {% endfor %}
+ (F) - X Retrieval Range        : {{x_start}} {{x_end}}
+     - Y Retrieval Range        : {{y_start}} {{y_end}}
 Write directly to file?         : {{write_directly_to_file}}
 Use file lock?                  : {{use_file_lock}}
 Overwrite Existing?             : {{overwrite_existing}}
@@ -152,9 +152,9 @@ Proxy Normalization species     : {% for gas in proxy_normalization_species %}{{
                                 :  {{"{:>4}{:>12}".format(val.name,val.molecular_weight_gpmol)}}
 {%- endfor %}
                                 : ###END_OF_LIST###
-Profile Aerosols                : 
+Profile Aerosols                : {% for aerosol in aerosol_species %}{{aerosol}} {% endfor %}
 AOD Reference wavelength (nm)   : {{profile_aerosols.aod_reference_wavelength_nm}}
-Profile Aer Opt. Prop. Params.  :
+Profile Aer Opt. Prop. Params.  : {% for param in aerosol_params %}{{param}} {% endfor %}
 AOD from profile file           : {{profile_aerosols.aod_from_profile_file}}
         (F) - Profile Par.----->: Name   AOD ProfType LowerZ UpperZ PeakZ  H.Width  Relaxation  <-(km)
 {%- for key,val in profile_aerosols.profile_aer_opt_prop_params.items()%}
@@ -167,7 +167,7 @@ Aer Opt. Par. from Profile file?: {{profile_aerosols.aer_opt_par_from_profile_fi
                                 : {{"{:>4}{:>11}{:>19}".format(val.name,val.value,val.column_uncertainty)}}
 {%- endfor %}
                                 : ###END_OF_LIST###
-Profile Cloud Species           : 
+Profile Cloud Species           : {% for cloud in cloud_species %}{{cloud}} {% endfor %}
 COD Reference wavelength (nm)   : {{profile_cloud_species.cod_reference_wavelength_nm}}
 COD from profile file           : {{profile_cloud_species.cod_from_profile_file}}
        (F) - # Subpixels        : {{profile_cloud_species.n_subpixels}}
@@ -242,7 +242,7 @@ Full LUT To Memory              : {{full_lut_to_memory}}
                                 : {{"{:>5}{:>7}{:>6}{:>6} {}".format(val.name,val.cia1,val.cia2,val.brd1,val.file)}}
 {%- endfor %}
                                 :  ###END_OF_LIST###
-Airglow Gases                   : 
+Airglow Gases                   : {% for gas in airglow_gases %}{{gas}} {% endfor %}
   Emiss Cross Section Entries ->:  Name    BRD1   XsectFilename (Full path:RootDataDirectory/SAO_crosssections/splatv2_xsect)
 {%- for key,val in airglow_cross_section_entries.items() %}
                                 :  {{"{:>4}{:>8}   {}".format(val.name,val.brd1,val.file)}}
@@ -278,7 +278,7 @@ Trace Gas                       : <.............................................
 {%- endfor %}
                                 : ###END_OF_LIST###
 Aerosol                         : <....................................................>
- - Profile Species AOD          :
+ - Profile Species AOD          : 
  - Profile Param. Species AOD ->: Name  ProfPar OverwriteUncert? (T)->NewCovar
                                 : ###END_OF_LIST###
  - Aerosol Opt Prop Pars.       :
@@ -304,12 +304,12 @@ Surface Reflectance             : <.............................................
        Option Index             : {{surface_reflectance.option_index}}
          (1) Polynomial Scaling :
             - Order             : {{surface_reflectance.polynomial_scaling.order}}
-            - Coeff Uncert. (%) : {% for elem in surface_reflectance.polynomial_scaling.coeff_unc_prcnt %}{{elem}} {% endfor %}
+            - Coeff Uncert. (%) : {% for elem in surface_reflectance.polynomial_scaling.uncert_prcnt %}{{elem}} {% endfor %}
          (2) Window Poly. Scale.:
-            - Win. Order        : {% for elem in surface_reflectance.window_poly_scale.order %}{{elem}} {% endfor %}
-{%- for elem in surface_reflectance.window_poly_scale.uncert_prcnt %}
-            - Win. {{loop.index}} Uncert (%) : {{elem}} 
-{%- endfor %}
+            - Win. Order        : {%- for key,val in surface_reflectance.window_poly_scale.items() %}{{val.order}} {% endfor %}
+{%- for key,val in surface_reflectance.window_poly_scale.items() %}
+            - Win. {{loop.index}} Uncert (%) : {{val.uncert_prcnt}}
+{%- endfor %} 
          (3) EOF Fit(Case4 only):
             - Scale EOF Uncert. : {{surface_reflectance.eof_fit.scale_eof_uncert}}
              (T) Scale Factor   : {{surface_reflectance.eof_fit.scale_factor}}
@@ -318,22 +318,22 @@ Radiometric Offset              : <.............................................
    (T) Option Index             : {{radiometric_offset.option_index}}
        (1) Polynomial Scaling   :
            - Order              : {{radiometric_offset.polynomial_scaling.order}}
-           - Coeff Unc. (% Rad) : {{radiometric_offset.polynomial_scaling.coeff_unc_prcnt_rad}}
+           - Coeff Unc. (% Rad) : {{radiometric_offset.polynomial_scaling.uncert_prcnt}}
        (2) Win. Polynomial Scl. :
-           - Win. Order         : {% for elem in radiometric_offset.window_poly_scale.order %}{{elem}} {% endfor %}
-{%- for elem in radiometric_offset.window_poly_scale.uncert_prcnt %}
-            - Win. {{loop.index}} Uncert (%) : {{elem}} 
-{%- endfor %}           
+           - Win. Order         : {%- for key,val in radiometric_offset.window_poly_scale.items() %}{{val.order}} {% endfor %}
+{%- for key,val in radiometric_offset.window_poly_scale.items() %}
+            - Win. {{loop.index}} Uncert (%) : {{val.uncert_prcnt}}
+{%- endfor %}        
 Radiometric Scaling             : <....................................................>
  - Add to State Vector          : {{radiometric_scaling.add_to_state_vector}}
    (T) Option Index             : {{radiometric_scaling.option_index}}
        (1) Polynomial Scaling   :
            - Order              : {{radiometric_scaling.polynomial_scaling.order}}
-           - Coeff Unc. (%)     : {{radiometric_scaling.polynomial_scaling.coeff_unc_prcnt}}
+           - Coeff Unc. (%)     : {{radiometric_scaling.polynomial_scaling.uncert_prcnt}}
        (2) Win. Polynomial Scl. :
-           - Win. Order         : {% for elem in radiometric_scaling.window_poly_scale.order %}{{elem}} {% endfor %}
-{%- for elem in radiometric_scaling.window_poly_scale.uncert_prcnt %}
-            - Win. {{loop.index}} Uncert (%) : {{elem}} 
+           - Win. Order         : {%- for key,val in radiometric_scaling.window_poly_scale.items() %}{{val.order}} {% endfor %}
+{%- for key,val in radiometric_scaling.window_poly_scale.items() %}
+            - Win. {{loop.index}} Uncert (%) : {{val.uncert_prcnt}}
 {%- endfor %}  
 EOF Residuals                   : <....................................................>
  - Add to State Vector          : {{eof_residuals.add_to_state_vector}}
@@ -354,12 +354,12 @@ Wavelength Grid                 : <.............................................
    (T) Option Index             : {{wavelength_grid.option_index}}
        (1) Polynomial Scaling   :
            - Order              : {{wavelength_grid.polynomial_scaling.order}}
-           - Coeff Unc. (%)     : {{wavelength_grid.polynomial_scaling.coeff_unc_prcnt}}
+           - Coeff Unc. (%)     : {{wavelength_grid.polynomial_scaling.uncert_prcnt}}
        (2) Win. Polynomial Scl. :
-           - Win. Order         : {% for elem in wavelength_grid.window_poly_scale.order %}{{elem}}{% endfor %}
-{%- for elem in wavelength_grid.window_poly_scale.uncert_prcnt %}
-            - Win. {{loop.index}} Uncert (%) : {{elem}} 
-{%- endfor %}  
+           - Win. Order         : {%- for key,val in wavelength_grid.window_poly_scale.items() %}{{val.order}} {% endfor %}
+{%- for key,val in wavelength_grid.window_poly_scale.items() %}
+            - Win. {{loop.index}} Uncert (%) : {{val.uncert_prcnt}}
+{%- endfor %}    
 --------------------------------+------------------------------------------------------
 %%% OPTIMIZER OPTIONS %%%       :
 Maximum # Iterations            : {{max_iter}}

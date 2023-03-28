@@ -1,0 +1,946 @@
+root_data_directory = "/n/holylfs04/LABS/wofsy_lab/Lab/sroche/splat_static/SPLAT/data"
+log_file = "/n/home11/sroche/testing/mair_json_setup_o2_test.log"
+output_file = "/n/home11/sroche/testing/mair_json_setup_o2_test.nc"
+l1_file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+l2_met_file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2_Prior_O2_1x1/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340_prior.nc"
+isrf_file = "o2_isrf_lut_20210722_xflipped.nc"
+calculation_mode = "INVERSE"
+compute_all_pixels = "F"
+x_start = 200
+x_end = 200
+y_start = 1
+y_end = 1
+write_directly_to_file = "F"
+use_file_lock = "T"
+overwrite_existing = "F"
+cache_pixel_output = "T"
+switch_on_debug = "T"
+debug_level = "3"
+do_single_pixel_calc_from_inp = "F"
+apriori_file = "AFGLUS_apriori_PA.nc"
+sampling_method = 1
+assume_earth_for_gravity = "T"
+surface_gravity_mps2 = 9.80991
+planetary_radius_km = 6378.1
+linearize_wrt_hybrid_grid = "T"
+profile_trace_gases = [ "N2", "O2", "Ar", "H2O", "CH4", "CO2", "PA1",]
+wet_trace_gases = [ "H2O",]
+proxy_normalization_species = [ "CH4",]
+aerosol_species = []
+aerosol_params = []
+cloud_species = []
+surface_reflectance_option = 1
+surface_emissivity_option = 1
+do_plant_fluorescence = "F"
+chlorophyll_spectrum_file = "data/SIF/chlorophyll_fl_734nm_norm.nc"
+assume_earth_for_scattering = "T"
+co2_profile_gas_name = "CO2"
+scattering_gases = [ "N2",]
+do_raman_scattering = "F"
+rss_ref_temperature_k = 250.0
+raman_gases = [ "N2", "O2",]
+abs_species = [ "PACIA", "O2", "H2O", "CO2",]
+number_of_fine_layers = 2
+full_lut_to_memory = "T"
+airglow_gases = []
+do_aerosols = "F"
+do_clouds = "F"
+do_lambertian_clouds = "T"
+cloud_albedo = 0.8
+prf_species = []
+col_species = [ "H2O", "CO2", "PA1",]
+overwrite_clim_uncertainty = "F"
+max_iter = 15
+max_div = 5
+convergence_threshold = 0.1
+initial_gamma_lm = 10.0
+r_divergent = 0.25
+r_convergent = 0.75
+divergent_scale_factor = 4.0
+convergent_scale_factor = 0.5
+chi_gof_threshold = 10.0
+scale_obs_cov = "T"
+obs_cov_scale_factor = 1.0
+scale_prior_cov = "T"
+prior_cov_scale_factor = 1.0
+xsec = "ggg2020_o2"
+windows = [ "o2_window",]
+isrf_agg = 1
+
+[single_pixel_calc_inp]
+date_yyyymmdd = "20070715"
+hour_decimal_utc = 17
+sza_deg = 30.0
+vza_deg = 30.0
+aza_deg = 45.0
+saa_deg = 0.0
+vaa_deg = 45.0
+longitude_deg = -87.95
+latitude_deg = 32.05
+surface_altitude_km = 0.0
+obs_altitude_km = 0.0
+cloud_fraction = 0.2
+cloud_pressure_hpa = 500.0
+wind_speed_mps = 5.0
+wind_dir_deg = 0.0
+chlorophyll_mgpm3 = 30.0
+ocean_salinity_pptv = 300.0
+snow_fraction = 0.0
+sea_ice_fraction = 0.0
+snow_depth_m = 0.0
+snow_age_days = 0.0
+
+[l2_profile_support_data]
+use_l2_profile_met = "T"
+file_type = "SPLAT"
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2_Prior_O2_1x1/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340_prior.nc"
+gases = [ "CH4", "CO2", "H2O",]
+aerosols = []
+
+[clouds]
+use_l2_clouds = "F"
+use_clouds_from_l2_prof_met = "F"
+species = []
+file_type = "SPLAT"
+file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+
+[l2_surface_reflectance]
+use_l2_surface = "T"
+
+[amf_mode_options]
+convolution_buffer = 2.0
+radiative_transfer_model = "LBL_IQU"
+isrf_option = "OMVISFix"
+
+[common_options]
+solar_file = "chance_jpl_mrg_hitran_200-16665nm.nc"
+rtm_at_l1_resolution = "F"
+solar_io_correction = "F"
+use_custom_rtm_grid = "F"
+custom_grid_file = "custom_rtm_grid.nc"
+
+[profile_aerosols]
+aod_reference_wavelength_nm = 550.0
+aod_from_profile_file = "T"
+aer_opt_par_from_profile_file = "F"
+
+[profile_cloud_species]
+cod_reference_wavelength_nm = 550.0
+cod_from_profile_file = "F"
+n_subpixels = 2
+cloud_fractions = [ 0.8, 0.01,]
+cloud_pressure_hpa = [ 500.0, 200.0,]
+
+[temperature]
+add_to_state_vector = "T"
+temperature_option = 2
+
+[surface_pressure]
+add_to_state_vector = "T"
+overwrite_clim_uncertainty = "T"
+uncertainty_hpa = 16
+
+[surface_reflectance]
+add_to_state_vector = "T"
+init_state_from_obs = "F"
+albedo_file = "albedo_bands.nc"
+max_poly_order = 1
+option_index = 1
+
+[radiometric_offset]
+add_to_state_vector = "F"
+option_index = 2
+
+[radiometric_scaling]
+add_to_state_vector = "F"
+option_index = 2
+
+[eof_residuals]
+add_to_state_vector = "F"
+
+[isrf_parameters]
+add_to_state_vector = "T"
+
+[wavelength_grid]
+add_to_state_vector = "T"
+option_index = 1
+
+[init_state]
+init_state_with_prev_fit = "T"
+filter_chi_squared = "F"
+max_chi_squared = 5.0
+filter_rms = "F"
+max_rms = 0.05
+gas_substate = "F"
+aerosol_substate = "F"
+temperature_substate = "F"
+surface_pressure_substate = "F"
+brdf_substate = "F"
+radiance_offset_substate = "F"
+radiance_scaling_substate = "F"
+residual_eof_substate = "F"
+isrf_substate = "T"
+wavelength_substate = "T"
+
+[level1_options]
+viewing_geometry = "T"
+
+[profile_output_options]
+outputs = [ "Prior", "Posterior",]
+air_molecular_weight = [ "F", "F",]
+gravity = [ "F", "F",]
+relative_humidity = [ "F", "F",]
+air_partial_column = [ "T", "T",]
+total_aod = [ "F", "F",]
+cloud_n_pixels = [ "F", "F",]
+cloud_fraction_total = [ "F", "F",]
+total_cod = [ "F", "F",]
+
+[rtm_output_options]
+wavelength = [ "F", "T",]
+irradiance = [ "F", "F",]
+
+[optical_property_diagnostics]
+total_optical_depth = [ "F", "F",]
+brdf_kernel_amplitudes = [ "T", "T",]
+
+[general_fit_statistics]
+cost_function = "T"
+chi_square = "T"
+uncertatinty_derivative = "T"
+spectrum_rms = "T"
+number_of_iterations = "T"
+fit_quality_flag = "T"
+
+[spectrum]
+spectrum_residuals = "F"
+level1_spectrum = "F"
+level1_uncertainty = "F"
+iteration_radiance = "F"
+iteration_radiance_max_iter = 5
+
+[total_state_vector]
+averaging_kernel = "F"
+posteriori_covariance = "F"
+priori_covariance = "F"
+posteriori_state = "T"
+priori_state = "T"
+iteration_state = "F"
+iteration_state_max_iter = 5
+
+[full_matrices_for_offline_err]
+gain_matrix = "F"
+
+[l2_2d_support_data.surface_altitude]
+use = "T"
+file_type = "SPLAT"
+file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+
+[l2_2d_support_data.surface_winds]
+use = "F"
+file_type = "SPLAT"
+file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+
+[l2_2d_support_data.chlorophyll]
+use = "F"
+file_type = "SPLAT"
+file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+
+[l2_2d_support_data.ocean_salinity]
+use = "F"
+file_type = "SPLAT"
+file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+
+[l2_2d_support_data.snow_parameters]
+use = "F"
+file_type = "SPLAT"
+file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+
+[vlidort_line_by_line.model1]
+name = "LBL_IQU"
+n_stoke = 3
+n_stream = 4
+n_moment = 1000
+thermax_nm = 3000.0
+debug = "F"
+
+[vlidort_line_by_line.model2]
+name = "LBL_I"
+n_stoke = 1
+n_stream = 4
+n_moment = 1000
+thermax_nm = 3000.0
+debug = "F"
+
+[vlidort_line_by_line.model3]
+name = "LBL_16S"
+n_stoke = 3
+n_stream = 16
+n_moment = 1000
+thermax_nm = 3000.0
+debug = "F"
+
+[vlidort_pca.model1]
+name = "PCA_IQU"
+n_stoke = 3
+n_stream = 4
+n_moment = 1000
+thermax_nm = 3000.0
+debug = "F"
+control_file = "pca_bin.control"
+
+[first_order.model1]
+name = "FrstOrd"
+n_stoke = 1
+n_moment = 200
+thermax_nm = 3000.0
+
+[two_stream.model1]
+name = "TwoStr"
+n_moment = 1000
+thermax_nm = 3000.0
+
+[trace_gas_properties.a]
+name = "N2"
+molecular_weight_gpmol = 28.014
+
+[trace_gas_properties.b]
+name = "O2"
+molecular_weight_gpmol = 31.998
+
+[trace_gas_properties.c]
+name = "Ar"
+molecular_weight_gpmol = 39.948
+
+[trace_gas_properties.d]
+name = "H2O"
+molecular_weight_gpmol = 18.015
+
+[trace_gas_properties.e]
+name = "CH4"
+molecular_weight_gpmol = 16.043
+
+[trace_gas_properties.f]
+name = "CO2"
+molecular_weight_gpmol = 44.009
+
+[trace_gas_properties.g]
+name = "PA1"
+molecular_weight_gpmol = 28.965
+
+[surface_reflectance_options.fixed_lambertian]
+albedo_value = 0.3
+
+[surface_reflectance_options.lambertian_spectrum]
+lambertian_surface_file = "grass_ASTAR.dat"
+
+[surface_reflectance_options.ler_climatology]
+use_constant_wavelength = "T"
+ler_wavelength_nm = 335.0
+ler_climatology_file = "OMI-Aura_L3-OMLER_2005m01-2009m12_v003-2010m0503t063707.nc"
+
+[surface_reflectance_options.modis_fa]
+refl_clim_directory = "./mcd43cmg_0p05"
+do_isotropic = "T"
+black_white_blue = 1
+ocean_glint_brdf = "T"
+modis_fa_file = "spatial_db_scia_mrg_usgs_FA_n16_12Ksamp_splib07a_extended.nc"
+
+[surface_reflectance_options.brdf_climatology]
+brdf_climatology_file = "MARCI_Hapke_clim.nc"
+
+[surface_emissivity_options.fixed_emissivity]
+emissivity_value = 0.9
+
+[surface_emissivity_options.emissivity_spectrum]
+emissivity_spectrum_file = ""
+
+[surface_emissivity_options.emissivity_climatology]
+emissivity_climatology_file = ""
+
+[scattering_gas_entries.a]
+name = "CO2"
+file = "CO2_rayleigh_optprop.nc"
+
+[scattering_gas_entries.b]
+name = "Ar"
+file = "Ar_rayleigh_optprop.nc"
+
+[scattering_gas_entries.c]
+name = "N2"
+file = "N2_rayleigh_optprop.nc"
+
+[scattering_gas_entries.d]
+name = "O2"
+file = "O2_rayleigh_optprop.nc"
+
+[raman_gas_entries.a]
+name = "N2"
+file = "N2_rrs_optprop.nc"
+
+[raman_gas_entries.b]
+name = "O2"
+file = "O2_rrs_optprop.nc"
+
+[cross_section_entries.H2O]
+name = "H2O"
+cia1 = "-"
+cia2 = "-"
+brd1 = "-"
+file = "GGG2020_H2O_1235_1300_VP_0p004.nc"
+
+[cross_section_entries.CO2]
+name = "CO2"
+cia1 = "-"
+cia2 = "-"
+brd1 = "-"
+file = "GGG2020_CO2_1235_1300_VP_0p004.nc"
+
+[cross_section_entries.O2]
+name = "O2"
+cia1 = "-"
+cia2 = "-"
+brd1 = "-"
+file = "GGG2020_O2_1235_1300_SDVP_0p004.nc"
+
+[cross_section_entries.PACIA]
+name = "PACIA"
+cia1 = "PA1"
+cia2 = "PA1"
+brd1 = "-"
+file = "GGG2020_O2_1235_1300_PACIA_0p004_e46.nc"
+
+[airglow_cross_section_entries.a]
+name = "O2DG"
+brd1 = "-"
+file = "GGG2020_O2_1235_1300_SDVP_0p004_airglow.nc"
+
+[aerosol_optical_properties.SU]
+name = "SU"
+file = "SU_200nm-20um_wgphase_flexinput.nc"
+
+[aerosol_optical_properties.BC]
+name = "BC"
+file = "BC_200nm-20um_wgphase_flexinput.nc"
+
+[aerosol_optical_properties.OC]
+name = "OC"
+file = "OC_200nm-20um_wgphase_flexinput.nc"
+
+[aerosol_optical_properties.SF]
+name = "SF"
+file = "SF_200nm-20um_wgphase_flexinput.nc"
+
+[aerosol_optical_properties.SC]
+name = "SC"
+file = "SC_200nm-20um_wgphase_flexinput.nc"
+
+[aerosol_optical_properties.DU]
+name = "DU"
+file = "DU_200nm-20um_wgphase_flexinput.nc"
+
+[cloud_opt_prop.a]
+name = "CW"
+file = "WC_200nm-20um_wgphase_flexinput.nc"
+
+[cloud_opt_prop.b]
+name = "CI"
+file = "WC_200nm-20um_wgphase_flexinput.nc"
+
+[uncertainty_option.CH4]
+name = "CH4"
+cov_mat_type = "ZCORRELATED"
+par1 = 5.0
+par2 = 2.0
+
+[uncertainty_option.H2O]
+name = "H2O"
+cov_mat_type = "DIAGONAL"
+par1 = 1000.0
+par2 = ""
+
+[uncertainty_option.CO2]
+name = "CO2"
+cov_mat_type = "DIAGONAL"
+par1 = 1000.0
+par2 = ""
+
+[temperature.fit_profile]
+overwrite_clim_uncertainty = "T"
+cov_mat_type = "DIAGONAL"
+parameters = 5.0
+
+[temperature.fit_shift]
+overwrite_clim_uncertainty = "T"
+shift_unc_k = 5.0
+
+[surface_reflectance.polynomial_scaling]
+order = 1
+uncert_prcnt = [ 5, 1,]
+
+[surface_reflectance.eof_fit]
+scale_eof_uncert = "F"
+scale_factor = 2.0
+
+[radiometric_offset.polynomial_scaling]
+order = 0
+uncert_prcnt = [ 5,]
+
+[radiometric_scaling.polynomial_scaling]
+order = 1
+uncert_prcnt = [ 5, 5,]
+
+[wavelength_grid.polynomial_scaling]
+order = 1
+uncert_prcnt = [ 1, 1,]
+
+[profile_output_options.pressure_layer]
+edge = [ "F", "T",]
+mid = [ "F", "F",]
+
+[profile_output_options.temperature_layer]
+edge = [ "F", "F",]
+mid = [ "F", "F",]
+
+[profile_output_options.altitude_layer]
+edge = [ "F", "F",]
+mid = [ "F", "F",]
+
+[profile_output_options.gas_partial_column]
+save = [ "T", "T",]
+species = [ "O2", "H2O", "PA1",]
+
+[profile_output_options.gas_column_uncertainties]
+save = [ "T", "T",]
+species = [ "O2", "H2O", "PA1",]
+
+[profile_output_options.gas_mixing_ratios]
+save = [ "T", "T",]
+species = [ "O2", "H2O", "PA1",]
+
+[profile_output_options.dry_gas_mixing_ratios]
+save = [ "F", "F",]
+species = [ "all",]
+
+[profile_output_options.proxy_column_avg_mix_rat]
+save = [ "F", "F",]
+species = [ "all",]
+
+[profile_output_options.species_aod]
+save = [ "F", "F",]
+species = [ "all",]
+
+[profile_output_options.species_profile_params]
+save = [ "F", "F",]
+species = [ "all",]
+
+[profile_output_options.species_profile_par_derivs]
+save = [ "F", "F",]
+species = [ "all",]
+
+[rtm_output_options.radiance]
+save = [ "F", "F",]
+stokes = "F"
+
+[rtm_output_options.radiant_flux]
+save = [ "F", "F",]
+stokes = "F"
+
+[rtm_output_options.direct_flux]
+save = [ "F", "F",]
+stokes = "F"
+
+[rtm_output_options.gas_jacobians]
+scattering_weights = [ "F", "F",]
+
+[optical_property_diagnostics.gas_absorption_xsect]
+save = [ "F", "F",]
+species = [ "all",]
+
+[fwd_inv_mode_options.o2_window]
+index = 1
+start_nm = 1249.2
+end_nm = 1287.8
+buffer_nm = 2.0
+convolution_grid_sampling = 0.004
+radiative_transfer_model = "TRNMSN"
+isrf = "MAirCal"
+convolution_width_hw1e = 10.0
+use_fft_for_convolution = "F"
+
+[single_pixel_calc_inp.pixel_corners.longitudes_deg]
+bot_left = -88.0
+top_left = -88.0
+top_right = -87.9
+bot_right = -87.9
+
+[single_pixel_calc_inp.pixel_corners.latitudes_deg]
+bot_left = 32.0
+top_left = 32.1
+top_right = 32.1
+bot_right = 32.0
+
+[single_pixel_calc_inp.band_definition.band1]
+name = "TEMPOVis"
+start_nm = 540.0
+end_nm = 740.0
+sampling_nm = 0.01
+view_dir_idx = 1
+
+[l2_surface_reflectance.band_inputs.o2delta]
+name = "O2Delta"
+file_type = "SPLAT"
+index = 1
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2_Prior_O2_1x1/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340_prior.nc"
+
+[isrf_parametrization.fixed_supergaussian.a]
+name = "MSatCH4"
+hw1e = 0.189
+asym = 0.0
+shape_fac = 2.0
+wavenumber_units = "F"
+
+[isrf_parametrization.fixed_supergaussian.b]
+name = "MSatFix"
+hw1e = 0.05
+asym = 0.0
+shape_fac = 2.0
+wavenumber_units = "F"
+
+[isrf_parametrization.fixed_supergaussian.c]
+name = "MSatdw"
+hw1e = 0.05001
+asym = 0.0
+shape_fac = 2.0
+wavenumber_units = "F"
+
+[isrf_parametrization.fixed_supergaussian.d]
+name = "OMVISFix"
+hw1e = 0.34
+asym = 0.0
+shape_fac = 2.0
+wavenumber_units = "F"
+
+[isrf_parametrization.fixed_supergaussian.e]
+name = "MSatWnum"
+hw1e = 0.3
+asym = 0.0
+shape_fac = 2.0
+wavenumber_units = "T"
+
+[isrf_parametrization.fixed_tropomi.a]
+name = "SWIR"
+c0 = 0.0
+d = 0.5703
+s = 2.7202
+w = 2.6464
+eta = 0.0989
+gamma = 1.477
+m = 1.6701
+wavenumber_units = "F"
+
+[isrf_parametrization.isrf_file.a]
+name = "MSatB1"
+band_index = 1
+wavenumber_units = "F"
+file = "methanesat_isrf_parameters.nc"
+isrf_agg = 1
+
+[isrf_parametrization.isrf_file.b]
+name = "MSatB2"
+band_index = 2
+wavenumber_units = "F"
+file = "methanesat_isrf_parameters.nc"
+isrf_agg = ""
+
+[isrf_parametrization.isrf_file.c]
+name = "MAirCal"
+band_index = 1
+wavenumber_units = "F"
+file = "o2_isrf_lut_20210722_xflipped.nc"
+isrf_agg = 1
+
+[isrf_parametrization.isrf_file.d]
+name = "TROPSWIR"
+band_index = 1
+wavenumber_units = "F"
+file = "tropomi_isrf_test_parameters.nc"
+isrf_agg = ""
+
+[isrf_parametrization.isrf_file.e]
+name = "LUTSIR"
+band_index = 1
+wavenumber_units = "F"
+file = "tropomi_isrf_test_lut.nc"
+isrf_agg = ""
+
+[isrf_parametrization.isrf_file.f]
+name = "GOSATB2"
+band_index = 1
+wavenumber_units = "T"
+file = "gosat_isrf_lut.nc"
+isrf_agg = ""
+
+[profile_aerosols.profile_aer_opt_prop_params.a]
+name = "SU"
+aod = 1.0
+prof_type = "GDF"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 0.0
+
+[profile_aerosols.profile_aer_opt_prop_params.b]
+name = "BC"
+aod = 0.01
+prof_type = "EXP"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 1.0
+
+[profile_aerosols.profile_aer_opt_prop_params.c]
+name = "OC"
+aod = 0.01
+prof_type = "BOX"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 0.0
+
+[profile_aerosols.profile_aer_opt_prop_params.d]
+name = "SF"
+aod = 0.01
+prof_type = "GDF"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 0.0
+
+[profile_aerosols.profile_aer_opt_prop_params.e]
+name = "SC"
+aod = 0.01
+prof_type = "GDF"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 0.0
+
+[profile_aerosols.profile_aer_opt_prop_params.f]
+name = "DU"
+aod = 0.01
+prof_type = "GDF"
+lower_z = 0.0
+upper_z = 12.0
+peak_z = 6.0
+h_width = 0.5
+relaxation = 0.0
+
+[profile_aerosols.const_values.a]
+name = "SU_alpha"
+value = 3.0
+column_uncertainty = 1.0
+
+[profile_cloud_species.species_proftype.a]
+name = "CW"
+prof_type = "BOX"
+
+[profile_cloud_species.species_proftype.b]
+name = "CI"
+prof_type = "BOX"
+
+[profile_cloud_species.profile_params.a]
+name = "CW"
+pixel = 1
+cod = 10.0
+lower_z = 2.0
+upper_z = 5.0
+peak_z = 4.0
+h_width = 1.0
+relaxation = 0.0
+
+[profile_cloud_species.profile_params.b]
+name = "CW"
+pixel = 2
+cod = 0.1
+lower_z = 10.0
+upper_z = 12.0
+peak_z = 11.0
+h_width = 1.0
+relaxation = 0.0
+
+[profile_cloud_species.profile_params.c]
+name = "CI"
+pixel = 2
+cod = 0.9
+lower_z = 10.0
+upper_z = 12.0
+peak_z = 11.0
+h_width = 1.0
+relaxation = 0.0
+
+[surface_reflectance.window_poly_scale.window1]
+order = 3
+uncert_prcnt = 100
+
+[radiometric_offset.window_poly_scale.window1]
+order = 1
+uncert_prcnt = 5
+
+[radiometric_scaling.window_poly_scale.window1]
+order = 1
+uncert_prcnt = 25
+
+[eof_residuals.eofs_to_add.a]
+band_index = 1
+eof_index = 1
+uncertainty = 1.0
+file = "ch4proxy_eof_residuals_v0_01_04_sorted.nc"
+
+[eof_residuals.eofs_to_add.b]
+band_index = 1
+eof_index = 2
+uncertainty = 1.0
+file = "ch4proxy_eof_residuals_v0_01_04_sorted.nc"
+
+[isrf_parameters.parameters_to_fit.a]
+window = 1
+param = 2
+poly_order = 0
+uncertainty = 0.05
+tbd = 0.3
+
+[wavelength_grid.window_poly_scale.window1]
+order = 0
+uncert_prcnt = 100
+
+[rtm_output_options.gas_jacobians.trace_gas]
+save = [ "F", "F",]
+species = [ "all",]
+stokes = "F"
+
+[rtm_output_options.gas_jacobians.trace_gas_part_col]
+save = [ "F", "F",]
+species = [ "CH4", "CH4", "CO2",]
+lower_index = [ 1, 7, 1,]
+upper_index = [ 1, 8, 20,]
+stokes = "F"
+
+[rtm_output_options.gas_jacobians.air_mass_factors]
+save = [ "F", "F",]
+species = [ "all",]
+
+[rtm_output_options.met_jacobians.temperature_profile]
+save = [ "F", "F",]
+stokes = "F"
+
+[rtm_output_options.met_jacobians.temperature_shift]
+save = [ "F", "F",]
+stokes = "F"
+
+[rtm_output_options.met_jacobians.surface_pressure]
+save = [ "F", "F",]
+stokes = "F"
+
+[rtm_output_options.aerosol_jacobians.profile_aod]
+save = [ "F", "F",]
+species = []
+stokes = "F"
+
+[rtm_output_options.aerosol_jacobians.profile_aod_par]
+save = [ "F", "F",]
+species = [ "all",]
+stokes = "F"
+
+[rtm_output_options.aerosol_jacobians.profile_ssa]
+save = [ "F", "F",]
+species = [ "all",]
+stokes = "F"
+
+[rtm_output_options.aerosol_jacobians.profile_ssa_par]
+save = [ "F", "F",]
+species = [ "all",]
+stokes = "F"
+
+[rtm_output_options.aerosol_jacobians.opt_prop_params]
+save = [ "F", "F",]
+species = [ "all",]
+stokes = "F"
+
+[rtm_output_options.surface_jacobians.brdf_kernel_factors]
+save = [ "F", "F",]
+stokes = "F"
+
+[rtm_output_options.surface_jacobians.brdf_kernel_parameters]
+save = [ "F", "F",]
+stokes = "F"
+
+[rtm_output_options.instrument_jacobians.isrf]
+save = [ "F", "F",]
+stokes = "F"
+
+[rtm_output_options.instrument_jacobians.wavelength_shift]
+save = [ "F", "F",]
+stokes = "F"
+
+[sub_state_vector_diagnostics.gas_absorption_post_covar.profile_mixing_ratio]
+save = "F"
+species = [ "all",]
+
+[sub_state_vector_diagnostics.gas_absorption_post_covar.column_avg_mixing_ratio]
+save = "T"
+species = [ "O2", "H2O", "CO2",]
+
+[sub_state_vector_diagnostics.gas_absorption_post_covar.dry_profile_mixing_ratio]
+save = "F"
+species = [ "all",]
+
+[sub_state_vector_diagnostics.gas_absorption_post_covar.dry_column_avg_mixing_ratio]
+save = "T"
+species = [ "O2", "H2O", "CO2",]
+
+[sub_state_vector_diagnostics.gas_absorption_post_covar.proxy_posteriori_uncert]
+save = "F"
+species = [ "all",]
+
+[sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel]
+save = "T"
+species = [ "CO2", "H2O",]
+
+[l1_radiance.band_inputs.o2delta]
+name = "O2Delta"
+file_type = "SPLAT"
+index = 1
+file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+
+[surface_reflectance_options.fixed_kernel_brdf.vlidort_options.a]
+name = "Lambertian"
+index = 1
+amplitude = 0.5
+n_par = 0
+par1 = 0.0
+par2 = 0.0
+par3 = 0.0
+
+[surface_reflectance_options.fixed_kernel_brdf.vlidort_options.b]
+name = "LiSparse"
+index = 4
+amplitude = 0.01
+n_par = 2
+par1 = 2.0
+par2 = 1.0
+par3 = 0.0
+
+[surface_reflectance_options.fixed_kernel_brdf.vlidort_options.c]
+name = "Ross-thick"
+index = 3
+amplitude = 0.01
+n_par = 0
+par1 = 0.0
+par2 = 0.0
+par3 = 0.0

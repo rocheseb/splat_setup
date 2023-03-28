@@ -30,8 +30,10 @@ isrf_file = "ch4_isrf_lut_20210722_xtrkflip.nc"
 calculation_mode = "INVERSE"
 compute_all_pixels = "F"
 # if compute_all_pixels is False, use these pixel ranges:
-x_retrieval_range = [ 100, 100,]
-y_retrieval_range = [ 30, 30,]
+x_start = 100
+x_end = 100
+y_start = 30
+y_end = 30
 # if write_directly_to_file is "F", will create a subset directory
 write_directly_to_file = "F"
 use_file_lock = "T"
@@ -340,6 +342,9 @@ linearize_wrt_hybrid_grid = "T"
 profile_trace_gases = [ "N2", "O2", "Ar", "H2O", "CH4", "CO2", "PA1",]
 wet_trace_gases = [ "H2O",]
 proxy_normalization_species = [ "CH4",]
+aerosol_species = []
+aerosol_params =[]
+cloud_species = []
 
 # properties of gases listed under profile_trace_gases
 # molecular weights are in g/mol
@@ -575,7 +580,7 @@ co2_profile_gas_name = "CO2"
 scattering_gases = [ "N2",]
 # if do_raman_scattering is "T", use rss_def_temperature_k and raman_gas_entries
 do_raman_scattering = "F"
-rss_ref_temperature_k = "250.0"
+rss_ref_temperature_k = 250.0
 raman_gases = [ "N2", "O2",]
 # lits of gases to be included in the spectrum calculation
 abs_species = [ "O2", "H2O", "CO2", "PACIA",]
@@ -583,6 +588,8 @@ abs_species = [ "O2", "H2O", "CO2", "PACIA",]
 number_of_fine_layers = 2
 # if "T", read the cross sections in memory
 full_lut_to_memory = "T"
+# "O2DG" is used as the airglow species
+airglow_gases = []
 
 # used if assume_earth_for_scattering is "F"
 ["GAS OPTIONS".scattering_gas_entries.a]
@@ -761,11 +768,11 @@ option_index = 1
 
 ["STATE VECTOR OPTIONS".surface_reflectance.polynomial_scaling]
 order = 1
-coeff_unc_prcnt = [ 5.0, 1.0,]
+uncert_prcnt = [ 5.0, 1.0,]
 
-["STATE VECTOR OPTIONS".surface_reflectance.window_poly_scale]
-order = [ 1,]
-uncert_prcnt = [ 100.0,]
+["STATE VECTOR OPTIONS".surface_reflectance.window_poly_scale.window1]
+order = 1
+uncert_prcnt = 100.0 # uncertainty (%) on the order+1 parameters, same for all parameters
 
 ["STATE VECTOR OPTIONS".surface_reflectance.eof_fit]
 scale_eof_uncert = "F"
@@ -779,11 +786,11 @@ option_index = 2
 
 ["STATE VECTOR OPTIONS".radiometric_offset.polynomial_scaling]
 order = 0
-coeff_unc_prcnt_rad = 5.0
+uncert_prcnt = 5.0
 
-["STATE VECTOR OPTIONS".radiometric_offset.window_poly_scale]
-order = [ 1,]
-uncert_prcnt = [ 5.0,]
+["STATE VECTOR OPTIONS".radiometric_offset.window_poly_scale.window1]
+order = 1
+uncert_prcnt = 5.0 # uncertainty (%) on the order+1 parameters, same for all parameters
 
 ["STATE VECTOR OPTIONS".radiometric_scaling]
 # if add_to_state_vector is "F", do not check the other radiometric_scaling parameters
@@ -793,11 +800,11 @@ option_index = 2
 
 ["STATE VECTOR OPTIONS".radiometric_scaling.polynomial_scaling]
 order = 1
-coeff_unc_prcnt = 5.0
+uncert_prcnt = 5.0
 
-["STATE VECTOR OPTIONS".radiometric_scaling.window_poly_scale]
-order = [ 1,]
-uncert_prcnt = [ 25.0,]
+["STATE VECTOR OPTIONS".radiometric_scaling.window_poly_scale.window1]
+order = 1
+uncert_prcnt = 25.0 # uncertainty (%) on the order+1 parameters, same for all parameters
 
 ["STATE VECTOR OPTIONS".eof_residuals]
 # if add_to_state_vector is "F", do not check the other eof_residuals parameters
@@ -834,11 +841,11 @@ option_index = 1
 
 ["STATE VECTOR OPTIONS".wavelength_grid.polynomial_scaling]
 order = 1
-coeff_unc_prcnt = 1.0
+uncert_prcnt = 1.0
 
-["STATE VECTOR OPTIONS".wavelength_grid.window_poly_scale]
-order = [ 0,]
-uncert_prcnt = [ 1.0,]
+["STATE VECTOR OPTIONS".wavelength_grid.window_poly_scale.window1]
+order = 0
+uncert_prcnt = 1.0 # uncertainty (%) on the order+1 parameters, same for all parameters
 
 ####################
 #################### Optimizer Options
