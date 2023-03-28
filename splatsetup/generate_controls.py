@@ -5,7 +5,7 @@ Calls control_setup.py for all permutations of sets of input parameters defined 
 import os
 import toml
 import argparse
-import control_setup
+from splatsetup import control_setup
 import itertools
 from collections import OrderedDict
 
@@ -34,6 +34,7 @@ def generate_controls(**kwargs):
 
 
 def main():
+    code_dir = os.path.dirname(__file__)
     parser = argparse.ArgumentParser(
         description="Generate splat control files corresponding to a set of parameters from an input toml file, write a list of splat commands to run them with parallel",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -45,7 +46,7 @@ def main():
     parser.add_argument("run_dir", help="full path to the splat run directory")
     parser.add_argument("data_dir", help="full path to the data directory for the splat run")
     parser.add_argument(
-        "-t", "--template", default="/n/home11/sroche/gitrepos/methanesat/template.control"
+        "-t", "--template", default=os.path.join(code_dir, "inputs", "template.control")
     )
     parser.add_argument("-j", "--toml", default=None, help="full path to controls input toml file")
     args = parser.parse_args()

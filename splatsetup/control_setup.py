@@ -167,12 +167,12 @@ def control_setup(control_file: str, toml_file: str, template_file: str) -> Dict
 
     code_dir = os.path.dirname(__file__)
     # dedicated cross-section inputs
-    with open(os.path.join(code_dir, "xsec.toml"), "r") as f:
+    with open(os.path.join(code_dir, "inputs", "xsec.toml"), "r") as f:
         xsec_data = toml.load(f)
     dict_update(template_inputs, xsec_data[toml_inputs["xsec"]])
 
     # dedicated windows inputs
-    with open(os.path.join(code_dir, "window.toml"), "r") as f:
+    with open(os.path.join(code_dir, "inputs", "window.toml"), "r") as f:
         window_data = toml.load(f)
     window_list = toml_inputs["windows"]
     for window in window_list:
@@ -207,7 +207,7 @@ def main():
     parser.add_argument(
         "-t",
         "--template-file",
-        default=os.path.join(code_dir, "template.control"),
+        default=os.path.join(code_dir, "inputs", "template.control"),
     )
     parser.add_argument(
         "-j",
@@ -219,8 +219,6 @@ def main():
     path_list = [
         args.toml_file,
         args.template_file,
-        os.path.join(code_dir, "xsec.toml"),
-        os.path.join(code_dir, "window.toml"),
     ]
     for path in path_list:
         if not os.path.exists(path):

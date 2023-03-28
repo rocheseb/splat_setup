@@ -8,7 +8,7 @@ import toml
 import argparse
 
 
-def toml_2_control(control_file: str, toml_file: str, template_file: str) -> None:
+def toml_to_control(control_file: str, toml_file: str, template_file: str) -> None:
     """
     Convert a full .toml SPLAT file to a .control file
 
@@ -25,8 +25,7 @@ def toml_2_control(control_file: str, toml_file: str, template_file: str) -> Non
 
     # write output control file
     with open(control_file, "w") as f:
-        if control_file.endswith(".control"):
-            f.write(template.render(**template_inputs))
+        f.write(template.render(**template_inputs))
 
 
 def main():
@@ -39,7 +38,7 @@ def main():
     parser.add_argument(
         "-t",
         "--template-file",
-        default=os.path.join(code_dir, "template.control"),
+        default=os.path.join(code_dir, "inputs", "template.control"),
     )
     parser.add_argument(
         "-j",
@@ -56,7 +55,7 @@ def main():
         if not os.path.exists(path):
             raise Exception(f"Wong path: {path}")
 
-    toml_2_control(args.control_file, args.toml_file, args.template_file)
+    toml_to_control(args.control_file, args.toml_file, args.template_file)
 
 
 if __name__ == "__main__":

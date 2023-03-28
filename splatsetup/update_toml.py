@@ -5,7 +5,7 @@ Use to update a TOML file using a second TOML file
 import os
 import toml
 import argparse
-from control_setup import dict_update
+from splatsetup.control_setup import dict_update
 
 
 def update_toml(infile: str, update_file: str, outfile: str) -> None:

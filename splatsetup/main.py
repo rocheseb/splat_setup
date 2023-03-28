@@ -30,7 +30,7 @@ from bokeh.models import (
 )
 from bokeh.layouts import grid, column, row
 
-from toml_to_control import toml_to_control
+from splatsetup.toml_to_control import toml_to_control
 
 app_path = os.path.dirname(__file__)
 
