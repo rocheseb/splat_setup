@@ -101,7 +101,7 @@ def save_control_file():
     toml_to_control(
         f"{control_output.value}.control",
         f"{control_output.value}.toml",
-        os.path.join(app_path, "template.control"),
+        os.path.join(app_path, "inputs", "template.control"),
     )
 
 
