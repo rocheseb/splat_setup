@@ -22,7 +22,7 @@ from bokeh.models import (
     Tabs,
     RadioGroup,
     CheckboxGroup,
-    NumericInput,
+    #  NumericInput,
     DataTable,
     TableColumn,
     ColumnDataSource,
@@ -352,6 +352,10 @@ def build_model(
     if value is None:
         value = nested_dict_get(control_data, toml_control_path_list[0])
         kwargs["value"] = value
+
+    if type(kwargs["value"]) in [int, float]:
+        # we use TextInput even for numeric input such that they can be used to give a template field instead of a value
+        kwargs["value"] = str(kwargs["value"])
 
     result = model(**kwargs)
     result.on_change(
@@ -871,14 +875,14 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
     )
 
     x_start = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["x_start"],
         title="X start",
         name="x_start",
         width=150,
     )
     x_end = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["x_end"],
         title="X end",
         name="x_end",
@@ -887,14 +891,14 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
     x_retrieval_range = row(children=[x_start, x_end])
 
     y_start = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["y_start"],
         title="Y start",
         name="y_start",
         width=150,
     )
     y_end = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["y_end"],
         title="Y end",
         name="y_end",
@@ -1593,7 +1597,7 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
     )
 
     surface_gravity = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["surface_gravity_mps2"],
         name="surface_gravity",
         title="Surface Gravity (m.s-2)",
@@ -1601,7 +1605,7 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
     )
 
     planetary_radius = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["planetary_radius_km"],
         name="planetary_radius",
         title="Planetary Radius (km)",
@@ -1659,10 +1663,11 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         name="aerosol_species",
         toml_control_path="aerosol_species",
         default_active=control_data["aerosol_species"],
+        inline=True,
     )
 
     aod_reference_wavelength = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["profile_aerosols.aod_reference_wavelength_nm"],
         name="aod_reference_wavelength",
         title="AOD Reference Wavelength (nm)",
@@ -1734,10 +1739,11 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         name="cloud_species",
         toml_control_path="cloud_species",
         default_active=control_data["cloud_species"],
+        inline=True,
     )
 
     cod_reference_wavelength = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["profile_cloud_species.cod_reference_wavelength_nm"],
         name="cod_reference_wavelength",
         title="COD Reference Wavelength (nm)",
@@ -1760,7 +1766,7 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
     )
 
     n_subpixels = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["profile_cloud_species.n_subpixels"],
         name="n_subpixels",
         title="# Subpixels",
@@ -1877,7 +1883,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
     )
 
     fixed_lambertian_albedo = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["surface_reflectance_options.fixed_lambertian.albedo_value"],
         name="fixed_lambertian_albedo",
         title="Fixed Lambertian Albedo",
@@ -1909,7 +1915,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
     )
 
     ler_wavelength = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["surface_reflectance_options.ler_climatology.ler_wavelength_nm"],
         name="ler_wavelength",
         title="LER Wavelength (nm)",
@@ -2033,7 +2039,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
     )
 
     fixed_emissivity_value = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["surface_emissivity_options.fixed_emissivity.emissivity_value"],
         name="fixed_emissivity_value",
         title="Fixed Emissivity Value",
@@ -2162,7 +2168,7 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
     )
 
     rss_ref_temperature = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["rss_ref_temperature_k"],
         name="rss_ref_temperature",
         title="RSS Reference Temperature (K)",
@@ -2198,7 +2204,7 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
     )
 
     number_of_fine_layers = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["number_of_fine_layers"],
         name="number_of_fine_layers",
         title="Number of Fine Layers for Cross Section Calculations",
@@ -2323,7 +2329,7 @@ def cloud_options() -> bokeh.models.layouts.TabPanel:
     )
 
     cloud_albedo = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["cloud_albedo"],
         name="cloud_albedo",
         title="Cloud Albedo",
@@ -2464,7 +2470,7 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
     )
 
     fit_profile_parameters = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["temperature.fit_profile.parameters"],
         name="fit_profile_parameters",
         title="Parameters",
@@ -2498,7 +2504,7 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
     )
 
     fit_shift_uncertainty = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["temperature.fit_shift.shift_unc_k"],
         name="fit_shift_uncertainty",
         title="Shift Uncertainty (K)",
@@ -2548,7 +2554,7 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
     )
 
     surface_pressure_uncertainty = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["surface_pressure.uncertainty_hpa"],
         name="surface_pressure_uncertainty",
         title="Surface Pressure Uncertainty (hPa)",
@@ -2606,7 +2612,7 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
     )
 
     max_poly_order = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["surface_reflectance.max_poly_order"],
         name="max_poly_order",
         title="Maximum Polynomial Order",
@@ -2663,7 +2669,7 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
     )
 
     surface_reflectance_eof_scale_factor = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["surface_reflectance.eof_fit.scale_factor"],
         name="surface_reflectance_eof_scale_factor",
         title="EOF Uncertainty Scale Factor",
@@ -2988,7 +2994,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     Generate the layouts in the Optimizer panel
     """
     max_iter = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["max_iter"],
         name="max_iter",
         title="Maximum # of Iterations",
@@ -2996,7 +3002,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     max_div = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["max_div"],
         name="max_div",
         title="Maximum # of Divergences",
@@ -3004,7 +3010,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     convergence_threshold = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["convergence_threshold"],
         name="convergence_threshold",
         title="Convergence Threshold",
@@ -3012,7 +3018,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     initial_gamma_lm = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["initial_gamma_lm"],
         name="initial_gamma_lm",
         title="Initial Levenberg-Marquardt Parameter",
@@ -3020,7 +3026,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     r_divergent = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["r_divergent"],
         name="r_divergent",
         title="Divergent Ratio",
@@ -3028,7 +3034,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     r_convergent = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["r_convergent"],
         name="r_convergent",
         title="Convergent Ratio",
@@ -3036,7 +3042,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     divergent_scale_factor = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["divergent_scale_factor"],
         name="divergent_scale_factor",
         title="Divergent Scale Factor",
@@ -3044,7 +3050,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     convergent_scale_factor = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["convergent_scale_factor"],
         name="convergent_scale_factor",
         title="Convergent Scale Factor",
@@ -3052,7 +3058,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     chi_gof_threshold = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["chi_gof_threshold"],
         name="chi_gof_threshold",
         title="Chi-squared Threshold",
@@ -3071,7 +3077,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     scale_obs_cov_inputs = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["obs_cov_scale_factor"],
         name="scale_obs_cov_inputs",
         title="Scale Factor",
@@ -3090,7 +3096,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     scale_prior_cov_inputs = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["prior_cov_scale_factor"],
         name="scale_prior_cov_inputs",
         title="Scale Factor",
@@ -3120,7 +3126,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     max_chi_squared = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["init_state.max_chi_squared"],
         name="max_chi_squared",
         title="Maximum Chi-squared",
@@ -3140,7 +3146,7 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     )
 
     max_rms = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["init_state.max_rms"],
         name="max_rms",
         title="Maximum RMS",
@@ -3627,7 +3633,7 @@ def inverse_diagnostics_options() -> bokeh.models.layouts.TabPanel:
         width=200,
     )
     iteration_radiance_inputs = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["spectrum.iteration_radiance_max_iter"],
         name="iteration_radiance_inputs",
         title="Maximum # of Iterations",
@@ -3673,7 +3679,7 @@ def inverse_diagnostics_options() -> bokeh.models.layouts.TabPanel:
         width=200,
     )
     iteration_state_inputs = build_model(
-        NumericInput,
+        TextInput,
         toml_control_path_list=["total_state_vector.iteration_state_max_iter"],
         name="iteration_state_inputs",
         title="Maximum # of Iterations",
@@ -3942,7 +3948,11 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-t", "--toml-file", default="", help="Full path to the input TOML file", required=True
+        "-t",
+        "--toml-file",
+        default=os.path.join(app_path, "inputs", "tomltest_o2.toml"),
+        help="Full path to the input TOML file",
+        required=True,
     )
     parser.add_argument(
         "-j",
