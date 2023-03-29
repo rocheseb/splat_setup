@@ -1,6 +1,8 @@
 # README #
 
-This aims to breakup the long splat control files into a smaller file where only the inputs that most commonly change from run to run appear
+This aims to breakup the long splat control files into a smaller file where only the inputs that most commonly change from run to run appear.
+
+Also include a [Bokeh](https://bokeh.org/) application to serve as a GUI for creating SPLAT control files
 
 ## Installation
 
@@ -31,7 +33,7 @@ Bokeh application to serve as a GUI for creating SPLAT control files
 
 Takes a full SPLAT .toml file as input with the **-t/--toml-file** argument.
 
-There is an example input file included: [tomltest_o2.toml](splatsetup/inputs/tomltest_o2.toml)
+There is an example input file included: [tomltest_o2.toml](splatsetup/inputs/tomltest_o2.toml) that is used as default for **--toml-file**
 
 ### [template.control](splatsetup/inputs/template.control): 
 
