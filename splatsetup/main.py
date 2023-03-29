@@ -3952,7 +3952,6 @@ def main():
         "--toml-file",
         default=os.path.join(app_path, "inputs", "tomltest_o2.toml"),
         help="Full path to the input TOML file",
-        required=True,
     )
     parser.add_argument(
         "-j",
