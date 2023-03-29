@@ -66,6 +66,27 @@ def dict_depth(d: dict) -> int:
 
 
 # Callbacks
+def load_toml():
+    """
+    Load new control file
+    """
+    global control_data
+
+    toml_file = curdoc().select_one({"name": "control_input"}).value
+
+    if not os.path.exists(toml_file):
+        print(f"Wrong path {toml_file}")
+        return
+
+    with open(toml_file, "r") as infile:
+        control_data = toml.load(infile)
+
+    # Reload the document using the new control_data
+    # Trigger our dummy widget callback to reload the page by setting its value to anything different from ""
+    reload_page_input = curdoc().select_one({"name": "reload_page_input"})
+    reload_page_input.value = "reload"
+
+
 def save_control_file():
     control_output = curdoc().select_one({"name": "control_output"})
 
@@ -3903,27 +3924,6 @@ def doc_maker():
     final_layout = column(children=[load_options, save_options, control])
 
     curdoc().add_root(final_layout)
-
-
-def load_toml():
-    """
-    Load new control file
-    """
-    global control_data
-
-    toml_file = curdoc().select_one({"name": "control_input"}).value
-
-    if not os.path.exists(toml_file):
-        print(f"Wrong path {toml_file}")
-        return
-
-    with open(toml_file, "r") as infile:
-        control_data = toml.load(infile)
-
-    # Reload the document using the new control_data
-    # Trigger our dummy widget callback to reload the page by setting its value to anything different from ""
-    reload_page_input = curdoc().select_one({"name": "reload_page_input"})
-    reload_page_input.value = "reload"
 
 
 def modify_doc(doc):
