@@ -9,8 +9,8 @@
 root_data_directory = "/n/holylfs04/LABS/wofsy_lab/Lab/sroche/splat_static/SPLAT/data"
 l1_file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level1/RF06_V3/CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856.nc"
 l2_met_file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2Met_CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856_prior.nc"
-output_file = "/n/home11/sroche/testing/mair_json_setup_ch4_test.nc"
-log_file = "/n/home11/sroche/testing/mair_json_setup_ch4_test.log"
+output_file = "/n/home11/sroche/testing/mair_toml_setup_ch4_test.nc"
+log_file = "/n/home11/sroche/testing/mair_toml_setup_ch4_test.log"
 isrf_file = "ch4_isrf_lut_20210722_xtrkflip.nc"
 # specify the absorption cross section lookup table files
 # Special key: xsec must specify a key defined in xsec.toml

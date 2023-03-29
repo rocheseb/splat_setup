@@ -1,13 +1,13 @@
 root_data_directory = "/n/holylfs04/LABS/wofsy_lab/Lab/sroche/splat_static/SPLAT/data"
-log_file = "/n/home11/sroche/testing/mair_toml_setup_o2_test.log"
-output_file = "/n/home11/sroche/testing/mair_toml_setup_o2_test.nc"
-l1_file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
-l2_met_file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2_Prior_O2_1x1/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340_prior.nc"
-isrf_file = "o2_isrf_lut_20210722_xflipped.nc"
+log_file = "/n/home11/sroche/testing/mair_toml_setup_ch4_test.log"
+output_file = "/n/home11/sroche/testing/mair_toml_setup_ch4_test.nc"
+l1_file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level1/RF06_V3/CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856.nc"
+l2_met_file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2Met_CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856_prior.nc"
+isrf_file = "ch4_isrf_lut_20210722_xtrkflip.nc"
 calculation_mode = "INVERSE"
 compute_all_pixels = "F"
-x_start = 200
-x_end = 200
+x_start = 600
+x_end = 600
 y_start = 1
 y_end = 1
 write_directly_to_file = "F"
@@ -15,7 +15,7 @@ use_file_lock = "T"
 overwrite_existing = "F"
 cache_pixel_output = "T"
 switch_on_debug = "T"
-debug_level = "3"
+debug_level = ""
 do_single_pixel_calc_from_inp = "F"
 apriori_file = "AFGLUS_apriori_PA.nc"
 sampling_method = 1
@@ -39,7 +39,7 @@ scattering_gases = [ "N2",]
 do_raman_scattering = "F"
 rss_ref_temperature_k = 250.0
 raman_gases = [ "N2", "O2",]
-abs_species = [ "PACIA", "O2", "H2O", "CO2",]
+abs_species = [ "CH4", "H2O", "CO2",]
 number_of_fine_layers = 2
 full_lut_to_memory = "T"
 airglow_gases = []
@@ -47,8 +47,8 @@ do_aerosols = "F"
 do_clouds = "F"
 do_lambertian_clouds = "T"
 cloud_albedo = 0.8
-prf_species = []
-col_species = [ "H2O", "CO2", "PA1",]
+prf_species = [ "CH4", "CO2",]
+col_species = [ "H2O",]
 overwrite_clim_uncertainty = "F"
 max_iter = 15
 max_div = 5
@@ -63,8 +63,8 @@ scale_obs_cov = "T"
 obs_cov_scale_factor = 1.0
 scale_prior_cov = "T"
 prior_cov_scale_factor = 1.0
-xsec = "ggg2020_o2"
-windows = [ "o2_window",]
+xsec = "ggg2020_ch4"
+windows = [ "co2_window", "ch4_window",]
 isrf_agg = 1
 
 [single_pixel_calc_inp]
@@ -93,7 +93,7 @@ snow_age_days = 0.0
 [l2_profile_support_data]
 use_l2_profile_met = "T"
 file_type = "SPLAT"
-file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2_Prior_O2_1x1/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340_prior.nc"
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2Met_CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856_prior.nc"
 gases = [ "CH4", "CO2", "H2O",]
 aerosols = []
 
@@ -102,7 +102,7 @@ use_l2_clouds = "F"
 use_clouds_from_l2_prof_met = "F"
 species = []
 file_type = "SPLAT"
-file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level1/RF06_V3/CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856.nc"
 
 [l2_surface_reflectance]
 use_l2_surface = "T"
@@ -215,27 +215,27 @@ gain_matrix = "F"
 [l2_2d_support_data.surface_altitude]
 use = "T"
 file_type = "SPLAT"
-file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level1/RF06_V3/CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856.nc"
 
 [l2_2d_support_data.surface_winds]
 use = "F"
 file_type = "SPLAT"
-file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level1/RF06_V3/CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856.nc"
 
 [l2_2d_support_data.chlorophyll]
 use = "F"
 file_type = "SPLAT"
-file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level1/RF06_V3/CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856.nc"
 
 [l2_2d_support_data.ocean_salinity]
 use = "F"
 file_type = "SPLAT"
-file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level1/RF06_V3/CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856.nc"
 
 [l2_2d_support_data.snow_parameters]
 use = "F"
 file_type = "SPLAT"
-file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level1/RF06_V3/CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856.nc"
 
 [vlidort_line_by_line.model1]
 name = "LBL_IQU"
@@ -368,28 +368,35 @@ name = "H2O"
 cia1 = "-"
 cia2 = "-"
 brd1 = "-"
-file = "GGG2020_H2O_1235_1300_VP_0p004.nc"
+file = "GGG2020_H2O_1580_1670_VP_0p01.nc"
 
 [cross_section_entries.CO2]
 name = "CO2"
 cia1 = "-"
 cia2 = "-"
 brd1 = "-"
-file = "GGG2020_CO2_1235_1300_VP_0p004.nc"
+file = "GGG2020_CO2_1580_1670_SDVP_LM_0p01.nc"
 
 [cross_section_entries.O2]
 name = "O2"
 cia1 = "-"
 cia2 = "-"
 brd1 = "-"
-file = "GGG2020_O2_1235_1300_SDVP_0p004.nc"
+file = "GGG2020_O2_1200_1310_SDVP.nc"
 
 [cross_section_entries.PACIA]
 name = "PACIA"
 cia1 = "PA1"
 cia2 = "PA1"
 brd1 = "-"
-file = "GGG2020_O2_1235_1300_PACIA_0p004_e46.nc"
+file = "GGG2020_O2_1200_1310_PACIA_scaled_e46.nc"
+
+[cross_section_entries.CH4]
+name = "CH4"
+cia1 = "-"
+cia2 = "-"
+brd1 = "-"
+file = "GGG2020_CH4_1580_1670_SDVP_LM_0p01.nc"
 
 [airglow_cross_section_entries.a]
 name = "O2DG"
@@ -508,19 +515,19 @@ save_prior = "F"
 save_posterior = "F"
 
 [profile_output_options.gas_partial_column]
-save_prior = "T"
-save_posterior = "T"
-species = [ "O2", "H2O", "PA1",]
+save_prior = "F"
+save_posterior = "F"
+species = [ "all",]
 
 [profile_output_options.gas_column_uncertainties]
-save_prior = "T"
-save_posterior = "T"
-species = [ "O2", "H2O", "PA1",]
+save_prior = "F"
+save_posterior = "F"
+species = [ "all",]
 
 [profile_output_options.gas_mixing_ratios]
 save_prior = "T"
 save_posterior = "T"
-species = [ "O2", "H2O", "PA1",]
+species = [ "CO2", "CH4", "H2O",]
 
 [profile_output_options.dry_gas_mixing_ratios]
 save_prior = "F"
@@ -528,9 +535,9 @@ save_posterior = "F"
 species = [ "all",]
 
 [profile_output_options.proxy_column_avg_mix_rat]
-save_prior = "F"
-save_posterior = "F"
-species = [ "all",]
+save_prior = "T"
+save_posterior = "T"
+species = [ "CO2", "CH4",]
 
 [profile_output_options.species_aod]
 save_prior = "F"
@@ -583,12 +590,23 @@ save_prior = "F"
 save_posterior = "F"
 species = [ "all",]
 
-[fwd_inv_mode_options.o2_window]
+[fwd_inv_mode_options.co2_window]
 index = 1
-start_nm = 1249.2
-end_nm = 1287.8
+start_nm = 1595.0
+end_nm = 1618.0
 buffer_nm = 2.0
-convolution_grid_sampling = 0.004
+convolution_grid_sampling = 0.01
+radiative_transfer_model = "TRNMSN"
+isrf = "MAirCal"
+convolution_width_hw1e = 10.0
+use_fft_for_convolution = "F"
+
+[fwd_inv_mode_options.ch4_window]
+index = 1
+start_nm = 1629.0
+end_nm = 1654.0
+buffer_nm = 2.0
+convolution_grid_sampling = 0.01
 radiative_transfer_model = "TRNMSN"
 isrf = "MAirCal"
 convolution_width_hw1e = 10.0
@@ -613,11 +631,11 @@ end_nm = 740.0
 sampling_nm = 0.01
 view_dir_idx = 1
 
-[l2_surface_reflectance.band_inputs.o2delta]
-name = "O2Delta"
+[l2_surface_reflectance.band_inputs.weakch4]
+name = "WeakCH4"
 file_type = "SPLAT"
 index = 1
-file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2_Prior_O2_1x1/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340_prior.nc"
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level2/2022_Reprocess/RF06/L2Met_CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856_prior.nc"
 
 [isrf_parametrization.fixed_supergaussian.a]
 name = "MSatCH4"
@@ -683,7 +701,7 @@ isrf_agg = ""
 name = "MAirCal"
 band_index = 1
 wavenumber_units = "F"
-file = "o2_isrf_lut_20210722_xflipped.nc"
+file = "ch4_isrf_lut_20210722_xtrkflip.nc"
 isrf_agg = 1
 
 [isrf_parametrization.isrf_file.d]
@@ -814,11 +832,23 @@ relaxation = 0.0
 order = 3
 uncert_prcnt = 100
 
+[surface_reflectance.window_poly_scale.window2]
+order = 3
+uncert_prcnt = 100
+
 [radiometric_offset.window_poly_scale.window1]
 order = 1
 uncert_prcnt = 5
 
+[radiometric_offset.window_poly_scale.window2]
+order = 1
+uncert_prcnt = 5
+
 [radiometric_scaling.window_poly_scale.window1]
+order = 1
+uncert_prcnt = 25
+
+[radiometric_scaling.window_poly_scale.window2]
 order = 1
 uncert_prcnt = 25
 
@@ -842,6 +872,10 @@ uncertainty = 0.05
 tbd = 0.3
 
 [wavelength_grid.window_poly_scale.window1]
+order = 0
+uncert_prcnt = 100
+
+[wavelength_grid.window_poly_scale.window2]
 order = 0
 uncert_prcnt = 100
 
@@ -956,33 +990,33 @@ stokes = "F"
 
 [sub_state_vector_diagnostics.gas_absorption_post_covar.profile_mixing_ratio]
 save = "F"
-species = [ "all",]
+species = [ "CH4",]
 
 [sub_state_vector_diagnostics.gas_absorption_post_covar.column_avg_mixing_ratio]
 save = "T"
-species = [ "O2", "H2O", "CO2",]
+species = [ "CH4", "CO2", "H2O",]
 
 [sub_state_vector_diagnostics.gas_absorption_post_covar.dry_profile_mixing_ratio]
 save = "F"
-species = [ "all",]
+species = [ "CH4",]
 
 [sub_state_vector_diagnostics.gas_absorption_post_covar.dry_column_avg_mixing_ratio]
 save = "T"
-species = [ "O2", "H2O", "CO2",]
+species = [ "CH4",]
 
 [sub_state_vector_diagnostics.gas_absorption_post_covar.proxy_posteriori_uncert]
-save = "F"
-species = [ "all",]
+save = "T"
+species = [ "CO2", "CH4", "H2O",]
 
 [sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel]
 save = "T"
-species = [ "CO2", "H2O",]
+species = [ "CO2", "CH4",]
 
-[l1_radiance.band_inputs.o2delta]
-name = "O2Delta"
+[l1_radiance.band_inputs.weakch4]
+name = "WeakCH4"
 file_type = "SPLAT"
 index = 1
-file = "/n/holyscratch01/wofsy_lab/sroche/level1/RF06_V3/O2_1x1_prio/MethaneAIR_L1B_O2_20210806T160431_20210806T160441_20210925T195340.nc"
+file = "/n/holylfs04/LABS/wofsy_lab/Lab/MethaneAIR/level1/RF06_V3/CH4_NATIVE/MethaneAIR_L1B_CH4_20210806T173908_20210806T173918_20210930T114856.nc"
 
 [surface_reflectance_options.fixed_kernel_brdf.vlidort_options.a]
 name = "Lambertian"
