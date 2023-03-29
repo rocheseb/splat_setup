@@ -13,8 +13,11 @@ First create a python environment with Python == 3.10.9, then install with:
 Use these with **-h** for usage info
 
 **splatsetup**: starts the bokeh server to create a SPLAT control file
+
 **toml2ctrl**: convert a given SPLAT .toml file to a .control file
+
 **ctrlsetup**: creates a .toml or .control file based on input .toml files
+
 **updtoml**: update a .toml file with the contents of a second .toml file
 
 
