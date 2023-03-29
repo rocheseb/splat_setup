@@ -22,13 +22,13 @@ from bokeh.models import (
     Tabs,
     RadioGroup,
     CheckboxGroup,
-    #  NumericInput,
     DataTable,
     TableColumn,
     ColumnDataSource,
     InlineStyleSheet,
+    CustomJS,
 )
-from bokeh.layouts import grid, column, row
+from bokeh.layouts import column, row
 
 from splatsetup.toml_to_control import toml_to_control
 from splatsetup.control_setup import nested_dict_set, nested_dict_get
@@ -3795,7 +3795,8 @@ def doc_maker():
     """
     global control_data
 
-    curdoc().clear()  # removes everything in the current document
+    # remove everything in the current document
+    curdoc().clear()
 
     # build the different panels and gather them in a Tabs object
     control = Tabs(
@@ -3847,7 +3848,7 @@ def doc_maker():
     )
     save_button = Button(
         label="Save",
-        width=100,
+        width=80,
         stylesheets=[
             InlineStyleSheet(
                 css="""
@@ -3866,16 +3867,51 @@ def doc_maker():
 
     save_options = row(children=[control_output, save_button])
 
-    final_layout = grid([column(children=[save_options, control])])
+    control_input = TextInput(
+        name="control_input",
+        title="Full path to the input SPLAT control file (.TOML format)",
+    )
+    load_button = Button(
+        label="Load",
+        width=80,
+        stylesheets=[
+            InlineStyleSheet(
+                css="""
+                    div.bk-btn-group button {
+                        border:none;
+                        background-color: lightblue;
+                        color:teal;
+                        font-weight: bold;
+                        height: 40px !important;
+                    }
+                    """
+            )
+        ],
+    )
+    load_button.on_click(load_toml)
+
+    # Dummy invisible widget used to reload the page at the end of load_toml()
+    reload_page_input = TextInput(
+        value="",
+        name="reload_page_input",
+        visible=False,
+    )
+    reload_page_input.js_on_change("value", CustomJS(code="window.location.reload();"))
+
+    load_options = row(children=[control_input, load_button, reload_page_input])
+
+    final_layout = column(children=[load_options, save_options, control])
 
     curdoc().add_root(final_layout)
 
 
-def load_toml(toml_file):
+def load_toml():
     """
     Load new control file
     """
     global control_data
+
+    toml_file = curdoc().select_one({"name": "control_input"}).value
 
     if not os.path.exists(toml_file):
         print(f"Wrong path {toml_file}")
@@ -3884,7 +3920,10 @@ def load_toml(toml_file):
     with open(toml_file, "r") as infile:
         control_data = toml.load(infile)
 
-    doc_maker()
+    # Reload the document using the new control_data
+    # Trigger our dummy widget callback to reload the page by setting its value to anything different from ""
+    reload_page_input = curdoc().select_one({"name": "reload_page_input"})
+    reload_page_input.value = "reload"
 
 
 def modify_doc(doc):
