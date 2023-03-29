@@ -47,7 +47,7 @@ class UsageError(Exception):
 
 def nested_dict_del(d: Dict, path: str, delimiter: str = ".") -> Any:
     """
-    nested_dict_set(d,"path.to.key",val) does del d["path"]["to"]["key"]
+    nested_dict_del(d,"path.to.key") does del d["path"]["to"]["key"]
     d is modified in place
     """
     key_list = path.split(delimiter)
