@@ -61,7 +61,7 @@ def load_default_controls(splat_inputs: Dict) -> Dict:
     Inputs:
         - splat_inputs (Dict): the contents of --toml-file
     """
-    with open(os.path.join(os.path.dirname(__file__), "control_setup.toml"), "r") as f:
+    with open(os.path.join(os.path.dirname(__file__), "inputs", "control_setup.toml"), "r") as f:
         control_setup_dict = toml.load(f)
 
     # remove first level keys

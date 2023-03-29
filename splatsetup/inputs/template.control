@@ -379,116 +379,116 @@ Init. State w. Prev. Fit?       : {{init_state.init_state_with_prev_fit}}
           (T) Max Chi Sq.       : {{init_state.max_chi_squared}}
       - Filter RMS              : {{init_state.filter_rms}}
           (T) Max RMS           : {{init_state.max_rms}} 
-      - Gas Substate            : {{init_state.gas_substate}} F
-      - Aerosol Substate        : {{init_state.aerosol_substate}} F
-      - Temperature Substate    : {{init_state.temperature_substate}} F
-      - Surf. Pres. Substate    : {{init_state.surface_pressure_substate}} F
-      - BRDF Substate           : {{init_state.brdf_substate}} F
-      - Rad. Offset Substate    : {{init_state.radiance_offset_substate}} F
-      - Rad, Scaling Substate   : {{init_state.radiance_scaling_substate}} F
-      - Residual EOF Substate   : {{init_state.residual_eof_substate}} F
-      - ISRF Substate           : {{init_state.isrf_substate}} T
-      - Wavelength Substate     : {{init_state.wavelength_substate}} T
+      - Gas Substate            : {{init_state.gas_substate}}
+      - Aerosol Substate        : {{init_state.aerosol_substate}}
+      - Temperature Substate    : {{init_state.temperature_substate}}
+      - Surf. Pres. Substate    : {{init_state.surface_pressure_substate}}
+      - BRDF Substate           : {{init_state.brdf_substate}}
+      - Rad. Offset Substate    : {{init_state.radiance_offset_substate}}
+      - Rad, Scaling Substate   : {{init_state.radiance_scaling_substate}}
+      - Residual EOF Substate   : {{init_state.residual_eof_substate}}
+      - ISRF Substate           : {{init_state.isrf_substate}}
+      - Wavelength Substate     : {{init_state.wavelength_substate}}
 --------------------------------+------------------------------------------------------
 %%% DIAGNOSTIC OPTIONS %%%      :
 Level 1 Output Options          :
    Viewing Geometry             : {{level1_options.viewing_geometry}}
-Profile Output Options         @: {% for elem in profile_output_options.outputs %}{{elem}} {% endfor %}
-   Pressure (Layer Edge)       @: {% for elem in profile_output_options.pressure_layer.edge %}{{elem}} {% endfor %}
-   Pressure (Layer Mid)        @: {% for elem in profile_output_options.pressure_layer.mid %}{{elem}} {% endfor %}
-   Temperature (Layer Edge)    @: {% for elem in profile_output_options.temperature_layer.edge %}{{elem}} {% endfor %}
-   Temperature (Layer Mid)     @: {% for elem in profile_output_options.temperature_layer.mid %}{{elem}} {% endfor %}
-   Altitude (Layer Edge)       @: {% for elem in profile_output_options.altitude_layer.edge %}{{elem}} {% endfor %}
-   Altitude (Layer Mid)        @: {% for elem in profile_output_options.altitude_layer.mid %}{{elem}} {% endfor %}
-   Air Molecular Weight        @: {% for elem in profile_output_options.air_molecular_weight %}{{elem}} {% endfor %}
-   Gravity                     @: {% for elem in profile_output_options.gravity %}{{elem}} {% endfor %}
-   RH                          @: {% for elem in profile_output_options.relative_humidity %}{{elem}} {% endfor %}
-   Air Partial Column          @: {% for elem in profile_output_options.air_partial_column %}{{elem}} {% endfor %}
-   Gas Partial Columns         @: {% for elem in profile_output_options.gas_partial_column.save %}{{elem}} {% endfor %}
+Profile Output Options         @: Prior Posterior
+   Pressure (Layer Edge)       @: {{profile_output_options.pressure.layer_edge.save_prior}} {{profile_output_options.pressure.layer_edge.save_posterior}}
+   Pressure (Layer Mid)        @: {{profile_output_options.pressure.layer_mid_prior}} {{profile_output_options.pressure.layer_mid.save_posterior}}
+   Temperature (Layer Edge)    @: {{profile_output_options.temperature.layer_edge.save_prior}} {{profile_output_options.temperature.layer_edge.save_posterior}}
+   Temperature (Layer Mid)     @: {{profile_output_options.temperature.layer_mid_prior}} {{profile_output_options.temperature.layer_mid.save_posterior}}
+   Altitude (Layer Edge)       @: {{profile_output_options.altitude.layer_edge.save_prior}} {{profile_output_options.altitude.layer_edge.save_posterior}}
+   Altitude (Layer Mid)        @: {{profile_output_options.altitude.layer_mid_prior}} {{profile_output_options.altitude.layer_mid.save_posterior}}
+   Air Molecular Weight        @: {{profile_output_options.air_molecular_weight.save_prior}} {{profile_output_options.air_molecular_weight.save_posterior}}
+   Gravity                     @: {{profile_output_options.gravity.save_prior}} {{profile_output_options.gravity.save_posterior}}
+   RH                          @: {{profile_output_options.relative_humidity.save_prior}} {{profile_output_options.relative_humidity.save_posterior}}
+   Air Partial Column          @: {{profile_output_options.air_partial_column.save_prior}} {{profile_output_options.air_partial_column.save_posterior}}
+   Gas Partial Columns         @: {{profile_output_options.gas_partial_column.save_prior}} {{profile_output_options.gas_partial_column.save_posterior}}
      --> Species                : {% for elem in profile_output_options.gas_partial_column.species %}{{elem}} {% endfor %}
-   Gas Column Uncertainties    @: {% for elem in profile_output_options.gas_column_uncertainties.save %}{{elem}} {% endfor %}
+   Gas Column Uncertainties    @: {{profile_output_options.gas_column_uncertainties.save_prior}} {{profile_output_options.gas_column_uncertainties.save_posterior}}
      --> Species                : {% for elem in profile_output_options.gas_column_uncertainties.species %}{{elem}} {% endfor %}
-   Gas Mixing Ratios           @: {% for elem in profile_output_options.gas_mixing_ratios.save %}{{elem}} {% endfor %}
+   Gas Mixing Ratios           @: {{profile_output_options.gas_mixing_ratios.save_prior}} {{profile_output_options.gas_mixing_ratios.save_posterior}}
      --> Species                : {% for elem in profile_output_options.gas_mixing_ratios.species %}{{elem}} {% endfor %}
-   Dry Gas Mixing Ratios       @: {% for elem in profile_output_options.dry_gas_mixing_ratios.save %}{{elem}} {% endfor %}
+   Dry Gas Mixing Ratios       @: {{profile_output_options.dry_gas_mixing_ratios.save_prior}} {{profile_output_options.dry_gas_mixing_ratios.save_posterior}}
      --> Species                : {% for elem in profile_output_options.dry_gas_mixing_ratios.species %}{{elem}} {% endfor %}
-   Proxy Column Avg. Mix. Rat. @: {% for elem in profile_output_options.proxy_column_avg_mix_rat.save %}{{elem}} {% endfor %}
+   Proxy Column Avg. Mix. Rat. @: {{profile_output_options.proxy_column_avg_mix_rat.save_prior}} {{profile_output_options.proxy_column_avg_mix_rat.save_posterior}}
      --> Species                : {% for elem in profile_output_options.proxy_column_avg_mix_rat.species %}{{elem}} {% endfor %}
-   Total AOD                   @: {% for elem in profile_output_options.total_aod %}{{elem}} {% endfor %}
-   Species AOD                 @: {% for elem in profile_output_options.species_aod.save %}{{elem}} {% endfor %}
+   Total AOD                   @: {{profile_output_options.total_aod.save_prior}} {{profile_output_options.total_aod.save_posterior}}
+   Species AOD                 @: {{profile_output_options.species_aod.save_prior}} {{profile_output_options.species_aod.save_posterior}}
      --> Species                : {% for elem in profile_output_options.species_aod.species %}{{elem}} {% endfor %}
-   Species Profile Params      @: {% for elem in profile_output_options.species_profile_params.save %}{{elem}} {% endfor %}
+   Species Profile Params      @: {{profile_output_options.species_profile_params.save_prior}} {{profile_output_options.species_profile_params.save_posterior}}
      --> Species                : {% for elem in profile_output_options.species_profile_params.species %}{{elem}} {% endfor %}
-   Species Profile Par Derivs. @: {% for elem in profile_output_options.species_profile_par_derivs.save %}{{elem}} {% endfor %}
+   Species Profile Par Derivs. @: {{profile_output_options.species_profile_par_derivs.save_prior}} {{profile_output_options.species_profile_par_derivs.save_posterior}}
      --> Species                : {% for elem in profile_output_options.species_profile_par_derivs.species %}{{elem}} {% endfor %}
-   Cloud # Pixels               : {% for elem in profile_output_options.cloud_n_pixels %}{{elem}} {% endfor %}
-   Cloud Fraction (Total)       : {% for elem in profile_output_options.cloud_fraction_total %}{{elem}} {% endfor %}
-   Total COD (CF weighted)      : {% for elem in profile_output_options.total_cod %}{{elem}} {% endfor %}
+   Cloud # Pixels               : {{profile_output_options.cloud_n_pixels.save_prior}} {{profile_output_options.cloud_n_pixels.save_posterior}}
+   Cloud Fraction (Total)       : {{profile_output_options.cloud_fraction_total.save_prior}} {{profile_output_options.cloud_fraction_total.save_posterior}}
+   Total COD (CF weighted)      : {{profile_output_options.total_cod.save_prior}} {{profile_output_options.total_cod.save_posterior}}
 RTM Output Options              : 
-   Wavelength                  @: {% for elem in rtm_output_options.wavelength %}{{elem}} {% endfor %}
-   Irradiance                  @: {% for elem in rtm_output_options.irradiance %}{{elem}} {% endfor %}
-   Radiance                    @: {% for elem in rtm_output_options.radiance.save %}{{elem}} {% endfor %}
+   Wavelength                  @: {{rtm_output_options.wavelength.save_prior}} {{rtm_output_options.wavelength.save_posterior}}
+   Irradiance                  @: {{rtm_output_options.irradiance.save_prior}} {{rtm_output_options.irradiance.save_posterior}}
+   Radiance                    @: {{rtm_output_options.radiance.save_prior}} {{rtm_output_options.radiance.save_posterior}}
      --> Stokes Q,U?            : {{rtm_output_options.radiance.stokes}}
-   Radiant Flux                @: {% for elem in rtm_output_options.radiant_flux.save %}{{elem}} {% endfor %}
+   Radiant Flux                @: {{rtm_output_options.radiant_flux.save_prior}} {{rtm_output_options.radiant_flux.save_posterior}}
      --> Stokes Q,U?            : {{rtm_output_options.radiant_flux.stokes}}
-   Direct Flux                 @: {% for elem in rtm_output_options.direct_flux.save %}{{elem}} {% endfor %}
+   Direct Flux                 @: {{rtm_output_options.direct_flux.save_prior}} {{rtm_output_options.direct_flux.save_posterior}}
      --> Stokes Q,U?            : {{rtm_output_options.direct_flux.stokes}}
    Gas Jacobians                :
-     Trace Gas Jacobians       @: {% for elem in rtm_output_options.gas_jacobians.trace_gas.save %}{{elem}} {% endfor %}
+     Trace Gas Jacobians       @: {{rtm_output_options.gas_jacobians.trace_gas.save_prior}} {{rtm_output_options.gas_jacobians.trace_gas.save_posterior}}
        --> Species              : {% for elem in rtm_output_options.gas_jacobians.trace_gas.species %}{{elem}} {% endfor %}
        --> Stokes Q,U?          : {{rtm_output_options.gas_jacobians.trace_gas.stokes}}
-     Trace Gas Part. Col.      @: {% for elem in rtm_output_options.gas_jacobians.trace_gas_part_col.save %}{{elem}} {% endfor %}
-       --> Species              : {% for elem in rtm_output_options.gas_jacobians.trace_gas_part_col.species %}{{elem}} {% endfor %} 
-       --> Lower Index          : {% for elem in rtm_output_options.gas_jacobians.trace_gas_part_col.lower_index %}{{elem}} {% endfor %}   
-       --> Upper Index          : {% for elem in rtm_output_options.gas_jacobians.trace_gas_part_col.upper_index %}{{elem}} {% endfor %}  
+     Trace Gas Part. Col.      @: {{rtm_output_options.gas_jacobians.trace_gas_part_col.save_prior}} {{rtm_output_options.gas_jacobians.trace_gas_part_col.save_posterior}}
+       --> Species              : {% for elem in rtm_output_options.gas_jacobians.trace_gas_part_col.species.species %}{{elem}} {% endfor %} 
+       --> Lower Index          : {% for elem in rtm_output_options.gas_jacobians.trace_gas_part_col.species.lower_index %}{{elem}} {% endfor %}   
+       --> Upper Index          : {% for elem in rtm_output_options.gas_jacobians.trace_gas_part_col.species.upper_index %}{{elem}} {% endfor %}  
        --> Stokes Q,U?          : {{rtm_output_options.gas_jacobians.trace_gas_part_col.stokes}}
-     Scattering Weights        @: {% for elem in rtm_output_options.gas_jacobians.scattering_weights %}{{elem}} {% endfor %}
-     Air Mass Factors          @: {% for elem in rtm_output_options.gas_jacobians.air_mass_factors.save %}{{elem}} {% endfor %}
+     Scattering Weights        @: {{rtm_output_options.gas_jacobians.scattering_weights.save_prior}} {{rtm_output_options.gas_jacobians.scattering_weights.save_posterior}}
+     Air Mass Factors          @: {{rtm_output_options.gas_jacobians.air_mass_factors.save_prior}} {{rtm_output_options.gas_jacobians.air_mass_factors.save_posterior}}
        --> Species              : {% for elem in rtm_output_options.gas_jacobians.air_mass_factors.species %}{{elem}} {% endfor %}
    Met Jacobians                :
-     Temperature Profile       @: {% for elem in rtm_output_options.met_jacobians.temperature_profile.save %}{{elem}} {% endfor %}
+     Temperature Profile       @: {{rtm_output_options.met_jacobians.temperature_profile.save_prior}} {{rtm_output_options.met_jacobians.temperature_profile.save_posterior}}
        --> Stokes Q,U?          : {{rtm_output_options.met_jacobians.temperature_profile.stokes}}
-     Temperature Shift         @: {% for elem in rtm_output_options.met_jacobians.temperature_shift.save %}{{elem}} {% endfor %}
+     Temperature Shift         @: {{rtm_output_options.met_jacobians.temperature_shift.save_prior}} {{rtm_output_options.met_jacobians.temperature_shift.save_posterior}}
        --> Stokes Q,U?          : {{rtm_output_options.met_jacobians.temperature_shift.stokes}}
-     Surface Pressure          @: {% for elem in rtm_output_options.met_jacobians.surface_pressure.save %}{{elem}} {% endfor %}
+     Surface Pressure          @: {{rtm_output_options.met_jacobians.surface_pressure.save_prior}} {{rtm_output_options.met_jacobians.surface_pressure.save_posterior}}
        --> Stokes Q,U           : {{rtm_output_options.met_jacobians.surface_pressure.stokes}}
    Aerosol Jacobians            : 
-     Profile AOD               @: {% for elem in rtm_output_options.aerosol_jacobians.profile_aod.save %}{{elem}} {% endfor %}
+     Profile AOD               @: {{rtm_output_options.aerosol_jacobians.profile_aod.save_prior}} {{rtm_output_options.aerosol_jacobians.profile_aod.save_posterior}}
        --> Species              : {% for elem in rtm_output_options.aerosol_jacobians.profile_aod.species %}{{elem}} {% endfor %}
        --> Stokes Q,U?          : {{rtm_output_options.aerosol_jacobians.profile_aod.stokes}}
-     Profile AOD Par           @: {% for elem in rtm_output_options.aerosol_jacobians.profile_aod_par.save %}{{elem}} {% endfor %}
+     Profile AOD Par           @: {{rtm_output_options.aerosol_jacobians.profile_aod_par.save_prior}} {{rtm_output_options.aerosol_jacobians.profile_aod_par.save_posterior}}
        --> Species              : {% for elem in rtm_output_options.aerosol_jacobians.profile_aod_par.species %}{{elem}} {% endfor %}
        --> Stokes Q,U           : {{rtm_output_options.aerosol_jacobians.profile_aod_par.stokes}}
-     Profile SSA               @: {% for elem in rtm_output_options.aerosol_jacobians.profile_ssa.save %}{{elem}} {% endfor %}
+     Profile SSA               @: {{rtm_output_options.aerosol_jacobians.profile_ssa.save_prior}} {{rtm_output_options.aerosol_jacobians.profile_ssa.save_posterior}}
        --> Species              : {% for elem in rtm_output_options.aerosol_jacobians.profile_ssa.species %}{{elem}} {% endfor %}
        --> Stokes Q,U?          : {{rtm_output_options.aerosol_jacobians.profile_ssa.stokes}}
-     Profile SSA Par           @: {% for elem in rtm_output_options.aerosol_jacobians.profile_ssa_par.save %}{{elem}} {% endfor %}
+     Profile SSA Par           @: {{rtm_output_options.aerosol_jacobians.profile_ssa_par.save_prior}} {{rtm_output_options.aerosol_jacobians.profile_ssa_par.save_posterior}}
        --> Species              : {% for elem in rtm_output_options.aerosol_jacobians.profile_ssa_par.species %}{{elem}} {% endfor %}
        --> Stokes Q,U?          : {{rtm_output_options.aerosol_jacobians.profile_ssa_par.stokes}}
-     Opt Prop Params           @: {% for elem in rtm_output_options.aerosol_jacobians.opt_prop_params.save %}{{elem}} {% endfor %}
+     Opt Prop Params           @: {{rtm_output_options.aerosol_jacobians.opt_prop_params.save_prior}} {{rtm_output_options.aerosol_jacobians.opt_prop_params.save_posterior}}
        --> Params               : {% for elem in rtm_output_options.aerosol_jacobians.opt_prop_params.species %}{{elem}} {% endfor %}
        --> Stokes Q,U?          : {{rtm_output_options.aerosol_jacobians.opt_prop_params.stokes}} 
    Surface Jacobians            : 
-     BRDF Kernel Factors       @: {% for elem in rtm_output_options.surface_jacobians.brdf_kernel_factors.save %}{{elem}} {% endfor %}
+     BRDF Kernel Factors       @: {{rtm_output_options.surface_jacobians.brdf_kernel_factors.save_prior}} {{rtm_output_options.surface_jacobians.brdf_kernel_factors.save_posterior}}
        --> Stokes Q,U?          : {{rtm_output_options.surface_jacobians.brdf_kernel_factors.stokes}}
-     BRDF Kernel Parameters    @: {% for elem in rtm_output_options.surface_jacobians.brdf_kernel_parameters.save %}{{elem}} {% endfor %}
+     BRDF Kernel Parameters    @: {{rtm_output_options.surface_jacobians.brdf_kernel_parameters.save_prior}} {{rtm_output_options.surface_jacobians.brdf_kernel_parameters.save_posterior}}
        --> Stokes Q,U?          : {{rtm_output_options.surface_jacobians.brdf_kernel_parameters.stokes}}
    Instrument Jacobians         :
-     ISRF                      @: {% for elem in rtm_output_options.instrument_jacobians.isrf.save %}{{elem}} {% endfor %}
+     ISRF                      @: {{rtm_output_options.instrument_jacobians.isrf.save_prior}} {{rtm_output_options.instrument_jacobians.isrf.save_posterior}}
        --> Stokes Q,U           : {{rtm_output_options.instrument_jacobians.isrf.stokes}}
-     Wavelength Shift          @: {% for elem in rtm_output_options.instrument_jacobians.wavelength_shift.save %}{{elem}} {% endfor %}
+     Wavelength Shift          @: {{rtm_output_options.instrument_jacobians.wavelength_shift.save_prior}} {{rtm_output_options.instrument_jacobians.wavelength_shift.save_posterior}}
        --> Stokes Q,U           : {{rtm_output_options.instrument_jacobians.wavelength_shift.stokes}}
 Optical Property Diagnostics    :
-   Gas Absorption XSect        @: {% for elem in optical_property_diagnostics.gas_absorption_xsect.save %}{{elem}} {% endfor %}
+   Gas Absorption XSect        @: {{optical_property_diagnostics.gas_absorption_xsect.save_prior}} {{optical_property_diagnostics.gas_absorption_xsect.save_posterior}}
        --> Species              : {% for elem in optical_property_diagnostics.gas_absorption_xsect.species %}{{elem}} {% endfor %}
-   Total Optical Depth         @: {% for elem in optical_property_diagnostics.total_optical_depth %}{{elem}} {% endfor %}
-   BRDF Kernel Amplitudes      @: {% for elem in optical_property_diagnostics.brdf_kernel_amplitudes %}{{elem}} {% endfor %}
+   Total Optical Depth         @: {{optical_property_diagnostics.total_optical_depth.save_prior}} {{optical_property_diagnostics.total_optical_depth.save_posterior}}
+   BRDF Kernel Amplitudes      @: {{optical_property_diagnostics.brdf_kernel_amplitudes.save_prior}} {{optical_property_diagnostics.brdf_kernel_amplitudes.save_posterior}}
 --------------------------------+------------------------------------------------------
 %%% INVERSE DIAG OPTIONS %%%    :
 General Fit Statistics          :
    Cost Function                : {{general_fit_statistics.cost_function}}
    Chi Square                   : {{general_fit_statistics.chi_square}}
-   Uncertainty Derivative       : {{general_fit_statistics.uncertatinty_derivative}}
+   Uncertainty Derivative       : {{general_fit_statistics.uncertainty_derivative}}
    Spectrum RMS                 : {{general_fit_statistics.spectrum_rms}}
    Number of iterations         : {{general_fit_statistics.number_of_iterations}}
    Fit Quality Flag             : {{general_fit_statistics.fit_quality_flag}}

@@ -18,6 +18,7 @@ use_fft_for_convolution = "F"
 name = "WeakCH4"
 file_type = "SPLAT"
 index = 1
+file = "=l2_met_file"
 
 [co2_window.l1_radiance.band_inputs.weakch4]
 name = "WeakCH4"

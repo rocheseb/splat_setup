@@ -2,7 +2,7 @@ import os
 import argparse
 import toml
 import numpy as np
-from typing import Optional, Sequence, Dict, Any
+from typing import Optional, Sequence, Dict, Any, Callable
 from functools import partial
 from tornado.ioloop import IOLoop
 import bokeh
@@ -96,13 +96,15 @@ def save_control_file():
     # Write the .toml SPLAT input file
     with open(f"{control_output.value}.toml", "w") as outfile:
         toml.dump(control_data, outfile)
+    print(f"SAVED {control_output.value}.toml")
 
     # Write the .control SPLAT input file
     toml_to_control(
         f"{control_output.value}.control",
         f"{control_output.value}.toml",
-        os.path.join(app_path, "inputs", "template.control"),
+        template_file,  # global variable setup in start_server()
     )
+    print(f"SAVED {control_output.value}.control")
 
 
 def select_status_update(attr, old, new, model_name):
@@ -137,7 +139,7 @@ def table_to_control(
     else:
         # if a key_map was used to set nicer titles for the table header
         # revert these to the original field names in control_data
-        new_data = {korig: new_data[knew] for korig, knew in key_map.items()}
+        new_data = {korig: new_data[korig] for korig in key_map.keys()}
 
     if mode == "double_layer":
         # in double_layer mode the intermediary key does not matter and is just iterated over
@@ -146,6 +148,8 @@ def table_to_control(
         nested_dict_del(control_data, f"{toml_control_path}")
 
     for key, value in new_data.items():
+        if type(value) == np.str_:
+            value = str(value)
         if mode == "direct":
             # new_data only has 1 key in direct mode, it updates toml_control_path directly
             nested_dict_set(control_data, f"{toml_control_path}", value)
@@ -153,6 +157,8 @@ def table_to_control(
             nested_dict_set(control_data, f"{toml_control_path}.{key}", value)
         elif mode == "double_layer":  # here value is an array
             for i, v in enumerate(value):
+                if type(v) == np.str_:
+                    v = str(v)
                 nested_dict_set(control_data, f"{toml_control_path}.{i}.{key}", v)
 
 
@@ -216,17 +222,25 @@ def update_visible(attr, old, new, target_model_name: str, model_name_dict: Dict
     The visible attribute of target_model_name will be set based on the visible attribute of
     master_model_name and of the model that triggered the callback.
 
-    model_name (str): model which visible attribute will be updated
-    model_name_dict (Dict[str]): keys are model names, values are in ["T","F"]
+    target_model_name (str): name of the model which visible attribute will be updated
+    model_name_dict (Dict[str,str]): keys are model names, values are in ["T","F",""]
+            when values are "", a successive OR evaluation is done on the models values
+            when values are ["T","F"], a successive AND evaluation is done on model_name_dict.values()
     """
     target_model = curdoc().select_one({"name": target_model_name})
     model_dict = {
         model_name: curdoc().select_one({"name": model_name}) for model_name in model_name_dict
     }
 
-    result = True
+    mode = "OR" if ("" in model_name_dict.values()) else "AND"
+
+    # OR starts at False, AND starts at True
+    result = mode == "AND"
     for key, val in model_name_dict.items():
-        result = result and (model_dict[key].value == val)
+        if mode == "AND":
+            result = result and (model_dict[key].value == val)
+        elif mode == "OR":
+            result = result or (model_dict[key].value == "T")
 
     target_model.visible = result
 
@@ -254,6 +268,9 @@ def update_control_field(
     """
     global control_data
 
+    if type(new) == np.str_:
+        new = str(new)
+
     for toml_control_path in toml_control_path_list:
         nested_dict_set(control_data, toml_control_path, new)
 
@@ -265,6 +282,7 @@ def update_control_field(
         if hasattr(model, "value"):
             model.value = new
         elif hasattr(model, "source"):
+            # harcode tables using this update to use new for the "file" column
             source_data = dict(model.source.data)
             if "file" in source_data:
                 source_data["file"] = [new for i in source_data["file"]]
@@ -339,17 +357,21 @@ def build_model(
     linked_value_model_list: Sequence[str] = [],
     linked_model_list: Sequence[str] = [],
     linked_model_mode_list: Sequence[str] = [],
+    value: Optional[Any] = None,
     **kwargs,
 ) -> Any:
     """
     Generic function to build a model with an on_change callback that assigns its value to the toml_control_path field in control_data
     model: any bokeh model function
-    toml_control_path (Sequence[str]): list of dot-separated paths to the fields to be updated in control_data
+    toml_control_path (Sequence[str]): list of dot-separated paths to the fields to be updated in control_data (including the present model first)
     is_bool (bool): use for Select widget that have "T"/"F" options to set their css update callback
     linked_value_model_list (Sequence[str]): list of model names with their value linked to the value of this model
     linked_model_list (Sequence[str]): list of model names with their visibility linked to the value of this model (only used when is_bool is True)
     linked_model_mode_list (Sequence[str]): "T"/"F" for each model in linked_model_list (only used when linked_model_list is not empty)
     """
+    if value is None:
+        value = nested_dict_get(control_data, toml_control_path_list[0])
+        kwargs["value"] = value
 
     result = model(**kwargs)
     result.on_change(
@@ -374,6 +396,153 @@ def build_model(
             )
 
     return result
+
+
+def build_diag_model(
+    title: str,
+    toml_control_path: str,
+    species_builder: Optional[Callable] = None,
+) -> bokeh.models.layouts.Row:
+    """
+    Generic function to generate a repeated layout in the Diagnostic Options.
+    It has two Select T/F widgets, for Prior and Posterior, and in some cases it allows specifying a list of species the option applies to.
+    """
+    name = toml_control_path.replace(".", "_")
+    title_div = custom_div(text=title)
+    toml_control_data = nested_dict_get(control_data, toml_control_path)
+    selectors = [
+        build_model(
+            Select,
+            toml_control_path_list=[f"{toml_control_path}.save_{elem}"],
+            name=f"{name}_save_{elem}",
+            title=f"Save {elem}",
+            is_bool=True,
+            options=["T", "F"],
+            width=100,
+        )
+        for elem in ["prior", "posterior"]
+    ]
+    if (species_builder is not None) or ("stokes" in toml_control_data):
+        # set the callbacks to show the dependent inputs
+        for elem in selectors:
+            elem.on_change(
+                "value",
+                partial(
+                    update_visible,
+                    target_model_name=f"{name}_inputs",
+                    model_name_dict={f"{name}_save_prior": "", f"{name}_save_posterior": ""},
+                ),
+            )
+
+    selectors_row = row(children=selectors, width=800)
+
+    selectors_inputs_children = []
+
+    if species_builder is not None:
+        default_active = toml_control_data["species"]
+        if np.array_equal(toml_control_data["species"], ["all"]):
+            if species_builder == gas_checkboxes:
+                default_active = control_data["prf_species"] + control_data["col_species"]
+            elif species_builder == aerosol_checkboxes:
+                default_active = control_data["aerosol_species"]
+            elif species_builder == cloud_checkboxes:
+                default_active = control_data["cloud_species"]
+
+        selectors_inputs_children += [
+            species_builder(
+                name=f"{name}_species",
+                toml_control_path=f"{toml_control_path}.species",
+                default_active=default_active,
+                inline=True,
+            )
+        ]
+    elif "species" in toml_control_data:
+        selectors_inputs_children += [
+            build_table(
+                name=f"{name}_species",
+                title="Species",
+                toml_control_path=f"{toml_control_path}.species",
+                fixed_column_width=100,
+            )
+        ]
+
+    if "stokes" in toml_control_data:
+        selectors_inputs_children += [
+            build_model(
+                Select,
+                toml_control_path_list=[f"{toml_control_path}.stokes"],
+                is_bool=True,
+                options=["T", "F"],
+                name=f"{name}_stokes",
+                title="Stokes",
+                width=100,
+            )
+        ]
+
+    children = [title_div, selectors_row]
+    if selectors_inputs_children:
+        selectors_inputs = column(
+            children=selectors_inputs_children,
+            name=f"{name}_inputs",
+            visible=(toml_control_data["save_prior"] == "T")
+            or (toml_control_data["save_posterior"] == "T"),
+        )
+
+        children += [selectors_inputs]
+
+    return column(children=children, name=name)
+
+
+def build_inv_diag_model(
+    title: str,
+    toml_control_path: str,
+    species_builder: Optional[Callable] = None,
+) -> bokeh.models.layouts.Row:
+    """
+    Build a Select widget with the option of a linked checkboxgroup
+    """
+
+    name = toml_control_path.replace(".", "_")
+    title_div = custom_div(text=title)
+    toml_control_data = nested_dict_get(control_data, toml_control_path)
+
+    linked_model_list = []
+    if species_builder is not None:
+        linked_model_list += [f"{name}_species"]
+
+    selector = build_model(
+        Select,
+        toml_control_path_list=[f"{toml_control_path}.save"],
+        name=f"{name}_save",
+        is_bool=True,
+        options=["T", "F"],
+        linked_model_list=linked_model_list,
+        width=100,
+    )
+
+    children = [title_div, selector]
+
+    if species_builder is not None:
+        default_active = toml_control_data["species"]
+        if np.array_equal(toml_control_data["species"], ["all"]):
+            if species_builder == gas_checkboxes:
+                default_active = control_data["prf_species"] + control_data["col_species"]
+            elif species_builder == aerosol_checkboxes:
+                default_active = control_data["aerosol_species"]
+            elif species_builder == cloud_checkboxes:
+                default_active = control_data["cloud_species"]
+
+        children += [
+            species_builder(
+                name=f"{name}_species",
+                toml_control_path=f"{toml_control_path}.species",
+                default_active=default_active,
+                inline=True,
+            )
+        ]
+        children[-1].visible = toml_control_data["save"] == "T"
+
+    return column(children=children, name=name)
 
 
 def build_table(
@@ -545,6 +714,8 @@ def make_checkboxes(
     """
     Generic checkboxgroup builder
     """
+    if np.array_equal(default_active, ["all"]):
+        default_active = labels
 
     try:
         active = [labels.index(i) for i in default_active]
@@ -569,42 +740,42 @@ def gas_checkboxes(
     name: str,
     toml_control_path: str,
     default_active: Sequence[str] = [],
-    gas_list: Sequence[str] = ["N2", "O2", "Ar", "H2O", "CH4", "CO2", "PA1", "O2DG"],
+    species_list: Sequence[str] = ["N2", "O2", "Ar", "H2O", "CH4", "CO2", "PA1", "O2DG"],
     **kwargs: Any,
 ) -> bokeh.models.layouts.Column:
     """
     Make a checkboxgroup to select for gases
     """
 
-    return make_checkboxes(name, toml_control_path, gas_list, default_active, **kwargs)
+    return make_checkboxes(name, toml_control_path, species_list, default_active, **kwargs)
 
 
 def aerosol_checkboxes(
     name: str,
     toml_control_path: str,
     default_active: Sequence[str] = [],
-    aerosol_list: Sequence[str] = ["SU", "BC", "OC", "SF", "SC", "DU"],
+    species_list: Sequence[str] = ["SU", "BC", "OC", "SF", "SC", "DU"],
     **kwargs: Any,
 ) -> bokeh.models.layouts.Column:
     """
     Make a checkboxgroup to select for aerosols
     """
 
-    return make_checkboxes(name, toml_control_path, aerosol_list, default_active, **kwargs)
+    return make_checkboxes(name, toml_control_path, species_list, default_active, **kwargs)
 
 
 def cloud_checkboxes(
     name: str,
     toml_control_path: str,
     default_active: Sequence[str] = [],
-    cloud_list: Sequence[str] = ["CW", "CI"],
+    species_list: Sequence[str] = ["CW", "CI"],
     **kwargs: Any,
 ) -> bokeh.models.layouts.Column:
     """
     Make a checkboxgroup to select for clouds
     """
 
-    return make_checkboxes(name, toml_control_path, cloud_list, default_active, **kwargs)
+    return make_checkboxes(name, toml_control_path, species_list, default_active, **kwargs)
 
 
 # The following *_options functions each build a TabPanel object
@@ -616,7 +787,6 @@ def file_options() -> bokeh.models.layouts.TabPanel:
     root_data_directory = build_model(
         TextInput,
         toml_control_path_list=["root_data_directory"],
-        value=control_data["root_data_directory"],
         title="Root data directory",
         name="root_data_directory",
     )
@@ -624,7 +794,6 @@ def file_options() -> bokeh.models.layouts.TabPanel:
     log_file = build_model(
         TextInput,
         toml_control_path_list=["log_file"],
-        value=control_data["log_file"],
         title="Output Log file",
         name="log_file",
     )
@@ -632,7 +801,6 @@ def file_options() -> bokeh.models.layouts.TabPanel:
     output_file = build_model(
         TextInput,
         toml_control_path_list=["output_file"],
-        value=control_data["output_file"],
         title="Output Level2 file",
         name="output_file",
     )
@@ -660,7 +828,6 @@ def file_options() -> bokeh.models.layouts.TabPanel:
             "aux_lamb_clouds_file",
             "l1_radiance_band_inputs_table",
         ],
-        value=control_data["l1_file"],
         title="Input Level1 file",
         name="l1_file",
     )
@@ -672,7 +839,6 @@ def file_options() -> bokeh.models.layouts.TabPanel:
             f"l2_surface_reflectance.band_inputs.{key}.file"
             for key in control_data["l2_surface_reflectance"]["band_inputs"]
         ],
-        value=control_data["l2_met_file"],
         title="Input a priori Level2 file",
         name="l2_met_file",
     )
@@ -707,7 +873,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         Select,
         toml_control_path_list=["calculation_mode"],
         title="Calculation Mode",
-        value=control_data["calculation_mode"],
         options=["INVERSE", "FORWARD"],
         name="calculation_mode",
         width=300,
@@ -718,7 +883,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["compute_all_pixels"],
         is_bool=True,
         title="Compute all pixels",
-        value=control_data["compute_all_pixels"],
         options=["T", "F"],
         name="compute_all_pixels",
         width=200,
@@ -729,7 +893,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["x_start"],
         title="X start",
         name="x_start",
-        value=control_data["x_start"],
         width=150,
     )
     x_end = build_model(
@@ -737,7 +900,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["x_end"],
         title="X end",
         name="x_end",
-        value=control_data["x_end"],
         width=150,
     )
     x_retrieval_range = row(children=[x_start, x_end])
@@ -747,7 +909,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["y_start"],
         title="Y start",
         name="y_start",
-        value=control_data["y_start"],
         width=150,
     )
     y_end = build_model(
@@ -755,7 +916,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["y_end"],
         title="Y end",
         name="y_end",
-        value=control_data["y_end"],
         width=150,
     )
     y_retrieval_range = row(children=[y_start, y_end])
@@ -765,7 +925,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["write_directly_to_file"],
         is_bool=True,
         title="Write directly to file",
-        value=control_data["write_directly_to_file"],
         options=["T", "F"],
         name="write_directly_to_file",
         width=200,
@@ -776,7 +935,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["use_file_lock"],
         is_bool=True,
         title="Use file lock",
-        value=control_data["use_file_lock"],
         options=["T", "F"],
         name="use_file_lock",
         width=200,
@@ -787,7 +945,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["overwrite_existing"],
         is_bool=True,
         title="Overwrite existing",
-        value=control_data["overwrite_existing"],
         options=["T", "F"],
         name="overwrite_existing",
         width=200,
@@ -798,7 +955,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["cache_pixel_output"],
         is_bool=True,
         title="Cache pixel output",
-        value=control_data["cache_pixel_output"],
         options=["T", "F"],
         name="cache_pixel_output",
         width=200,
@@ -809,7 +965,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["switch_on_debug"],
         is_bool=True,
         title="Switch on debug",
-        value=control_data["switch_on_debug"],
         options=["T", "F"],
         name="switch_on_debug",
         width=200,
@@ -819,7 +974,6 @@ def retrieval_options() -> bokeh.models.layouts.TabPanel:
         Select,
         toml_control_path_list=["debug_level"],
         title="Debug level",
-        value=control_data["debug_level"],
         options=["", "1", "2", "3"],
         name="debug_level",
         width=200,
@@ -864,7 +1018,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         linked_model_list=["single_pixel_calc_inputs", "l1_radiance_band_inputs"],
         linked_model_mode_list=["T", "F"],
         title="Do single pixel calculation from input",
-        value=control_data["do_single_pixel_calc_from_inp"],
         options=["T", "F"],
         name="do_single_pixel_calc",
         width=200,
@@ -949,10 +1102,17 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         width=1500,
     )
 
+    l1_radiance_template_data_map = {
+        "name": "Band Name",
+        "index": "Band Index",
+        "file_type": "File Type",
+        "file": "File",
+    }
     l1_radiance_band_inputs = build_table(
         name="l1_radiance_band_inputs",
         toml_control_path="l1_radiance.band_inputs",
         title="L1 Radiance Band Inputs",
+        key_map=l1_radiance_template_data_map,
         width_map={"name": 100, "file_type": 100, "index": 100, "file": 1100},
         visible=control_data["do_single_pixel_calc_from_inp"] == "F",
         width=1400,
@@ -968,7 +1128,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
             is_bool=True,
             linked_model_list=[f"l2_2d_support_data_{key}_inputs"],
             title=f"Use {nice_key} 2D Support Data",
-            value=control_data["l2_2d_support_data"][key]["use"],
             options=["T", "F"],
             name=f"use_l2_2d_support_data_{key}",
             width=200,
@@ -979,7 +1138,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
             Select,
             toml_control_path_list=[f"l2_2d_support_data.{key}.file_type"],
             title=f"{nice_key} File Type",
-            value=control_data["l2_2d_support_data"][key]["file_type"],
             options=["SPLAT", "METHANESAT"],
             name=f"l2_2d_support_data_{key}_file_type",
             width=200,
@@ -989,7 +1147,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
             TextInput,
             toml_control_path_list=[f"l2_2d_support_data.{key}.file"],
             title=f"{nice_key} File",
-            value=control_data["l2_2d_support_data"][key]["file"],
             name=f"l2_2d_support_data_{key}_file",
         )
 
@@ -1008,7 +1165,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["l2_profile_support_data_inputs"],
         title="Use Level2 Profile Meteorology",
-        value=control_data["l2_profile_support_data"]["use_l2_profile_met"],
         options=["T", "F"],
         name="use_l2_profile_met",
         width=200,
@@ -1018,7 +1174,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         Select,
         toml_control_path_list=["l2_profile_support_data.file_type"],
         title="Level2 Meteorology File Type",
-        value=control_data["l2_profile_support_data"]["file_type"],
         options=["SPLAT", "METHANESAT"],
         name="l2_profile_support_data_file_type",
         width=200,
@@ -1028,7 +1183,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         TextInput,
         toml_control_path_list=["l2_profile_support_data.file"],
         title="Level2 Meteorology File",
-        value=control_data["l2_profile_support_data"]["file"],
         name="l2_profile_support_data_file",
     )
 
@@ -1065,7 +1219,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["cloud_inputs"],
         title="Use Level2 Clouds",
-        value=control_data["clouds"]["use_l2_clouds"],
         options=["T", "F"],
         name="use_l2_clouds",
         width=200,
@@ -1092,7 +1245,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["clouds.use_clouds_from_l2_prof_met"],
         is_bool=True,
         title="Use Clouds from Level2 Profile Meteorology",
-        value=control_data["clouds"]["use_clouds_from_l2_prof_met"],
         options=["T", "F"],
         name="use_clouds_from_l2_prof_met",
         width=200,
@@ -1127,7 +1279,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         Select,
         toml_control_path_list=["clouds.file_type"],
         title="Aux Lambertian Cloud File Type",
-        value=control_data["clouds"]["file_type"],
         options=["SPLAT", "METHANESAT"],
         name="aux_lamb_clouds_file_type",
         width=200,
@@ -1137,7 +1288,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         TextInput,
         toml_control_path_list=["clouds.file"],
         title="Aux Lambertian Cloud File",
-        value=control_data["clouds"]["file"],
         name="aux_lamb_clouds_file",
     )
 
@@ -1165,7 +1315,6 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["l2_surface_reflectance_inputs"],
         title="Use Level2 Surface Reflectance",
-        value=control_data["l2_surface_reflectance"]["use_l2_surface"],
         options=["T", "F"],
         name="use_l2_surface",
         width=200,
@@ -1334,7 +1483,6 @@ def window_options() -> bokeh.models.layouts.TabPanel:
         TextInput,
         toml_control_path_list=["common_options.solar_file"],
         title="Solar Reference (will look under {{root_data_directory}}/SolarSpectra/)",
-        value=control_data["common_options"]["solar_file"],
         name="solar_reference_file",
     )
 
@@ -1343,7 +1491,6 @@ def window_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["common_options.rtm_at_l1_resolution"],
         is_bool=True,
         title="RTM at L1 Resolution",
-        value=control_data["common_options"]["rtm_at_l1_resolution"],
         options=["T", "F"],
         name="rtm_at_l1_resolution",
         width=200,
@@ -1378,7 +1525,6 @@ def window_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["common_options.solar_io_correction"],
         is_bool=True,
         title="Solar I0 Correction",
-        value=control_data["common_options"]["solar_io_correction"],
         options=["T", "F"],
         name="solar_io_correction",
         width=200,
@@ -1391,7 +1537,6 @@ def window_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["custom_grid_file"],
         title="Use Custom RTM grid",
-        value=control_data["common_options"]["use_custom_rtm_grid"],
         options=["T", "F"],
         name="use_custom_rtm_grid",
         width=200,
@@ -1403,7 +1548,6 @@ def window_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["common_options.custom_grid_file"],
         name="custom_grid_file",
         title="Custom Grid Filename (will look under {{root_data_directory}}/../../)",
-        value=control_data["common_options"]["custom_grid_file"],
         visible=(control_data["common_options"]["use_custom_rtm_grid"] == "T")
         and (control_data["common_options"]["rtm_at_l1_resolution"] == "F"),
     )
@@ -1445,7 +1589,6 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["apriori_file"],
         name="apriori_file",
         title="Level2 a priori filename (will look under {{root_data_directory}}/../../)",
-        value=control_data["apriori_file"],
     )
 
     sampling_method, _ = make_radiogroup(
@@ -1462,7 +1605,6 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         linked_model_list=["assume_earth_for_gravity_inputs"],
         linked_model_mode_list=["F"],
         title="Assume Earth for Gravity",
-        value=control_data["assume_earth_for_gravity"],
         options=["T", "F"],
         name="assume_earth_for_gravity",
         width=200,
@@ -1473,7 +1615,6 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_gravity_mps2"],
         name="surface_gravity",
         title="Surface Gravity (m.s-2)",
-        value=control_data["surface_gravity_mps2"],
         width=200,
     )
 
@@ -1482,7 +1623,6 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["planetary_radius_km"],
         name="planetary_radius",
         title="Planetary Radius (km)",
-        value=control_data["planetary_radius_km"],
         width=200,
     )
 
@@ -1497,7 +1637,6 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["linearize_wrt_hybrid_grid"],
         is_bool=True,
         title="Linearize w.r.t. Hybrid Grid",
-        value=control_data["linearize_wrt_hybrid_grid"],
         options=["T", "F"],
         name="linearize_wrt_hybrid_grid",
         width=200,
@@ -1540,17 +1679,18 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         default_active=control_data["aerosol_species"],
     )
 
-    aod_reference_wavelength = NumericInput(
+    aod_reference_wavelength = build_model(
+        NumericInput,
+        toml_control_path_list=["profile_aerosols.aod_reference_wavelength_nm"],
         name="aod_reference_wavelength",
         title="AOD Reference Wavelength (nm)",
-        value=control_data["profile_aerosols"]["aod_reference_wavelength_nm"],
         width=200,
     )
 
     aerosol_params = aerosol_checkboxes(
         name="aerosol_params",
         toml_control_path="aerosol_params",
-        aerosol_list=["SU_ALPHA"],
+        species_list=["SU_ALPHA"],
         default_active=control_data["aerosol_params"],
     )
 
@@ -1561,7 +1701,6 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         linked_model_list=["profile_aer_opt_prop_params_inputs"],
         linked_model_mode_list=["F"],
         title="AOD from Profile File",
-        value=control_data["profile_aerosols"]["aod_from_profile_file"],
         options=["T", "F"],
         name="aod_from_profile_file",
         width=200,
@@ -1582,7 +1721,6 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         linked_model_list=["const_values_inputs"],
         linked_model_mode_list=["F"],
         title="Aerosol Optical Parameters from Profile File",
-        value=control_data["profile_aerosols"]["aer_opt_par_from_profile_file"],
         options=["T", "F"],
         name="aer_opt_par_from_profile_file",
         width=300,
@@ -1621,7 +1759,6 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["profile_cloud_species.cod_reference_wavelength_nm"],
         name="cod_reference_wavelength",
         title="COD Reference Wavelength (nm)",
-        value=control_data["profile_cloud_species"]["cod_reference_wavelength_nm"],
         width=200,
     )
 
@@ -1632,7 +1769,6 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         linked_model_list=["cod_from_profile_file_inputs"],
         linked_model_mode_list=["F"],
         title="COD from Profile File",
-        value=control_data["profile_cloud_species"]["cod_from_profile_file"],
         options=["T", "F"],
         name="cod_from_profile_file",
         width=200,
@@ -1646,7 +1782,6 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["profile_cloud_species.n_subpixels"],
         name="n_subpixels",
         title="# Subpixels",
-        value=control_data["profile_cloud_species"]["n_subpixels"],
         width=200,
     )
 
@@ -1764,19 +1899,17 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance_options.fixed_lambertian.albedo_value"],
         name="fixed_lambertian_albedo",
         title="Fixed Lambertian Albedo",
-        value=control_data["surface_reflectance_options"]["fixed_lambertian"]["albedo_value"],
         width=200,
         visible=surface_reflectance_option_radiogroup.active == 0,
     )
 
     lambertian_surface_file = build_model(
         TextInput,
-        toml_control_path_list=["surface_reflectance_options.lambertian_spectrum"],
+        toml_control_path_list=[
+            "surface_reflectance_options.lambertian_spectrum.lambertian_surface_file"
+        ],
         name="lambertian_surface_file",
         title="Lambertian Surface Filename (will look for the file under {{root_data_directory}}/ReflSpectra/)",
-        value=control_data["surface_reflectance_options"]["lambertian_spectrum"][
-            "lambertian_surface_file"
-        ],
         visible=surface_reflectance_option_radiogroup.active == 1,
     )
 
@@ -1788,9 +1921,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["ler_wavelength"],
         title="Use Constant Wavelength",
-        value=control_data["surface_reflectance_options"]["ler_climatology"][
-            "use_constant_wavelength"
-        ],
         options=["T", "F"],
         name="ler_use_constant_wavelength",
         width=200,
@@ -1801,7 +1931,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance_options.ler_climatology.ler_wavelength_nm"],
         name="ler_wavelength",
         title="LER Wavelength (nm)",
-        value=control_data["surface_reflectance_options"]["ler_climatology"]["ler_wavelength_nm"],
         width=200,
         visible=control_data["surface_reflectance_options"]["ler_climatology"][
             "use_constant_wavelength"
@@ -1814,9 +1943,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance_options.ler_climatology.ler_climatology_file"],
         name="ler_climatology_file",
         title="LER Climatology File (will look under {{root_data_directory}}/LER_climatologies/)",
-        value=control_data["surface_reflectance_options"]["ler_climatology"][
-            "ler_climatology_file"
-        ],
     )
 
     ler_climatology_inputs = column(
@@ -1830,7 +1956,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance_options.modis_fa.modis_fa_file"],
         name="modis_fa_file",
         title="MODIS-FA Filename (will look under {{root_data_directory}}/BRDF_EOF/AlbSpec/)",
-        value=control_data["surface_reflectance_options"]["modis_fa"]["modis_fa_file"],
     )
 
     modis_fa_refl_clim_directory = build_model(
@@ -1838,7 +1963,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance_options.modis_fa.refl_clim_directory"],
         name="modis_fa_refl_clim_directory",
         title="Reflectance Climatology Directory (under {{root_data_directory}})",
-        value=control_data["surface_reflectance_options"]["modis_fa"]["refl_clim_directory"],
     )
 
     modis_fa_do_isotropic = build_model(
@@ -1848,7 +1972,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         linked_model_list=["modis_fa_black_white_blue", "modis_fa_ocean_glint_brdf"],
         linked_model_mode_list=["T", "F"],
         title="Do Isotropic",
-        value=control_data["surface_reflectance_options"]["modis_fa"]["do_isotropic"],
         options=["T", "F"],
         name="modis_fa_do_isotropic",
         width=200,
@@ -1869,7 +1992,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance_options.modis_fa.ocean_glint_brdf"],
         is_bool=True,
         title="Ocean Glint BRDF",
-        value=control_data["surface_reflectance_options"]["modis_fa"]["ocean_glint_brdf"],
         options=["T", "F"],
         name="modis_fa_ocean_glint_brdf",
         width=200,
@@ -1902,9 +2024,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         ],
         name="brdf_climatology_file",
         title="BRDF Climatology File",
-        value=control_data["surface_reflectance_options"]["brdf_climatology"][
-            "brdf_climatology_file"
-        ],
         visible=surface_reflectance_option_radiogroup.active == 5,
     )
 
@@ -1936,7 +2055,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_emissivity_options.fixed_emissivity.emissivity_value"],
         name="fixed_emissivity_value",
         title="Fixed Emissivity Value",
-        value=control_data["surface_emissivity_options"]["fixed_emissivity"]["emissivity_value"],
         width=200,
         visible=surface_emissivity_option_radiogroup.active == 0,
     )
@@ -1948,9 +2066,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         ],
         name="emissivity_spectrum_file",
         title="Emissivity Spectrum Filename (will look under {{root_data_directory}}/Emissivity)",
-        value=control_data["surface_emissivity_options"]["emissivity_spectrum"][
-            "emissivity_spectrum_file"
-        ],
         visible=surface_emissivity_option_radiogroup.active == 1,
     )
 
@@ -1961,9 +2076,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         ],
         name="emissivity_climatology_file",
         title="Emissivity Climatology Filename (will look under {{root_data_directory}}/Emissivity)",
-        value=control_data["surface_emissivity_options"]["emissivity_climatology"][
-            "emissivity_climatology_file"
-        ],
         visible=surface_emissivity_option_radiogroup.active == 2,
     )
 
@@ -1973,7 +2085,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["chlorophyll_spectrum_file"],
         title="Do Plant Fluorescence",
-        value=control_data["do_plant_fluorescence"],
         options=["T", "F"],
         name="do_plant_fluorescence",
         width=200,
@@ -1985,7 +2096,6 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["chlorophyll_spectrum_file"],
         name="chlorophyll_spectrum_file",
         title="Chlorophyll Spectrum Filename",
-        value=control_data["chlorophyll_spectrum_file"],
         visible=control_data["do_plant_fluorescence"] == "T",
     )
 
@@ -2024,7 +2134,6 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
         linked_model_list=["co2_profile_gas_name", "scattering_gases_inputs"],
         linked_model_mode_list=["T", "F"],
         title="Assume Earth for Scattering",
-        value=control_data["assume_earth_for_scattering"],
         options=["T", "F"],
         name="assume_earth_for_scattering",
         width=200,
@@ -2035,7 +2144,6 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["co2_profile_gas_name"],
         name="co2_profile_gas_name",
         title="CO2 Profile Gas Name",
-        value=control_data["co2_profile_gas_name"],
         width=200,
         visible=control_data["assume_earth_for_scattering"] == "T",
     )
@@ -2066,7 +2174,6 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["raman_scattering_inputs"],
         title="Do Raman Scattering",
-        value=control_data["do_raman_scattering"],
         options=["T", "F"],
         name="do_raman_scattering",
         width=200,
@@ -2077,7 +2184,6 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["rss_ref_temperature_k"],
         name="rss_ref_temperature",
         title="RSS Reference Temperature (K)",
-        value=control_data["rss_ref_temperature_k"],
         width=200,
     )
 
@@ -2105,7 +2211,7 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
         name="absorbing_gases",
         toml_control_path="abs_species",
         default_active=control_data["abs_species"],
-        gas_list=["N2", "O2", "Ar", "H2O", "CH4", "CO2", "PACIA"],
+        species_list=["N2", "O2", "Ar", "H2O", "CH4", "CO2", "PACIA"],
         inline=True,
     )
 
@@ -2114,7 +2220,6 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["number_of_fine_layers"],
         name="number_of_fine_layers",
         title="Number of Fine Layers for Cross Section Calculations",
-        value=control_data["number_of_fine_layers"],
         width=300,
     )
 
@@ -2123,7 +2228,6 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["full_lut_to_memory"],
         is_bool=True,
         title="Full Lookup-Table to Memory",
-        value=control_data["full_lut_to_memory"],
         options=["T", "F"],
         name="full_lut_to_memory",
         width=200,
@@ -2141,7 +2245,7 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
     airglow_gases = gas_checkboxes(
         name="airglow_gases",
         toml_control_path="airglow_gases",
-        gas_list=["O2DG"],
+        species_list=["O2DG"],
         default_active=control_data["airglow_gases"],
         inline=True,
     )
@@ -2184,7 +2288,6 @@ def aerosol_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["do_aerosols"],
         is_bool=True,
         title="Do Aerosols",
-        value=control_data["do_aerosols"],
         options=["T", "F"],
         name="do_aerosols",
         width=200,
@@ -2220,7 +2323,6 @@ def cloud_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["do_cloud_inputs"],
         title="Do Clouds",
-        value=control_data["do_clouds"],
         options=["T", "F"],
         name="do_clouds",
         width=200,
@@ -2233,7 +2335,6 @@ def cloud_options() -> bokeh.models.layouts.TabPanel:
         linked_model_list=["cloud_albedo", "cloud_opt_prop_inputs"],
         linked_model_mode_list=["T", "F"],
         title="Do Lambertian Clouds",
-        value=control_data["do_lambertian_clouds"],
         options=["T", "F"],
         name="do_lambertian_clouds",
         width=200,
@@ -2244,7 +2345,6 @@ def cloud_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["cloud_albedo"],
         name="cloud_albedo",
         title="Cloud Albedo",
-        value=control_data["cloud_albedo"],
         width=200,
         visible=control_data["do_lambertian_clouds"] == "T",
     )
@@ -2302,7 +2402,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["clim_uncertainty_options_inputs"],
         title="Overwrite Climatology Uncertainty",
-        value=control_data["overwrite_clim_uncertainty"],
         options=["T", "F"],
         name="overwrite_clim_uncertainty",
         width=200,
@@ -2340,7 +2439,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["add_temperature_inputs"],
         title="Add Temperature to State Vector",
-        value=control_data["temperature"]["add_to_state_vector"],
         options=["T", "F"],
         name="add_temperature",
         width=200,
@@ -2370,7 +2468,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["fit_profile_overwrite_clim_uncertainty_inputs"],
         title="Overwrite Climatology Uncertainty",
-        value=control_data["temperature"]["fit_profile"]["overwrite_clim_uncertainty"],
         options=["T", "F"],
         name="fit_profile_overwrite_clim_uncertainty",
         width=200,
@@ -2381,7 +2478,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["temperature.fit_profile.cov_mat_type"],
         name="fit_profile_covar_matrix_type",
         title="Covariance Matrix Type",
-        value=control_data["temperature"]["fit_profile"]["cov_mat_type"],
         width=200,
     )
 
@@ -2390,7 +2486,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["temperature.fit_profile.parameters"],
         name="fit_profile_parameters",
         title="Parameters",
-        value=control_data["temperature"]["fit_profile"]["parameters"],
         width=200,
     )
 
@@ -2415,7 +2510,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["fit_shift_uncertainty"],
         title="Overwrite Climatology Uncertainty",
-        value=control_data["temperature"]["fit_shift"]["overwrite_clim_uncertainty"],
         options=["T", "F"],
         name="fit_shift_overwrite_clim_uncertainty",
         width=200,
@@ -2426,7 +2520,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["temperature.fit_shift.shift_unc_k"],
         name="fit_shift_uncertainty",
         title="Shift Uncertainty (K)",
-        value=control_data["temperature"]["fit_shift"]["shift_unc_k"],
         width=200,
         visible=control_data["temperature"]["fit_shift"]["overwrite_clim_uncertainty"] == "T",
     )
@@ -2456,7 +2549,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["add_surface_pressure_inputs"],
         title="Add Surface Pressure to State Vector",
-        value=control_data["surface_pressure"]["add_to_state_vector"],
         options=["T", "F"],
         name="add_surface_pressure",
         width=200,
@@ -2468,7 +2560,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["surface_pressure_uncertainty"],
         title="Overwrite Climatology Uncertainty",
-        value=control_data["surface_pressure"]["overwrite_clim_uncertainty"],
         options=["T", "F"],
         name="surface_pressure_overwrite_clim_uncertainty",
         width=200,
@@ -2479,7 +2570,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_pressure.uncertainty_hpa"],
         name="surface_pressure_uncertainty",
         title="Surface Pressure Uncertainty (hPa)",
-        value=control_data["surface_pressure"]["uncertainty_hpa"],
         width=200,
         visible=control_data["surface_pressure"]["overwrite_clim_uncertainty"] == "T",
     )
@@ -2510,7 +2600,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["add_surface_reflectance_inputs"],
         title="Add Surface Reflectance to State Vector",
-        value=control_data["surface_reflectance"]["add_to_state_vector"],
         options=["T", "F"],
         name="add_surface_reflectance",
         width=200,
@@ -2522,7 +2611,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["init_state_from_obs_inputs"],
         title="Initialize State from Observation",
-        value=control_data["surface_reflectance"]["init_state_from_obs"],
         options=["T", "F"],
         name="init_state_from_obs",
         width=200,
@@ -2533,7 +2621,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance.albedo_file"],
         name="albedo_file",
         title="Albedo File",
-        value=control_data["surface_reflectance"]["albedo_file"],
     )
 
     max_poly_order = build_model(
@@ -2541,7 +2628,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance.max_poly_order"],
         name="max_poly_order",
         title="Maximum Polynomial Order",
-        value=control_data["surface_reflectance"]["max_poly_order"],
         width=200,
     )
 
@@ -2589,7 +2675,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["surface_reflectance_eof_scale_factor"],
         title="Scale EOF Uncertainty",
-        value=control_data["surface_reflectance"]["eof_fit"]["scale_eof_uncert"],
         options=["T", "F"],
         name="surface_reflectance_scale_eof_uncert",
         width=200,
@@ -2600,7 +2685,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance.eof_fit.scale_factor"],
         name="surface_reflectance_eof_scale_factor",
         title="EOF Uncertainty Scale Factor",
-        value=control_data["surface_reflectance"]["eof_fit"]["scale_factor"],
         width=200,
         visible=control_data["surface_reflectance"]["eof_fit"]["scale_eof_uncert"] == "T",
     )
@@ -2647,7 +2731,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["add_radiometric_offset_inputs"],
         title="Add Radiometric Offset to State Vector",
-        value=control_data["radiometric_offset"]["add_to_state_vector"],
         options=["T", "F"],
         name="add_radiometric_offset",
         width=200,
@@ -2717,7 +2800,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["add_radiometric_scaling_inputs"],
         title="Add Radiometric Scaling to State Vector",
-        value=control_data["radiometric_scaling"]["add_to_state_vector"],
         options=["T", "F"],
         name="add_radiometric_scaling",
         width=200,
@@ -2786,7 +2868,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["add_eof_residuals_inputs"],
         title="Add EOF Residuals to State Vector",
-        value=control_data["eof_residuals"]["add_to_state_vector"],
         options=["T", "F"],
         name="add_eof_residuals",
         width=200,
@@ -2813,7 +2894,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["add_isrf_parameters_inputs"],
         title="Add ISRF Parameters to State Vector",
-        value=control_data["isrf_parameters"]["add_to_state_vector"],
         options=["T", "F"],
         name="add_isrf_parameters",
         width=200,
@@ -2840,7 +2920,6 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         is_bool=True,
         linked_model_list=["add_wavelength_grid_inputs"],
         title="Add Wavelength Grid to State Vector",
-        value=control_data["wavelength_grid"]["add_to_state_vector"],
         options=["T", "F"],
         name="add_wavelength_grid",
         width=200,
@@ -2926,8 +3005,218 @@ def optimizer_options() -> bokeh.models.layouts.TabPanel:
     """
     Generate the layouts in the Optimizer panel
     """
+    max_iter = build_model(
+        NumericInput,
+        toml_control_path_list=["max_iter"],
+        name="max_iter",
+        title="Maximum # of Iterations",
+        width=200,
+    )
+
+    max_div = build_model(
+        NumericInput,
+        toml_control_path_list=["max_div"],
+        name="max_div",
+        title="Maximum # of Divergences",
+        width=200,
+    )
+
+    convergence_threshold = build_model(
+        NumericInput,
+        toml_control_path_list=["convergence_threshold"],
+        name="convergence_threshold",
+        title="Convergence Threshold",
+        width=200,
+    )
+
+    initial_gamma_lm = build_model(
+        NumericInput,
+        toml_control_path_list=["initial_gamma_lm"],
+        name="initial_gamma_lm",
+        title="Initial Levenberg-Marquardt Parameter",
+        width=200,
+    )
+
+    r_divergent = build_model(
+        NumericInput,
+        toml_control_path_list=["r_divergent"],
+        name="r_divergent",
+        title="Divergent Ratio",
+        width=200,
+    )
+
+    r_convergent = build_model(
+        NumericInput,
+        toml_control_path_list=["r_convergent"],
+        name="r_convergent",
+        title="Convergent Ratio",
+        width=200,
+    )
+
+    divergent_scale_factor = build_model(
+        NumericInput,
+        toml_control_path_list=["divergent_scale_factor"],
+        name="divergent_scale_factor",
+        title="Divergent Scale Factor",
+        width=200,
+    )
+
+    convergent_scale_factor = build_model(
+        NumericInput,
+        toml_control_path_list=["convergent_scale_factor"],
+        name="convergent_scale_factor",
+        title="Convergent Scale Factor",
+        width=200,
+    )
+
+    chi_gof_threshold = build_model(
+        NumericInput,
+        toml_control_path_list=["chi_gof_threshold"],
+        name="chi_gof_threshold",
+        title="Chi-squared Threshold",
+        width=200,
+    )
+
+    scale_obs_cov = build_model(
+        Select,
+        toml_control_path_list=["scale_obs_cov"],
+        is_bool=True,
+        linked_model_list=["scale_obs_cov_inputs"],
+        title="Scale Observation Covariance",
+        options=["T", "F"],
+        name="scale_obs_cov",
+        width=200,
+    )
+
+    scale_obs_cov_inputs = build_model(
+        NumericInput,
+        toml_control_path_list=["obs_cov_scale_factor"],
+        name="scale_obs_cov_inputs",
+        title="Scale Factor",
+        width=200,
+    )
+
+    scale_prior_cov = build_model(
+        Select,
+        toml_control_path_list=["scale_prior_cov"],
+        is_bool=True,
+        linked_model_list=["scale_prior_cov_inputs"],
+        title="Scale A Priori Covariance",
+        options=["T", "F"],
+        name="scale_prior_cov",
+        width=200,
+    )
+
+    scale_prior_cov_inputs = build_model(
+        NumericInput,
+        toml_control_path_list=["prior_cov_scale_factor"],
+        name="scale_prior_cov_inputs",
+        title="Scale Factor",
+        width=200,
+    )
+
+    init_state_with_prev_fit = build_model(
+        Select,
+        toml_control_path_list=["init_state.init_state_with_prev_fit"],
+        is_bool=True,
+        linked_model_list=["init_state_with_prev_fit_inputs"],
+        title="Initialize State with Previous Fit",
+        options=["T", "F"],
+        name="init_state_with_prev_fit",
+        width=200,
+    )
+
+    filter_chi_squared = build_model(
+        Select,
+        toml_control_path_list=["init_state.filter_chi_squared"],
+        is_bool=True,
+        linked_model_list=["max_chi_squared"],
+        title="Filter Chi-squared",
+        options=["T", "F"],
+        name="filter_chi_squared",
+        width=200,
+    )
+
+    max_chi_squared = build_model(
+        NumericInput,
+        toml_control_path_list=["init_state.max_chi_squared"],
+        name="max_chi_squared",
+        title="Maximum Chi-squared",
+        width=200,
+        visible=control_data["init_state"]["filter_chi_squared"] == "T",
+    )
+
+    filter_rms = build_model(
+        Select,
+        toml_control_path_list=["init_state.filter_rms"],
+        is_bool=True,
+        linked_model_list=["max_rms"],
+        title="Filter RMS",
+        options=["T", "F"],
+        name="filter_rms",
+        width=200,
+    )
+
+    max_rms = build_model(
+        NumericInput,
+        toml_control_path_list=["init_state.max_rms"],
+        name="max_rms",
+        title="Maximum RMS",
+        width=200,
+        visible=control_data["init_state"]["filter_rms"] == "T",
+    )
+
+    substate_list = [
+        f"{i}_substate"
+        for i in [
+            "gas",
+            "aerosol",
+            "temperature",
+            "surface_pressure",
+            "brdf",
+            "radiance_offset",
+            "radiance_scaling",
+            "residual_eof",
+            "isrf",
+            "wavelength",
+        ]
+    ]
+
+    substate_model_list = [
+        build_model(
+            Select,
+            toml_control_path_list=[f"init_state.{model_name}"],
+            is_bool=True,
+            title=" ".join(model_name.split("_")),
+            options=["T", "F"],
+            name=model_name,
+            width=200,
+        )
+        for model_name in substate_list
+    ]
+
+    init_state_with_prev_fit_inputs = column(
+        children=[filter_chi_squared, max_chi_squared, filter_rms, max_rms] + substate_model_list,
+        name="init_state_with_prev_fit_inputs",
+        visible=control_data["init_state"]["init_state_with_prev_fit"] == "T",
+    )
+
     optimizer_inputs = column(
-        children=[],
+        children=[
+            max_iter,
+            max_div,
+            convergence_threshold,
+            initial_gamma_lm,
+            row(children=[r_divergent, r_convergent]),
+            row(children=[divergent_scale_factor, convergent_scale_factor]),
+            chi_gof_threshold,
+            scale_obs_cov,
+            scale_obs_cov_inputs,
+            scale_prior_cov,
+            scale_prior_cov_inputs,
+            init_state_with_prev_fit,
+            init_state_with_prev_fit_inputs,
+        ],
         name="optimizer_inputs",
         width=1600,
     )
@@ -2939,14 +3228,577 @@ def diagnostics_options() -> bokeh.models.layouts.TabPanel:
     """
     Generate the layouts in the Diagnostics panel
     """
-    pass
+    viewing_geometry = build_model(
+        Select,
+        toml_control_path_list=["level1_options.viewing_geometry"],
+        is_bool=True,
+        options=["T", "F"],
+        name="viewing_geometry",
+        title="Viewing Geometry",
+        width=200,
+    )
+
+    level1_diag_options = TabPanel(
+        title="Level1 Diag", child=column(children=[viewing_geometry]), name="level1_diag"
+    )
+
+    profile_output_dict = {
+        "profile_output_options.air_molecular_weight": {
+            "title": "Air Molecular Weight",
+            "species_builder": None,
+        },
+        "profile_output_options.gravity": {"title": "Gravity", "species_builder": None},
+        "profile_output_options.relative_humidity": {
+            "title": "Relative Humidity",
+            "species_builder": None,
+        },
+        "profile_output_options.air_partial_column": {
+            "title": "Air Partial Column",
+            "species_builder": None,
+        },
+        "profile_output_options.total_aod": {"title": "Total AOD", "species_builder": None},
+        "profile_output_options.cloud_n_pixels": {
+            "title": "# of Cloud Pixels",
+            "species_builder": None,
+        },
+        "profile_output_options.cloud_fraction_total": {
+            "title": "Total Cloud Fraction",
+            "species_builder": None,
+        },
+        "profile_output_options.total_cod": {
+            "title": "Total Cloud Optical Depth",
+            "species_builder": None,
+        },
+        "profile_output_options.pressure.layer_edge": {
+            "title": "Pressure (Layer Edge)",
+            "species_builder": None,
+        },
+        "profile_output_options.pressure.layer_mid": {
+            "title": "Pressure (Layer Mid)",
+            "species_builder": None,
+        },
+        "profile_output_options.temperature.layer_edge": {
+            "title": "Temperature (Layer Edge)",
+            "species_builder": None,
+        },
+        "profile_output_options.temperature.layer_mid": {
+            "title": "Temperature (Layer Mid)",
+            "species_builder": None,
+        },
+        "profile_output_options.altitude.layer_edge": {
+            "title": "Altitude (Layer Edge)",
+            "species_builder": None,
+        },
+        "profile_output_options.altitude.layer_mid": {
+            "title": "Altitude (Layer Mid)",
+            "species_builder": None,
+        },
+        "profile_output_options.gas_partial_column": {
+            "title": "Gas Partial Column",
+            "species_builder": gas_checkboxes,
+        },
+        "profile_output_options.gas_column_uncertainties": {
+            "title": "Gas Column Uncertainty",
+            "species_builder": gas_checkboxes,
+        },
+        "profile_output_options.gas_mixing_ratios": {
+            "title": "Gas Mixing Ratio",
+            "species_builder": gas_checkboxes,
+        },
+        "profile_output_options.dry_gas_mixing_ratios": {
+            "title": "Gas Dry-Air Mixing Ratio",
+            "species_builder": gas_checkboxes,
+        },
+        "profile_output_options.proxy_column_avg_mix_rat": {
+            "title": "Proxy Column-Averaged Mixing Ratio",
+            "species_builder": gas_checkboxes,
+        },
+        "profile_output_options.species_aod": {
+            "title": "Species AOD",
+            "species_builder": aerosol_checkboxes,
+        },
+        "profile_output_options.species_profile_params": {
+            "title": "Species Profile Parameters",
+            "species_builder": aerosol_checkboxes,
+        },
+        "profile_output_options.species_profile_par_derivs": {
+            "title": "Species Profile Par. Deriv.",
+            "species_builder": aerosol_checkboxes,
+        },
+    }
+
+    profile_output_column = column(
+        children=[
+            build_diag_model(
+                title=v["title"], toml_control_path=k, species_builder=v["species_builder"]
+            )
+            for k, v in profile_output_dict.items()
+        ],
+        name="profile_output_column",
+    )
+
+    profile_output_options = TabPanel(
+        title="Profile Diag", child=profile_output_column, name="profile_diag"
+    )
+
+    rtm_output_dict = {
+        "rtm_output_options.wavelength": {"title": "Wavelength", "species_builder": None},
+        "rtm_output_options.irradiance": {"title": "Irradiance", "species_builder": None},
+        "rtm_output_options.radiance": {"title": "Radiance", "species_builder": None},
+        "rtm_output_options.radiant_flux": {"title": "Radiant Flux", "species_builder": None},
+        "rtm_output_options.direct_flux": {"title": "Direct Flux", "species_builder": None},
+    }
+
+    rtm_output_column = column(
+        children=[
+            build_diag_model(
+                title=v["title"], toml_control_path=k, species_builder=v["species_builder"]
+            )
+            for k, v in rtm_output_dict.items()
+        ],
+        name="rtm_output_column",
+    )
+
+    rtm_output_options = TabPanel(title="RTM Diag.", child=rtm_output_column, name="rtm_diag")
+
+    rtm_output_gas_jacobians_dict = {
+        "rtm_output_options.gas_jacobians.scattering_weights": {
+            "title": "Scattering Weights",
+            "species_builder": None,
+        },
+        "rtm_output_options.gas_jacobians.trace_gas": {
+            "title": "Trace Gas",
+            "species_builder": None,
+        },
+        "rtm_output_options.gas_jacobians.trace_gas_part_col": {
+            "title": "Trace Gas Partial Column",
+            "species_builder": None,
+        },
+        "rtm_output_options.gas_jacobians.air_mass_factors": {
+            "title": "Airmass Factors",
+            "species_builder": None,
+        },
+    }
+
+    rtm_output_gas_jacobians_column = column(
+        children=[
+            build_diag_model(
+                title=v["title"], toml_control_path=k, species_builder=v["species_builder"]
+            )
+            for k, v in rtm_output_gas_jacobians_dict.items()
+        ],
+        name="rtm_output_gas_jacobians_column",
+    )
+
+    rtm_output_gas_jacobians_options = TabPanel(
+        title="RTM Gas Jac.", child=rtm_output_gas_jacobians_column, name="rtm_gas_jacobians_diag"
+    )
+
+    rtm_output_met_jacobians_dict = {
+        "rtm_output_options.met_jacobians.temperature_profile": {
+            "title": "Temperature Profile",
+            "species_builder": None,
+        },
+        "rtm_output_options.met_jacobians.temperature_shift": {
+            "title": "Temperature Shift",
+            "species_builder": None,
+        },
+        "rtm_output_options.met_jacobians.surface_pressure": {
+            "title": "Surface Pressure",
+            "species_builder": None,
+        },
+    }
+
+    rtm_output_met_jacobians_column = column(
+        children=[
+            build_diag_model(
+                title=v["title"], toml_control_path=k, species_builder=v["species_builder"]
+            )
+            for k, v in rtm_output_met_jacobians_dict.items()
+        ],
+        name="rtm_output_met_jacobians_column",
+    )
+
+    rtm_output_met_jacobians_options = TabPanel(
+        title="RTM Met Jac.", child=rtm_output_met_jacobians_column, name="rtm_met_jacobians_diag"
+    )
+
+    rtm_output_aerosol_jacobians_dict = {
+        "rtm_output_options.aerosol_jacobians.profile_aod": {
+            "title": "Profile AOD",
+            "species_builder": aerosol_checkboxes,
+        },
+        "rtm_output_options.aerosol_jacobians.profile_aod_par": {
+            "title": "Profile AOD Parameters",
+            "species_builder": aerosol_checkboxes,
+        },
+        "rtm_output_options.aerosol_jacobians.profile_ssa": {
+            "title": "Profile SSA",
+            "species_builder": aerosol_checkboxes,
+        },
+        "rtm_output_options.aerosol_jacobians.profile_ssa_par": {
+            "title": "Profile SSA Parameters",
+            "species_builder": aerosol_checkboxes,
+        },
+        "rtm_output_options.aerosol_jacobians.opt_prop_params": {
+            "title": "Optical Properties Parameters",
+            "species_builder": aerosol_checkboxes,
+        },
+    }
+
+    rtm_output_aerosol_jacobians_column = column(
+        children=[
+            build_diag_model(
+                title=v["title"], toml_control_path=k, species_builder=v["species_builder"]
+            )
+            for k, v in rtm_output_aerosol_jacobians_dict.items()
+        ],
+        name="rtm_output_aerosol_jacobians_column",
+    )
+
+    rtm_output_aerosol_jacobians_options = TabPanel(
+        title="RTM Aerosol Jac.",
+        child=rtm_output_aerosol_jacobians_column,
+        name="rtm_aerosol_jacobians_diag",
+    )
+
+    rtm_output_surface_jacobians_dict = {
+        "rtm_output_options.surface_jacobians.brdf_kernel_factors": {
+            "title": "BRDF Kernel Factors",
+            "species_builder": None,
+        },
+        "rtm_output_options.surface_jacobians.brdf_kernel_parameters": {
+            "title": "BRDF Kernel Parameters",
+            "species_builder": None,
+        },
+    }
+
+    rtm_output_surface_jacobians_column = column(
+        children=[
+            build_diag_model(
+                title=v["title"], toml_control_path=k, species_builder=v["species_builder"]
+            )
+            for k, v in rtm_output_surface_jacobians_dict.items()
+        ],
+        name="rtm_output_surface_jacobians_column",
+    )
+
+    rtm_output_surface_jacobians_options = TabPanel(
+        title="RTM Surface Jac.",
+        child=rtm_output_surface_jacobians_column,
+        name="rtm_surface_jacobians_diag",
+    )
+
+    rtm_output_instrument_jacobians_dict = {
+        "rtm_output_options.instrument_jacobians.isrf": {"title": "ISRF", "species_builder": None},
+        "rtm_output_options.instrument_jacobians.wavelength_shift": {
+            "title": "Wavelength Shift",
+            "species_builder": None,
+        },
+    }
+
+    rtm_output_instrument_jacobians_column = column(
+        children=[
+            build_diag_model(
+                title=v["title"], toml_control_path=k, species_builder=v["species_builder"]
+            )
+            for k, v in rtm_output_instrument_jacobians_dict.items()
+        ],
+        name="rtm_output_instrument_jacobians_column",
+    )
+
+    rtm_output_instrument_jacobians_options = TabPanel(
+        title="RTM Instrument Jac.",
+        child=rtm_output_instrument_jacobians_column,
+        name="rtm_instrument_jacobians_diag",
+    )
+
+    optical_property_diagnostics_dict = {
+        "optical_property_diagnostics.total_optical_depth": {
+            "title": "Total Optical Depth",
+            "species_builder": None,
+        },
+        "optical_property_diagnostics.brdf_kernel_amplitudes": {
+            "title": "BRDF Kernel Amplitudes",
+            "species_builder": None,
+        },
+        "optical_property_diagnostics.gas_absorption_xsect": {
+            "title": "Gas Absorption Cross-Section",
+            "species_builder": gas_checkboxes,
+        },
+    }
+
+    optical_property_diagnostics_column = column(
+        children=[
+            build_diag_model(
+                title=v["title"], toml_control_path=k, species_builder=v["species_builder"]
+            )
+            for k, v in optical_property_diagnostics_dict.items()
+        ],
+        name="optical_property_diagnostics_column",
+    )
+
+    optical_property_diagnostics = TabPanel(
+        title="Optical Prop. Diag.", child=optical_property_diagnostics_column, name="opt_prop_diag"
+    )
+
+    diagnostics_tabs = Tabs(
+        tabs=[
+            level1_diag_options,
+            profile_output_options,
+            rtm_output_options,
+            rtm_output_gas_jacobians_options,
+            rtm_output_met_jacobians_options,
+            rtm_output_aerosol_jacobians_options,
+            rtm_output_surface_jacobians_options,
+            rtm_output_instrument_jacobians_options,
+            optical_property_diagnostics,
+        ],
+        name="diagnostics_tabs",
+        stylesheets=[
+            InlineStyleSheet(
+                css="""
+                    div.bk-tab {
+                        background-color: mistyrose;
+                        font-weight: bold;
+                        border-color: darkgray;
+                        color: mediumpurple;
+                    }
+                    div.bk-tab.bk-active {
+                        background-color: lightpink;
+                        border-color: mediumpurple;
+                        color: mediumpurple;
+                        font-weight: bold;
+                    }
+                    div.bk-header {
+                        border-bottom: 0px !important;
+                    }
+                    """
+            )
+        ],
+    )
+
+    return TabPanel(title="Diagnostics", child=diagnostics_tabs, name="diagnostics_panel")
 
 
 def inverse_diagnostics_options() -> bokeh.models.layouts.TabPanel:
     """
     Generate the layouts in the Inverse Diagnostics panel
     """
-    pass
+
+    general_fit_statistics_dict = {
+        "general_fit_statistics.cost_function": {"title": "Cost Function"},
+        "general_fit_statistics.chi_square": {"title": "Chi-squared"},
+        "general_fit_statistics.uncertainty_derivative": {"title": "Uncertainty Derivative"},
+        "general_fit_statistics.spectrum_rms": {"title": "Spectrum RMS"},
+        "general_fit_statistics.number_of_iterations": {"title": "Number of Iterations"},
+        "general_fit_statistics.fit_quality_flag": {"title": "Fit Quality Flag"},
+    }
+
+    general_fit_statistics_selectors = []
+    for k, v in general_fit_statistics_dict.items():
+        general_fit_statistics_selectors += [
+            build_model(
+                Select,
+                toml_control_path_list=[k],
+                name=k.replace(".", "_"),
+                title=v["title"],
+                is_bool=True,
+                options=["T", "F"],
+                width=200,
+            )
+        ]
+
+    general_fit_statistics_options = TabPanel(
+        title="General Fit Stats",
+        child=column(children=general_fit_statistics_selectors),
+        name="general_fit_statistics_options",
+    )
+
+    spectrum_dict = {
+        "spectrum.spectrum_residuals": {"title": "Spectrum Residuals"},
+        "spectrum.level1_spectrum": {"title": "Level1 Spectrum"},
+        "spectrum.level1_uncertainty": {"title": "Level1 Uncertainty"},
+    }
+
+    spectrum_selectors = []
+    for k, v in spectrum_dict.items():
+        spectrum_selectors += [
+            build_model(
+                Select,
+                toml_control_path_list=[k],
+                name=k.replace(".", "_"),
+                title=v["title"],
+                is_bool=True,
+                options=["T", "F"],
+                width=200,
+            )
+        ]
+    iteration_radiance = build_model(
+        Select,
+        toml_control_path_list=["spectrum.iteration_radiance"],
+        linked_model_list=["iteration_radiance_inputs"],
+        name="iteration_radiance",
+        title="Iteration Radiance",
+        is_bool=True,
+        options=["T", "F"],
+        width=200,
+    )
+    iteration_radiance_inputs = build_model(
+        NumericInput,
+        toml_control_path_list=["spectrum.iteration_radiance_max_iter"],
+        name="iteration_radiance_inputs",
+        title="Maximum # of Iterations",
+        width=200,
+        visible=control_data["spectrum"]["iteration_radiance"] == "T",
+    )
+
+    spectrum_options = TabPanel(
+        title="Spectrum",
+        child=column(children=spectrum_selectors + [iteration_radiance, iteration_radiance_inputs]),
+        name="spectrum_options",
+    )
+
+    total_state_vector_dict = {
+        "total_state_vector.averaging_kernel": {"title": "Averaging Kernel"},
+        "total_state_vector.posteriori_covariance": {"title": "Posterior Covariance"},
+        "total_state_vector.priori_covariance": {"title": "Prior Covariance"},
+        "total_state_vector.posteriori_state": {"title": "Posterior State"},
+        "total_state_vector.priori_state": {"title": "Prior State"},
+    }
+
+    total_state_vector_selectors = []
+    for k, v in total_state_vector_dict.items():
+        total_state_vector_selectors += [
+            build_model(
+                Select,
+                toml_control_path_list=[k],
+                name=k.replace(".", "_"),
+                title=v["title"],
+                is_bool=True,
+                options=["T", "F"],
+                width=200,
+            )
+        ]
+    iteration_state = build_model(
+        Select,
+        toml_control_path_list=["total_state_vector.iteration_state"],
+        linked_model_list=["iteration_state_inputs"],
+        name="iteration_state",
+        title="Iteration State",
+        is_bool=True,
+        options=["T", "F"],
+        width=200,
+    )
+    iteration_state_inputs = build_model(
+        NumericInput,
+        toml_control_path_list=["total_state_vector.iteration_state_max_iter"],
+        name="iteration_state_inputs",
+        title="Maximum # of Iterations",
+        width=200,
+        visible=control_data["total_state_vector"]["iteration_state"] == "T",
+    )
+
+    total_state_vector_options = TabPanel(
+        title="Total State Vector",
+        child=column(
+            children=total_state_vector_selectors + [iteration_state, iteration_state_inputs]
+        ),
+        name="total_state_vector_options",
+    )
+
+    sub_state_title_div = custom_div(text="Gas Absorption Posterior Covariance")
+    sub_state_vector_dict = {
+        "sub_state_vector_diagnostics.gas_absorption_post_covar.profile_mixing_ratio": {
+            "title": "Profile Mixing Ratio",
+            "species_builder": gas_checkboxes,
+        },
+        "sub_state_vector_diagnostics.gas_absorption_post_covar.column_avg_mixing_ratio": {
+            "title": "Column-Averaged Mixing Ratio",
+            "species_builder": gas_checkboxes,
+        },
+        "sub_state_vector_diagnostics.gas_absorption_post_covar.dry_profile_mixing_ratio": {
+            "title": "Profile Dry-Air Mixing Ratio",
+            "species_builder": gas_checkboxes,
+        },
+        "sub_state_vector_diagnostics.gas_absorption_post_covar.dry_column_avg_mixing_ratio": {
+            "title": "Column-Averaged Dry-Air Mixing Ratio",
+            "species_builder": gas_checkboxes,
+        },
+        "sub_state_vector_diagnostics.gas_absorption_post_covar.proxy_posteriori_uncert": {
+            "title": "Proxy Posterior Uncertainty",
+            "species_builder": gas_checkboxes,
+        },
+        "sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel": {
+            "title": "Column Averaging Kernel",
+            "species_builder": gas_checkboxes,
+        },
+    }
+
+    sub_state_vector_models = [
+        build_inv_diag_model(
+            title=v["title"], toml_control_path=k, species_builder=v["species_builder"]
+        )
+        for k, v in sub_state_vector_dict.items()
+    ]
+
+    sub_state_vector_options = TabPanel(
+        title="Sub State Vector",
+        child=column(children=[sub_state_title_div] + sub_state_vector_models),
+        name="sub_state_vector_options",
+    )
+
+    gain_matrix = build_model(
+        Select,
+        toml_control_path_list=["full_matrices_for_offline_err.gain_matrix"],
+        name="gain_matrix",
+        title="Gain Matrix",
+        is_bool=True,
+        options=["T", "F"],
+        width=200,
+    )
+
+    full_matrices_options = TabPanel(
+        title="Full Matrices", child=column(children=[gain_matrix]), name="full_matrices_options"
+    )
+
+    inverse_diagnostics_tabs = Tabs(
+        tabs=[
+            general_fit_statistics_options,
+            spectrum_options,
+            total_state_vector_options,
+            sub_state_vector_options,
+            full_matrices_options,
+        ],
+        name="inverse_diagnostics_tabs",
+        stylesheets=[
+            InlineStyleSheet(
+                css="""
+                    div.bk-tab {
+                        background-color: mistyrose;
+                        font-weight: bold;
+                        border-color: darkgray;
+                        color: mediumpurple;
+                    }
+                    div.bk-tab.bk-active {
+                        background-color: lightpink;
+                        border-color: mediumpurple;
+                        color: mediumpurple;
+                        font-weight: bold;
+                    }
+                    div.bk-header {
+                        border-bottom: 0px !important;
+                    }
+                    """
+            )
+        ],
+    )
+
+    return TabPanel(
+        title="Inverse Diagnostics",
+        child=inverse_diagnostics_tabs,
+        name="inverse_diagnostics_panel",
+    )
 
 
 def doc_maker():
@@ -2973,9 +3825,9 @@ def doc_maker():
                 "aerosol",
                 "cloud",
                 "state_vector",
-                # "optimizer",
-                # "diagnostics",
-                # "inverse_diagnostics",
+                "optimizer",
+                "diagnostics",
+                "inverse_diagnostics",
             ]
         ],
         stylesheets=[
@@ -3076,13 +3928,15 @@ def modify_doc(doc):
     doc_maker()
 
 
-def start_server(toml_file: str):
+def start_server(toml_file: str, jinja_template_file: str):
     """
     Launch the bokeh server and connect to it.
 
     toml_file (str): full path to the input .toml control file
     """
-    global control_data
+    global control_data, template_file
+
+    template_file = jinja_template_file
 
     # Having the data available globally from here
     # Then it does not get reloaded when we refresh the page
@@ -3106,11 +3960,17 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-t", "--toml-file", default="", help="full path to the input TOML file", required=True
+        "-t", "--toml-file", default="", help="Full path to the input TOML file", required=True
+    )
+    parser.add_argument(
+        "-j",
+        "--jinja-template",
+        default=os.path.join(app_path, "inputs", "template.control"),
+        help="Full path to the jinja template .control file",
     )
     args = parser.parse_args()
 
-    start_server(args.toml_file)
+    start_server(args.toml_file, args.jinja_template)
 
 
 if __name__ == "__main__":

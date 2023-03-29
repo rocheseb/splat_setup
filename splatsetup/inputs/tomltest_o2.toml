@@ -185,29 +185,10 @@ wavelength_substate = "T"
 [level1_options]
 viewing_geometry = "T"
 
-[profile_output_options]
-outputs = [ "Prior", "Posterior",]
-air_molecular_weight = [ "F", "F",]
-gravity = [ "F", "F",]
-relative_humidity = [ "F", "F",]
-air_partial_column = [ "T", "T",]
-total_aod = [ "F", "F",]
-cloud_n_pixels = [ "F", "F",]
-cloud_fraction_total = [ "F", "F",]
-total_cod = [ "F", "F",]
-
-[rtm_output_options]
-wavelength = [ "F", "T",]
-irradiance = [ "F", "F",]
-
-[optical_property_diagnostics]
-total_optical_depth = [ "F", "F",]
-brdf_kernel_amplitudes = [ "T", "T",]
-
 [general_fit_statistics]
 cost_function = "T"
 chi_square = "T"
-uncertatinty_derivative = "T"
+uncertainty_derivative = "T"
 spectrum_rms = "T"
 number_of_iterations = "T"
 fit_quality_flag = "T"
@@ -494,67 +475,116 @@ uncert_prcnt = [ 5, 5,]
 order = 1
 uncert_prcnt = [ 1, 1,]
 
-[profile_output_options.pressure_layer]
-edge = [ "F", "T",]
-mid = [ "F", "F",]
+[profile_output_options.air_molecular_weight]
+save_prior = "F"
+save_posterior = "F"
 
-[profile_output_options.temperature_layer]
-edge = [ "F", "F",]
-mid = [ "F", "F",]
+[profile_output_options.gravity]
+save_prior = "F"
+save_posterior = "F"
 
-[profile_output_options.altitude_layer]
-edge = [ "F", "F",]
-mid = [ "F", "F",]
+[profile_output_options.relative_humidity]
+save_prior = "F"
+save_posterior = "F"
+
+[profile_output_options.air_partial_column]
+save_prior = "T"
+save_posterior = "T"
+
+[profile_output_options.total_aod]
+save_prior = "F"
+save_posterior = "F"
+
+[profile_output_options.cloud_n_pixels]
+save_prior = "F"
+save_posterior = "F"
+
+[profile_output_options.cloud_fraction_total]
+save_prior = "F"
+save_posterior = "F"
+
+[profile_output_options.total_cod]
+save_prior = "F"
+save_posterior = "F"
 
 [profile_output_options.gas_partial_column]
-save = [ "T", "T",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "O2", "H2O", "PA1",]
+save = [ "T", "T",]
 
 [profile_output_options.gas_column_uncertainties]
-save = [ "T", "T",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "O2", "H2O", "PA1",]
+save = [ "T", "T",]
 
 [profile_output_options.gas_mixing_ratios]
-save = [ "T", "T",]
+save_prior = "T"
+save_posterior = "T"
 species = [ "O2", "H2O", "PA1",]
+save = [ "T", "T",]
 
 [profile_output_options.dry_gas_mixing_ratios]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 
 [profile_output_options.proxy_column_avg_mix_rat]
-save = [ "F", "F",]
+save_prior = "T"
+save_posterior = "T"
 species = [ "all",]
+save = [ "F", "F",]
 
 [profile_output_options.species_aod]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 
 [profile_output_options.species_profile_params]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 
 [profile_output_options.species_profile_par_derivs]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 
+[rtm_output_options.wavelength]
+save_prior = "F"
+save_posterior = "T"
+
+[rtm_output_options.irradiance]
+save_prior = "F"
+save_posterior = "F"
+
 [rtm_output_options.radiance]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
 [rtm_output_options.radiant_flux]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
 [rtm_output_options.direct_flux]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
-[rtm_output_options.gas_jacobians]
-scattering_weights = [ "F", "F",]
+[optical_property_diagnostics.total_optical_depth]
+save_prior = "F"
+save_posterior = "F"
+
+[optical_property_diagnostics.brdf_kernel_amplitudes]
+save_prior = "F"
+save_posterior = "F"
 
 [optical_property_diagnostics.gas_absorption_xsect]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 
 [fwd_inv_mode_options.o2_window]
@@ -819,73 +849,113 @@ tbd = 0.3
 order = 0
 uncert_prcnt = 100
 
+[profile_output_options.pressure.layer_edge]
+save_prior = "F"
+save_posterior = "T"
+
+[profile_output_options.pressure.layer_mid]
+save_prior = "F"
+save_posterior = "F"
+
+[profile_output_options.temperature.layer_edge]
+save_prior = "F"
+save_posterior = "F"
+
+[profile_output_options.temperature.layer_mid]
+save_prior = "F"
+save_posterior = "F"
+
+[profile_output_options.altitude.layer_edge]
+save_prior = "F"
+save_posterior = "F"
+
+[profile_output_options.altitude.layer_mid]
+save_prior = "F"
+save_posterior = "F"
+
+[rtm_output_options.gas_jacobians.scattering_weights]
+save_prior = "F"
+save_posterior = "F"
+
 [rtm_output_options.gas_jacobians.trace_gas]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 stokes = "F"
 
 [rtm_output_options.gas_jacobians.trace_gas_part_col]
-save = [ "F", "F",]
-species = [ "CH4", "CH4", "CO2",]
-lower_index = [ 1, 7, 1,]
-upper_index = [ 1, 8, 20,]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
 [rtm_output_options.gas_jacobians.air_mass_factors]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 
 [rtm_output_options.met_jacobians.temperature_profile]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
 [rtm_output_options.met_jacobians.temperature_shift]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
 [rtm_output_options.met_jacobians.surface_pressure]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
 [rtm_output_options.aerosol_jacobians.profile_aod]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = []
 stokes = "F"
 
 [rtm_output_options.aerosol_jacobians.profile_aod_par]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 stokes = "F"
 
 [rtm_output_options.aerosol_jacobians.profile_ssa]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 stokes = "F"
 
 [rtm_output_options.aerosol_jacobians.profile_ssa_par]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 stokes = "F"
 
 [rtm_output_options.aerosol_jacobians.opt_prop_params]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 species = [ "all",]
 stokes = "F"
 
 [rtm_output_options.surface_jacobians.brdf_kernel_factors]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
 [rtm_output_options.surface_jacobians.brdf_kernel_parameters]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
 [rtm_output_options.instrument_jacobians.isrf]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
 [rtm_output_options.instrument_jacobians.wavelength_shift]
-save = [ "F", "F",]
+save_prior = "F"
+save_posterior = "F"
 stokes = "F"
 
 [sub_state_vector_diagnostics.gas_absorption_post_covar.profile_mixing_ratio]
@@ -944,3 +1014,8 @@ n_par = 0
 par1 = 0.0
 par2 = 0.0
 par3 = 0.0
+
+[rtm_output_options.gas_jacobians.trace_gas_part_col.species]
+species = [ "CH4", "CH4", "CO2",]
+lower_index = [ 1, 7, 1,]
+upper_index = [ 1, 8, 20,]
