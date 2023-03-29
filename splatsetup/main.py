@@ -819,6 +819,8 @@ def file_options() -> bokeh.models.layouts.TabPanel:
             f"l2_surface_reflectance.band_inputs.{key}.file"
             for key in control_data["l2_surface_reflectance"]["band_inputs"]
         ],
+        linked_value_model_list=["l2_profile_support_data_file"]
+        + ["l2_surface_reflectance_inputs_table"],
         title="Input a priori Level2 file",
         name="l2_met_file",
     )
