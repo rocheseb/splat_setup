@@ -2,7 +2,7 @@
 
 This aims to breakup the long splat control files into a smaller file where only the inputs that most commonly change from run to run appear.
 
-Also include a [Bokeh](https://bokeh.org/) application to serve as a GUI for creating SPLAT control files
+Also includes a [Bokeh](https://bokeh.org/) application to serve as a GUI for creating SPLAT control files
 
 ## Installation
 
