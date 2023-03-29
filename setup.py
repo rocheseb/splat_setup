@@ -10,6 +10,7 @@ setup(
     license="MIT",
     packages=["splatsetup"],
     package_dir={"splatsetup": "splatsetup"},
+    package_data={"splatsetup": ["inputs/*.toml", "inputs/*.control"]},
     entry_points={
         "console_scripts": [
             "ctrlsetup=splatsetup.conttrol_setup:main",
@@ -19,6 +20,7 @@ setup(
         ],
     },
     zip_safe=False,
+    include_package_data=True,
     install_requires=["bokeh==3.1.0", "toml"],
     classifiers=[
         "Intended Audience :: Science/Research",
