@@ -31,6 +31,7 @@ from bokeh.models import (
 from bokeh.layouts import grid, column, row
 
 from splatsetup.toml_to_control import toml_to_control
+from splatsetup.control_setup import nested_dict_set, nested_dict_get
 
 app_path = os.path.dirname(__file__)
 
@@ -42,27 +43,6 @@ class UsageError(Exception):
     """
 
     pass
-
-
-def nested_dict_get(d: Dict, path: str, delimiter: str = ".") -> Any:
-    """
-    nested_dict_get(d,"path.to.key") returns d["path"]["to"]["key"]
-    """
-    key_list = path.split(delimiter)
-    for key in key_list:
-        d = d[key]
-    return d
-
-
-def nested_dict_set(d: Dict, path: str, val: Any, delimiter: str = ".") -> Any:
-    """
-    nested_dict_set(d,"path.to.key",val) does d["path"]["to"]["key"] = val
-    d is modified in place
-    """
-    key_list = path.split(delimiter)
-    for key in key_list[:-1]:
-        d = d.setdefault(key, {})
-    d[key_list[-1]] = val
 
 
 def nested_dict_del(d: Dict, path: str, delimiter: str = ".") -> Any:
