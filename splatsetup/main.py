@@ -35,6 +35,12 @@ from splatsetup.control_setup import nested_dict_set, nested_dict_get
 
 app_path = os.path.dirname(__file__)
 
+# Lists used to build checkboxgroups to select for different species
+gas_choices = ["N2", "O2", "Ar", "H2O", "CH4", "CO2", "PA1", "O2DG"]
+aerosol_choices = ["SU", "BC", "OC", "SF", "SC", "DU"]
+aerosol_param_choices = ["SU_alpha"]
+cloud_choices = ["CW", "CI"]
+
 
 # General utility functions
 class UsageError(Exception):
@@ -745,7 +751,7 @@ def gas_checkboxes(
     name: str,
     toml_control_path: str,
     default_active: Sequence[str] = [],
-    species_list: Sequence[str] = ["N2", "O2", "Ar", "H2O", "CH4", "CO2", "PA1", "O2DG"],
+    species_list: Sequence[str] = gas_choices,
     **kwargs: Any,
 ) -> bokeh.models.layouts.Column:
     """
@@ -759,7 +765,7 @@ def aerosol_checkboxes(
     name: str,
     toml_control_path: str,
     default_active: Sequence[str] = [],
-    species_list: Sequence[str] = ["SU", "BC", "OC", "SF", "SC", "DU"],
+    species_list: Sequence[str] = aerosol_choices,
     **kwargs: Any,
 ) -> bokeh.models.layouts.Column:
     """
@@ -773,7 +779,7 @@ def cloud_checkboxes(
     name: str,
     toml_control_path: str,
     default_active: Sequence[str] = [],
-    species_list: Sequence[str] = ["CW", "CI"],
+    species_list: Sequence[str] = cloud_choices,
     **kwargs: Any,
 ) -> bokeh.models.layouts.Column:
     """
@@ -794,6 +800,7 @@ def file_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["root_data_directory"],
         title="Root data directory",
         name="root_data_directory",
+        width=1200,
     )
 
     log_file = build_model(
@@ -801,6 +808,7 @@ def file_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["log_file"],
         title="Output Log file",
         name="log_file",
+        width=1200,
     )
 
     output_file = build_model(
@@ -808,6 +816,7 @@ def file_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["output_file"],
         title="Output Level2 file",
         name="output_file",
+        width=1200,
     )
     l1_file = build_model(
         TextInput,
@@ -835,6 +844,7 @@ def file_options() -> bokeh.models.layouts.TabPanel:
         ],
         title="Input Level1 file",
         name="l1_file",
+        width=1200,
     )
 
     l2_met_file = build_model(
@@ -848,6 +858,7 @@ def file_options() -> bokeh.models.layouts.TabPanel:
         + ["l2_surface_reflectance_inputs_table"],
         title="Input a priori Level2 file",
         name="l2_met_file",
+        width=1200,
     )
 
     info_div = Div(
@@ -1155,6 +1166,7 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
             toml_control_path_list=[f"l2_2d_support_data.{key}.file"],
             title=f"{nice_key} File",
             name=f"l2_2d_support_data_{key}_file",
+            width=1200,
         )
 
         select_inputs = column(
@@ -1191,6 +1203,7 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["l2_profile_support_data.file"],
         title="Level2 Meteorology File",
         name="l2_profile_support_data_file",
+        width=1200,
     )
 
     l2_profile_support_data_gases = gas_checkboxes(
@@ -1296,6 +1309,7 @@ def level1_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["clouds.file"],
         title="Aux Lambertian Cloud File",
         name="aux_lamb_clouds_file",
+        width=1200,
     )
 
     aux_lamb_clouds_inputs = column(
@@ -1491,6 +1505,7 @@ def window_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["common_options.solar_file"],
         title="Solar Reference (will look under {{root_data_directory}}/SolarSpectra/)",
         name="solar_reference_file",
+        width=1200,
     )
 
     rtm_at_l1_resolution = build_model(
@@ -1557,6 +1572,7 @@ def window_options() -> bokeh.models.layouts.TabPanel:
         title="Custom Grid Filename (will look under {{root_data_directory}}/../../)",
         visible=(control_data["common_options"]["use_custom_rtm_grid"] == "T")
         and (control_data["common_options"]["rtm_at_l1_resolution"] == "F"),
+        width=1200,
     )
 
     rtm_at_l1_resolution_inputs = column(
@@ -1596,6 +1612,7 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["apriori_file"],
         name="apriori_file",
         title="Level2 a priori filename (will look under {{root_data_directory}}/../../)",
+        width=1200,
     )
 
     sampling_method, _ = make_radiogroup(
@@ -1698,7 +1715,7 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
     aerosol_params = aerosol_checkboxes(
         name="aerosol_params",
         toml_control_path="aerosol_params",
-        species_list=["SU_ALPHA"],
+        species_list=aerosol_param_choices,
         default_active=control_data["aerosol_params"],
     )
 
@@ -1920,6 +1937,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         name="lambertian_surface_file",
         title="Lambertian Surface Filename (will look for the file under {{root_data_directory}}/ReflSpectra/)",
         visible=surface_reflectance_option_radiogroup.active == 1,
+        width=1200,
     )
 
     ler_use_constant_wavelength = build_model(
@@ -1952,6 +1970,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance_options.ler_climatology.ler_climatology_file"],
         name="ler_climatology_file",
         title="LER Climatology File (will look under {{root_data_directory}}/LER_climatologies/)",
+        width=1200,
     )
 
     ler_climatology_inputs = column(
@@ -1965,6 +1984,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance_options.modis_fa.modis_fa_file"],
         name="modis_fa_file",
         title="MODIS-FA Filename (will look under {{root_data_directory}}/BRDF_EOF/AlbSpec/)",
+        width=1200,
     )
 
     modis_fa_refl_clim_directory = build_model(
@@ -1972,6 +1992,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance_options.modis_fa.refl_clim_directory"],
         name="modis_fa_refl_clim_directory",
         title="Reflectance Climatology Directory (under {{root_data_directory}})",
+        width=1200,
     )
 
     modis_fa_do_isotropic = build_model(
@@ -2034,6 +2055,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         name="brdf_climatology_file",
         title="BRDF Climatology File",
         visible=surface_reflectance_option_radiogroup.active == 5,
+        width=1200,
     )
 
     surface_emissivity_option, surface_emissivity_option_radiogroup = make_radiogroup(
@@ -2076,6 +2098,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         name="emissivity_spectrum_file",
         title="Emissivity Spectrum Filename (will look under {{root_data_directory}}/Emissivity)",
         visible=surface_emissivity_option_radiogroup.active == 1,
+        width=1200,
     )
 
     emissivity_climatology_file = build_model(
@@ -2086,6 +2109,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         name="emissivity_climatology_file",
         title="Emissivity Climatology Filename (will look under {{root_data_directory}}/Emissivity)",
         visible=surface_emissivity_option_radiogroup.active == 2,
+        width=1200,
     )
 
     do_plant_fluorescence = build_model(
@@ -2106,6 +2130,7 @@ def surface_options() -> bokeh.models.layouts.TabPanel:
         name="chlorophyll_spectrum_file",
         title="Chlorophyll Spectrum Filename",
         visible=control_data["do_plant_fluorescence"] == "T",
+        width=1200,
     )
 
     surface_inputs = column(
@@ -2630,6 +2655,7 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path_list=["surface_reflectance.albedo_file"],
         name="albedo_file",
         title="Albedo File",
+        width=1200,
     )
 
     max_poly_order = build_model(
