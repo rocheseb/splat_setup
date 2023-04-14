@@ -318,7 +318,7 @@ Radiometric Offset              : <.............................................
    (T) Option Index             : {{radiometric_offset.option_index}}
        (1) Polynomial Scaling   :
            - Order              : {{radiometric_offset.polynomial_scaling.order}}
-           - Coeff Unc. (% Rad) : {{radiometric_offset.polynomial_scaling.uncert_prcnt}}
+           - Coeff Unc. (% Rad) : {% for elem in radiometric_offset.polynomial_scaling.uncert_prcnt %}{{elem}} {% endfor %}
        (2) Win. Polynomial Scl. :
            - Win. Order         : {%- for key,val in radiometric_offset.window_poly_scale.items() %}{{val.order}} {% endfor %}
 {%- for key,val in radiometric_offset.window_poly_scale.items() %}
@@ -329,7 +329,7 @@ Radiometric Scaling             : <.............................................
    (T) Option Index             : {{radiometric_scaling.option_index}}
        (1) Polynomial Scaling   :
            - Order              : {{radiometric_scaling.polynomial_scaling.order}}
-           - Coeff Unc. (%)     : {{radiometric_scaling.polynomial_scaling.uncert_prcnt}}
+           - Coeff Unc. (%)     : {% for elem in radiometric_scaling.polynomial_scaling.uncert_prcnt %}{{elem}} {% endfor %}
        (2) Win. Polynomial Scl. :
            - Win. Order         : {%- for key,val in radiometric_scaling.window_poly_scale.items() %}{{val.order}} {% endfor %}
 {%- for key,val in radiometric_scaling.window_poly_scale.items() %}
@@ -354,7 +354,7 @@ Wavelength Grid                 : <.............................................
    (T) Option Index             : {{wavelength_grid.option_index}}
        (1) Polynomial Scaling   :
            - Order              : {{wavelength_grid.polynomial_scaling.order}}
-           - Coeff Unc. (%)     : {{wavelength_grid.polynomial_scaling.uncert_prcnt}}
+           - Coeff Unc. (%)     : {% for elem in wavelength_grid.polynomial_scaling.uncert_prcnt %}{{elem}} {% endfor %}
        (2) Win. Polynomial Scl. :
            - Win. Order         : {%- for key,val in wavelength_grid.window_poly_scale.items() %}{{val.order}} {% endfor %}
 {%- for key,val in wavelength_grid.window_poly_scale.items() %}
@@ -395,11 +395,11 @@ Level 1 Output Options          :
    Viewing Geometry             : {{level1_options.viewing_geometry}}
 Profile Output Options         @: Prior Posterior
    Pressure (Layer Edge)       @: {{profile_output_options.pressure.layer_edge.save_prior}} {{profile_output_options.pressure.layer_edge.save_posterior}}
-   Pressure (Layer Mid)        @: {{profile_output_options.pressure.layer_mid_prior}} {{profile_output_options.pressure.layer_mid.save_posterior}}
+   Pressure (Layer Mid)        @: {{profile_output_options.pressure.layer_mid.save_prior}} {{profile_output_options.pressure.layer_mid.save_posterior}}
    Temperature (Layer Edge)    @: {{profile_output_options.temperature.layer_edge.save_prior}} {{profile_output_options.temperature.layer_edge.save_posterior}}
-   Temperature (Layer Mid)     @: {{profile_output_options.temperature.layer_mid_prior}} {{profile_output_options.temperature.layer_mid.save_posterior}}
+   Temperature (Layer Mid)     @: {{profile_output_options.temperature.layer_mid.save_prior}} {{profile_output_options.temperature.layer_mid.save_posterior}}
    Altitude (Layer Edge)       @: {{profile_output_options.altitude.layer_edge.save_prior}} {{profile_output_options.altitude.layer_edge.save_posterior}}
-   Altitude (Layer Mid)        @: {{profile_output_options.altitude.layer_mid_prior}} {{profile_output_options.altitude.layer_mid.save_posterior}}
+   Altitude (Layer Mid)        @: {{profile_output_options.altitude.layer_mid.save_prior}} {{profile_output_options.altitude.layer_mid.save_posterior}}
    Air Molecular Weight        @: {{profile_output_options.air_molecular_weight.save_prior}} {{profile_output_options.air_molecular_weight.save_posterior}}
    Gravity                     @: {{profile_output_options.gravity.save_prior}} {{profile_output_options.gravity.save_posterior}}
    RH                          @: {{profile_output_options.relative_humidity.save_prior}} {{profile_output_options.relative_humidity.save_posterior}}
@@ -483,6 +483,8 @@ Optical Property Diagnostics    :
        --> Species              : {% for elem in optical_property_diagnostics.gas_absorption_xsect.species %}{{elem}} {% endfor %}
    Total Optical Depth         @: {{optical_property_diagnostics.total_optical_depth.save_prior}} {{optical_property_diagnostics.total_optical_depth.save_posterior}}
    BRDF Kernel Amplitudes      @: {{optical_property_diagnostics.brdf_kernel_amplitudes.save_prior}} {{optical_property_diagnostics.brdf_kernel_amplitudes.save_posterior}}
+   BRDF Krn. Amp. @ Ref. Wvl   @: {{optical_property_diagnostics.brdf_kernel_amplitude_ref_wvl.save_prior}} {{optical_property_diagnostics.brdf_kernel_amplitude_ref_wvl.save_posterior}}
+       (T) --> Reference Wvl    : {{optical_property_diagnostics.brdf_kernel_amplitude_ref_wvl.reference_wavelength_nm}}
 --------------------------------+------------------------------------------------------
 %%% INVERSE DIAG OPTIONS %%%    :
 General Fit Statistics          :

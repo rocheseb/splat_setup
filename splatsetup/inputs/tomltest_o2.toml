@@ -578,6 +578,11 @@ save_posterior = "F"
 save_prior = "F"
 save_posterior = "F"
 
+[optical_property_diagnostics.brdf_kernel_amplitude_ref_wvl]
+save_prior = "T"
+save_posterior = "T"
+reference_wavelength_nm = 1285.5
+
 [optical_property_diagnostics.gas_absorption_xsect]
 save_prior = "F"
 save_posterior = "F"

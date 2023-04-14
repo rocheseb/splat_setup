@@ -62,6 +62,9 @@ wavelength_grid.polynomial_scaling.uncert_prcnt = [1, 1]
 wavelength_grid.window_poly_scale.window1.order = 0
 wavelength_grid.window_poly_scale.window1.uncert_prcnt = 100
 
+# albedo reference wavelength
+optical_property_diagnostics.brdf_kernel_amplitude_ref_wvl.reference_wavelength_nm = 1285.5
+
 # The defaults for diagnostics options in control_setup.toml are set for the CH4 + CO2 windows
 # Below we update fields for the O2 diagnostics
 

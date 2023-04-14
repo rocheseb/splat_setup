@@ -433,7 +433,11 @@ def build_diag_model(
         )
         for elem in ["prior", "posterior"]
     ]
-    if (species_builder is not None) or ("stokes" in toml_control_data):
+    if (
+        (species_builder is not None)
+        or ("stokes" in toml_control_data)
+        or ("reference_wavelength_nm" in toml_control_data)
+    ):
         # set the callbacks to show the dependent inputs
         for elem in selectors:
             elem.on_change(
@@ -487,6 +491,16 @@ def build_diag_model(
                 name=f"{name}_stokes",
                 title="Stokes",
                 width=100,
+            )
+        ]
+    if "reference_wavelength_nm" in toml_control_data:
+        selectors_inputs_children += [
+            build_model(
+                TextInput,
+                toml_control_path_list=[f"{toml_control_path}.reference_wavelength_nm"],
+                name=f"{name}_reference_wavelength",
+                title="Reference Wavelength",
+                width=200,
             )
         ]
 
@@ -2654,7 +2668,7 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         TextInput,
         toml_control_path_list=["surface_reflectance.albedo_file"],
         name="albedo_file",
-        title="Albedo File",
+        title="Albedo File (will look under {{root_data_directory}}/../../)",
         width=1200,
     )
 
@@ -3555,6 +3569,10 @@ def diagnostics_options() -> bokeh.models.layouts.TabPanel:
         },
         "optical_property_diagnostics.brdf_kernel_amplitudes": {
             "title": "BRDF Kernel Amplitudes",
+            "species_builder": None,
+        },
+        "optical_property_diagnostics.brdf_kernel_amplitude_ref_wvl": {
+            "title": "BRDF Kernel Amplitude at Reference Wavelength",
             "species_builder": None,
         },
         "optical_property_diagnostics.gas_absorption_xsect": {
