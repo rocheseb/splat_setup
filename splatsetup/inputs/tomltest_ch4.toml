@@ -131,6 +131,15 @@ n_subpixels = 2
 cloud_fractions = [ 0.8, 0.01,]
 cloud_pressure_hpa = [ 500.0, 200.0,]
 
+[aerosol]
+aod_species = []
+opt_prop_species = []
+[aerosol.aod_species_param.a]
+name = "SU"
+param_type = "SCALAR"
+overwrite_sigma = "T"
+sigma = 5
+
 [temperature]
 add_to_state_vector = "T"
 temperature_option = 2

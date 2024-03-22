@@ -278,10 +278,13 @@ Trace Gas                       : <.............................................
 {%- endfor %}
                                 : ###END_OF_LIST###
 Aerosol                         : <....................................................>
- - Profile Species AOD          : 
- - Profile Param. Species AOD ->: Name  ProfPar OverwriteUncert? (T)->NewCovar
+ - Profile Species AOD          : {% for elem in aerosol.aod_species %}{{elem}} {% endfor %}
+ - Profile Param. Species AOD ->: Name  Type OverwriteSigma Sigma
+{%- for key,val in aerosol.aod_species_param.items()%}
+                                : {{"{:>4} {} {} {}".format(val.name,val.param_type,val.overwrite_sigma,val.sigma)}}
+{%- endfor %}
                                 : ###END_OF_LIST###
- - Aerosol Opt Prop Pars.       :
+ - Aerosol Opt Prop Pars.       : {% for elem in aerosol.opt_prop_species %}{{elem}} {% endfor %}
 Temperature                     : <....................................................>
  - Add to state vector?         : {{temperature.add_to_state_vector}}
  - Temperature Option           : {{temperature.temperature_option}}

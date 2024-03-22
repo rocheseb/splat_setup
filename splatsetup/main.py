@@ -1755,6 +1755,7 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         toml_control_path="aerosol_params",
         species_list=aerosol_param_choices,
         default_active=control_data["aerosol_params"],
+        inline=True,
     )
 
     aod_from_profile_file = build_model(
@@ -2501,8 +2502,33 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
     )
 
     # Aerosols
-    # TODO: profile_species_aod
-    # TODO: profile_param_species_aod
+    aerosol_div = custom_div(text="Aerosol")
+    aod_species = aerosol_checkboxes(
+        name="aod_species",
+        toml_control_path="aerosol.aod_species",
+        species_list=aerosol_choices,
+        default_active=control_data["aerosol"]["aod_species"],
+        inline=True,
+    )
+    aod_species_inputs = build_table(
+        name="aod_species_param",
+        toml_control_path="aerosol.aod_species_param",
+        fixed_column_width=100,
+        title="Profile Param. Species AOD",
+        width=300,
+    )
+    aerosol_opt_prop_species = aerosol_checkboxes(
+        name="aerosol_opt_prop_species",
+        toml_control_path="aerosol.opt_prop_species",
+        species_list=aerosol_choices,
+        default_active=control_data["aerosol"]["opt_prop_species"],
+        inline=True,
+    )
+
+    aerosol_inputs = column(
+        children=[aerosol_div, aod_species, aod_species_inputs, aerosol_opt_prop_species],
+        name="state_vector_aerosol_inputs",
+    )
 
     # Temperature
     temperature_div = custom_div(text="Temperature")
@@ -3089,7 +3115,7 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
     state_vector_inputs = column(
         children=[
             trace_gas_inputs,
-            # aerosol_inputs, # TODO
+            aerosol_inputs,
             temperature_inputs,
             surface_pressure_inputs,
             surface_reflectance_inputs,

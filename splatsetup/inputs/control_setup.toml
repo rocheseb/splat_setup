@@ -732,6 +732,15 @@ cov_mat_type = "DIAGONAL"
 par1 = 1000.0
 par2 = ""
 
+["STATE VECTOR OPTIONS".aerosol]
+aod_species = []
+opt_prop_species = []
+["STATE VECTOR OPTIONS".aerosol.aod_species_param.a]
+name = "SU"
+param_type = "SCALAR"
+overwrite_sigma = "T"
+sigma = 5
+
 ["STATE VECTOR OPTIONS".temperature]
 add_to_state_vector = "T"
 # temperature_option: {1: Fit profile, 2: Fit shift}
