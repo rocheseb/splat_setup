@@ -53,7 +53,7 @@ setup(
     },
     zip_safe=False,
     include_package_data=True,
-    install_requires=["bokeh>=3.10.0", "toml"],
+    install_requires=["bokeh>=3.1.0", "toml"],
     classifiers=[
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",
