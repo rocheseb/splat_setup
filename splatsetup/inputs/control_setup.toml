@@ -20,7 +20,7 @@ isrf_file = "ch4_isrf_lut_20210722_xtrkflip.nc"
 
 # some fields in this default file are setup using the special keys "=l1_file", "=l2_met_file", and "=isrf_file"
 
-# some fields that depend on the spectral windows are only included as examples in comments (ctrl-f examples to find them), these will be filled in control_setup.py using window.toml
+# some fields that depend on the spectral windows are only included as examples in comments (ctrl-f example to find them), these will be filled in control_setup.py using window.toml
 
 ####################
 #################### Retrieval Options
@@ -847,6 +847,10 @@ uncert_prcnt = 1.0
 order = 0
 uncert_prcnt = 1.0 # uncertainty (%) on the order+1 parameters, same for all parameters
 
+["STATE VECTOR OPTIONS".init_wavelength_from_cross_correlation]
+init_wvl = "T"
+max_pixel_shift = 15 # maximum shift allowed in number of pixels between the measured and expected spectra
+
 ####################
 #################### Optimizer Options
 ####################
@@ -1182,3 +1186,10 @@ species = [ "CO2", "CH4",]
 
 ["INVERSE DIAG OPTIONS".full_matrices_for_offline_err]
 gain_matrix = "F"
+
+["INVERSE DIAG OPTIONS".error_analysis]
+do_error_analysis = "T"
+proxy_name = ["CO2",]
+gas_column_components = ["CH4", "CO2", "H2O",]
+print_outputs = ["F", "F", "F",]
+proxy_xgas_components = ["CH4",]

@@ -360,6 +360,9 @@ Wavelength Grid                 : <.............................................
 {%- for key,val in wavelength_grid.window_poly_scale.items() %}
             - Win. {{loop.index}} Uncert (%) : {{val.uncert_prcnt}}
 {%- endfor %}    
+                                : <....................................................>
+       Init. Wvl from X.Corr?   : {{init_wavelength_from_cross_correlation.init_wvl}}
+         (T) --> Max Pix. Shift : {{init_wavelength_from_cross_correlation.max_pixel_shift}}
 --------------------------------+------------------------------------------------------
 %%% OPTIMIZER OPTIONS %%%       :
 Maximum # Iterations            : {{max_iter}}
@@ -524,6 +527,12 @@ Sub State Vector Diagnostics    :
        --> Species              : {% for elem in sub_state_vector_diagnostics.gas_absorption_post_covar.column_averaging_kernel.species %}{{elem}} {% endfor %}
 Full matrices for offline Err.  :
    Gain matrix                  : {{full_matrices_for_offline_err.gain_matrix}}
+Error Analysis                  :
+     Do Error Analysis          : {{error_analysis.do_error_analysis}}
+     Proxy Name                 : {% for elem in error_analysis.proxy_name %}{{elem}} {% endfor %}
+     Gas Column Components      : {% for elem in error_analysis.gas_column_components %}{{elem}} {% endfor %}
+     Print Outputs              : {% for elem in error_analysis.print_outputs %}{{elem}} {% endfor %}
+     Proxy XGas Components      : {% for elem in error_analysis.proxy_xgas_components %}{{elem}} {% endfor %}
 --------------------------------+------------------------------------------------------
 END OF FILE                     :
 --------------------------------+------------------------------------------------------

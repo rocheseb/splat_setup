@@ -165,6 +165,10 @@ add_to_state_vector = "T"
 add_to_state_vector = "T"
 option_index = 1
 
+[init_wavelength_from_cross_correlation]
+init_wvl = "T"
+max_pixel_shift = 15
+
 [init_state]
 init_state_with_prev_fit = "T"
 filter_chi_squared = "F"
@@ -211,6 +215,13 @@ iteration_state_max_iter = 5
 
 [full_matrices_for_offline_err]
 gain_matrix = "F"
+
+[error_analysis]
+do_error_analysis = "T"
+proxy_name = []
+gas_column_components = ["O2", "H2O",]
+print_outputs = ["F", "F",]
+proxy_xgas_components = []
 
 [l2_2d_support_data.surface_altitude]
 use = "T"

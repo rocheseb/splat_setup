@@ -38,32 +38,36 @@ x_end = 200
 y_start = 1
 y_end = 1
 
-# Surface Reflectance State Vector Options
-surface_reflectance.polynomial_scaling.order = 1
-surface_reflectance.polynomial_scaling.uncert_prcnt = [5, 1]
-surface_reflectance.window_poly_scale.window1.order = 3
-surface_reflectance.window_poly_scale.window1.uncert_prcnt = 100
-
-# Radiometric Offset State Vector Options
-radiometric_offset.polynomial_scaling.order = 0
-radiometric_offset.polynomial_scaling.uncert_prcnt = [5]
-radiometric_offset.window_poly_scale.window1.order = 1
-radiometric_offset.window_poly_scale.window1.uncert_prcnt = 5
-
-# Radiometric Scaling State Vector Options
-radiometric_scaling.polynomial_scaling.order = 1
-radiometric_scaling.polynomial_scaling.uncert_prcnt = [5, 5]
-radiometric_scaling.window_poly_scale.window1.order = 1
-radiometric_scaling.window_poly_scale.window1.uncert_prcnt = 25
-
-# Wavelength Grid State Vector Options
-wavelength_grid.polynomial_scaling.order = 1
-wavelength_grid.polynomial_scaling.uncert_prcnt = [1, 1]
-wavelength_grid.window_poly_scale.window1.order = 0
-wavelength_grid.window_poly_scale.window1.uncert_prcnt = 100
-
 # albedo reference wavelength
 optical_property_diagnostics.brdf_kernel_amplitude_ref_wvl.reference_wavelength_nm = 1285.5
+
+# Surface Reflectance State Vector Options
+[surface_reflectance]
+polynomial_scaling.order = 1
+polynomial_scaling.uncert_prcnt = [5, 1]
+window_poly_scale.window1.order = 3
+window_poly_scale.window1.uncert_prcnt = 100
+
+# Radiometric Offset State Vector Options
+[radiometric_offset]
+polynomial_scaling.order = 0
+polynomial_scaling.uncert_prcnt = [5]
+window_poly_scale.window1.order = 1
+window_poly_scale.window1.uncert_prcnt = 5
+
+# Radiometric Scaling State Vector Options
+[radiometric_scaling]
+polynomial_scaling.order = 1
+polynomial_scaling.uncert_prcnt = [5, 5]
+window_poly_scale.window1.order = 1
+window_poly_scale.window1.uncert_prcnt = 25
+
+# Wavelength Grid State Vector Options
+[wavelength_grid]
+polynomial_scaling.order = 1
+polynomial_scaling.uncert_prcnt = [1, 1]
+window_poly_scale.window1.order = 0
+window_poly_scale.window1.uncert_prcnt = 100
 
 # The defaults for diagnostics options in control_setup.toml are set for the CH4 + CO2 windows
 # Below we update fields for the O2 diagnostics
@@ -111,4 +115,10 @@ species = [ "all",]
 save = "T"
 species = [ "CO2", "H2O",]
 
-
+# Error Analysis in Inverse Diag Options
+[error_analysis]
+do_error_analysis = "T"
+proxy_name = []
+gas_column_components = ["O2", "H2O",]
+print_outputs = ["F", "F",]
+proxy_xgas_components = []

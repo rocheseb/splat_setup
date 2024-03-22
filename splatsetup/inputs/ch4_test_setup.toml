@@ -33,34 +33,45 @@ y_start = 1
 y_end = 1
 
 # Surface Reflectance State Vector Options
-surface_reflectance.polynomial_scaling.order = 1
-surface_reflectance.polynomial_scaling.uncert_prcnt = [5, 1]
-surface_reflectance.window_poly_scale.window1.order = 3
-surface_reflectance.window_poly_scale.window1.uncert_prcnt = 100
-surface_reflectance.window_poly_scale.window2.order = 3
-surface_reflectance.window_poly_scale.window2.uncert_prcnt = 100
+[surface_reflectance]
+polynomial_scaling.order = 1
+polynomial_scaling.uncert_prcnt = [5, 1]
+window_poly_scale.window1.order = 3
+window_poly_scale.window1.uncert_prcnt = 100
+window_poly_scale.window2.order = 3
+window_poly_scale.window2.uncert_prcnt = 100
 
 # Radiometric Offset State Vector Options
-radiometric_offset.polynomial_scaling.order = 0
-radiometric_offset.polynomial_scaling.uncert_prcnt = [5]
-radiometric_offset.window_poly_scale.window1.order = 1
-radiometric_offset.window_poly_scale.window1.uncert_prcnt = 5
-radiometric_offset.window_poly_scale.window2.order = 1
-radiometric_offset.window_poly_scale.window2.uncert_prcnt = 5
+[radiometric_offset]
+polynomial_scaling.order = 0
+polynomial_scaling.uncert_prcnt = [5]
+window_poly_scale.window1.order = 1
+window_poly_scale.window1.uncert_prcnt = 5
+window_poly_scale.window2.order = 1
+window_poly_scale.window2.uncert_prcnt = 5
 
 # Radiometric Scaling State Vector Options
-radiometric_scaling.polynomial_scaling.order = 1
-radiometric_scaling.polynomial_scaling.uncert_prcnt = [5, 5]
-radiometric_scaling.window_poly_scale.window1.order = 1
-radiometric_scaling.window_poly_scale.window1.uncert_prcnt = 25
-radiometric_scaling.window_poly_scale.window2.order = 1
-radiometric_scaling.window_poly_scale.window2.uncert_prcnt = 25
+[radiometric_scaling]
+polynomial_scaling.order = 1
+polynomial_scaling.uncert_prcnt = [5, 5]
+window_poly_scale.window1.order = 1
+window_poly_scale.window1.uncert_prcnt = 25
+window_poly_scale.window2.order = 1
+window_poly_scale.window2.uncert_prcnt = 25
 
 # Wavelength Grid State Vector Options
-wavelength_grid.polynomial_scaling.order = 1
-wavelength_grid.polynomial_scaling.uncert_prcnt = [1, 1]
-wavelength_grid.window_poly_scale.window1.order = 0
-wavelength_grid.window_poly_scale.window1.uncert_prcnt = 100
-wavelength_grid.window_poly_scale.window2.order = 0
-wavelength_grid.window_poly_scale.window2.uncert_prcnt = 100
+[wavelength_grid]
+polynomial_scaling.order = 1
+polynomial_scaling.uncert_prcnt = [1, 1]
+window_poly_scale.window1.order = 0
+window_poly_scale.window1.uncert_prcnt = 100
+window_poly_scale.window2.order = 0
+window_poly_scale.window2.uncert_prcnt = 100
 
+# Error Analysis in Inverse Diag Options
+[error_analysis]
+do_error_analysis = "T"
+proxy_name = ["CO2",]
+gas_column_components = ["CH4", "CO2", "H2O",]
+print_outputs = ["F", "F", "F",]
+proxy_xgas_components = ["CH4",]

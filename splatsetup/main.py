@@ -201,16 +201,35 @@ def show_hide_inputs(attr, old, new, linked_model_name: str, mode: str = "T") ->
     linked_model.visible = new == mode
 
 
-def checkboxgroup_update(attr, old, new, model_name: str, toml_control_path: str) -> None:
+def checkboxgroup_update(
+    attr,
+    old,
+    new,
+    model_name: str,
+    toml_control_path: str,
+    as_bool: bool = False,
+    linked_outputs: Optional[str] = None,
+) -> None:
     """
     Update the control_data dictionary based on changes to a CheckboxGroup model
 
     model_name (str): name of the model that is triggering the update
     toml_control_path (str): dot-separated path to the variable to be updated in control_data
+    as_bool (bool): if True, returns "T" for checked boxes and "F" for unchecked boxes
     """
     global control_data
     boxes = curdoc().select_one({"name": model_name})
-    nested_dict_set(control_data, toml_control_path, [boxes.labels[i] for i in new])
+    if as_bool:
+        bool_result = ["T" if i in new else "F" for i, v in enumerate(boxes.labels)]
+        if linked_outputs is None:
+            nested_dict_set(control_data, toml_control_path, [bool_result[i] for i in new])
+        else:
+            linked_boxes = curdoc().select_one({"name": linked_outputs})
+            nested_dict_set(
+                control_data, toml_control_path, [bool_result[i] for i in linked_boxes.active]
+            )
+    else:
+        nested_dict_set(control_data, toml_control_path, [boxes.labels[i] for i in new])
 
 
 def radiogroup_update(attr, old, new, toml_control_path: str, one_based: bool = True) -> None:
@@ -734,6 +753,8 @@ def make_checkboxes(
     toml_control_path: str,
     labels: Sequence[str],
     default_active: Sequence[str] = [],
+    as_bool: bool = False,
+    linked_outputs: Optional[str] = None,
     **kwargs: Any,
 ) -> bokeh.models.layouts.Column:
     """
@@ -755,6 +776,8 @@ def make_checkboxes(
             checkboxgroup_update,
             model_name=f"{name}_checkboxes",
             toml_control_path=toml_control_path,
+            as_bool=as_bool,
+            linked_outputs=linked_outputs,
         ),
     )
 
@@ -1646,6 +1669,7 @@ def profile_options() -> bokeh.models.layouts.TabPanel:
         options=["T", "F"],
         name="assume_earth_for_gravity",
         width=200,
+        stylesheets=select_status_dict[control_data["assume_earth_for_gravity"]],
     )
 
     surface_gravity = build_model(
@@ -2225,6 +2249,7 @@ def gas_options() -> bokeh.models.layouts.TabPanel:
         options=["T", "F"],
         name="do_raman_scattering",
         width=200,
+        stylesheets=select_status_dict[control_data["do_raman_scattering"]],
     )
 
     rss_ref_temperature = build_model(
@@ -3030,6 +3055,37 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
         name="wavelength_grid_inputs",
     )
 
+    # initialize wavelengths from cross correlation
+    init_wvl_div = custom_div(text="Initialize Wavelengths")
+    init_wvl = build_model(
+        Select,
+        toml_control_path_list=["init_wavelength_from_cross_correlation.init_wvl"],
+        is_bool=True,
+        linked_model_list=["max_pixel_shift"],
+        title="Init wavelengths from cross correlation",
+        options=["T", "F"],
+        name="init_wvl",
+        width=200,
+    )
+
+    max_pixel_shift = build_model(
+        TextInput,
+        toml_control_path_list=["init_wavelength_from_cross_correlation.max_pixel_shift"],
+        name="max_pixel_shift",
+        title="Max. pixel shift (pixels)",
+        width=200,
+        visible=control_data["init_wavelength_from_cross_correlation"]["init_wvl"] == "T",
+    )
+
+    init_wavelength_inputs = column(
+        children=[
+            init_wvl_div,
+            init_wvl,
+            max_pixel_shift,
+        ],
+        name="init_wvl_inputs",
+    )
+
     state_vector_inputs = column(
         children=[
             trace_gas_inputs,
@@ -3042,6 +3098,7 @@ def state_vector_options() -> bokeh.models.layouts.TabPanel:
             eof_residuals_inputs,
             isrf_parameters_inputs,
             wavelength_grid_inputs,
+            init_wavelength_inputs,
         ],
         name="state_vector_inputs",
         width=1600,
@@ -3815,6 +3872,45 @@ def inverse_diagnostics_options() -> bokeh.models.layouts.TabPanel:
         title="Full Matrices", child=column(children=[gain_matrix]), name="full_matrices_options"
     )
 
+    # error analysis
+    error_analysis_models = [
+        gas_checkboxes(
+            name=i,
+            toml_control_path=f"error_analysis.{i}",
+            # fmt: off
+            default_active=control_data["error_analysis"][i] if i!="print_outputs" else [],
+            # fmt: on
+            inline=True,
+            as_bool=i == "print_outputs",
+            linked_outputs="gas_column_components_checkboxes",
+        )
+        for i in ["proxy_name", "gas_column_components", "print_outputs", "proxy_xgas_components"]
+    ]
+
+    error_analysis_inputs = column(
+        children=error_analysis_models,
+        name="error_analysis_inputs",
+        visible=control_data["error_analysis"]["do_error_analysis"] == "T",
+    )
+
+    do_error_analysis = build_model(
+        Select,
+        toml_control_path_list=["error_analysis.do_error_analysis"],
+        name="do_error_analysis",
+        title="Do Error Analysis",
+        linked_model_list=["error_analysis_inputs"],
+        is_bool=True,
+        options=["T", "F"],
+        width=200,
+        stylesheets=select_status_dict[control_data["error_analysis"]["do_error_analysis"]],
+    )
+
+    error_analysis_options = TabPanel(
+        title="Error Analysis",
+        child=column(children=[do_error_analysis, error_analysis_inputs]),
+        name="error_analysis_options",
+    )
+
     inverse_diagnostics_tabs = Tabs(
         tabs=[
             general_fit_statistics_options,
@@ -3822,6 +3918,7 @@ def inverse_diagnostics_options() -> bokeh.models.layouts.TabPanel:
             total_state_vector_options,
             sub_state_vector_options,
             full_matrices_options,
+            error_analysis_options,
         ],
         name="inverse_diagnostics_tabs",
         stylesheets=[
